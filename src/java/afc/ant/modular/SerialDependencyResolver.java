@@ -47,14 +47,11 @@ public class SerialDependencyResolver implements DependencyResolver
         nodes = buildNodeGraph(rootModules);
     }
     
-    private static Node resolveNode(final ModuleInfo module, final IdentityHashMap<ModuleInfo, Node> registry)
+    private static void registerNode(final Node node, final IdentityHashMap<ModuleInfo, Node> registry)
     {
-        Node node = registry.get(module);
-        if (node == null) {
-            node = new Node(module);
-            registry.put(module, node);
+        if (registry.put(node.module, node) != null) {
+            throw new IllegalStateException("Node already exists.");
         }
-        return node;
     }
     
     // TODO prevent repeated calls of #getFreeModule without calling moduleProcessed
@@ -106,22 +103,33 @@ public class SerialDependencyResolver implements DependencyResolver
         private final HashSet<Node> dependencyOf;
     }
     
-    private static HashSet<Node> buildNodeGraph(final Collection<ModuleInfo> modules)
+    private static HashSet<Node> buildNodeGraph(final Collection<ModuleInfo> rootModules)
     {
         final IdentityHashMap<ModuleInfo, Node> registry = new IdentityHashMap<ModuleInfo, Node>();
         final HashSet<Node> nodeGraph = new HashSet<Node>();
-        // TODO check that there are no missing and/or duplicate modules and all nodes are initialised fully
-        for (final ModuleInfo module : modules) {
-            final Node node = resolveNode(module, registry);
-            // linking nodes in the same way as modules are linked
-            for (final ModuleInfo dep : module.getDependencies()) {
-                final Node depNode = resolveNode(dep, registry);
-                node.dependencies.add(depNode);
-                depNode.dependencyOf.add(node);
-            }
-            nodeGraph.add(node);
+        for (final ModuleInfo module : rootModules) {
+            addNodeDeep(module, nodeGraph, registry);
         }
         return nodeGraph;
+    }
+    
+    private static void addNodeDeep(final ModuleInfo module, final HashSet<Node> nodeGraph,
+            final IdentityHashMap<ModuleInfo, Node> registry)
+    {
+        if (registry.containsKey(module)) {
+            return; // the module is already processed 
+        }
+        final Node node = new Node(module);
+        registerNode(node, registry);
+        // linking nodes in the same way as modules are linked
+        for (final ModuleInfo dep : module.getDependencies()) {
+            addNodeDeep(dep, nodeGraph, registry);
+            final Node depNode = registry.get(dep);
+            assert depNode != null;
+            node.dependencies.add(depNode);
+            depNode.dependencyOf.add(node);
+        }
+        nodeGraph.add(node);
     }
     
     private static void ensureNoLoops(final Collection<ModuleInfo> modules) throws CyclicDependenciesDetectedException

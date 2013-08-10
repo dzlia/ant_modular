@@ -341,6 +341,59 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         }
     }
     
+    public void testNonRootModulesInDependencies_NoLoops() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        final ModuleInfo module5 = new ModuleInfo("flux");
+        module3.addDependency(module1);
+        module3.addDependency(module2);
+        module2.addDependency(module4);
+        module4.addDependency(module5);
+        
+        
+        resolver.init(Arrays.asList(module1, module3, module4));
+
+        final ArrayList<ModuleInfo> order = flushModules(resolver, 5);
+        assertTrue(order.contains(module1));
+        assertTrue(order.contains(module2));
+        assertTrue(order.contains(module3));
+        assertTrue(order.contains(module4));
+        assertTrue(order.contains(module5));
+        assertTrue(order.indexOf(module1) < order.indexOf(module3));
+        assertTrue(order.indexOf(module2) < order.indexOf(module3));
+        assertTrue(order.indexOf(module4) < order.indexOf(module2));
+        assertTrue(order.indexOf(module5) < order.indexOf(module4));
+    }
+    
+    public void testNonRootModulesInDependencies_Loop() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        final ModuleInfo module5 = new ModuleInfo("flux");
+        module3.addDependency(module1);
+        module3.addDependency(module2);
+        module2.addDependency(module4);
+        module4.addDependency(module5);
+        module5.addDependency(module2);
+        
+        
+        try {
+            resolver.init(Arrays.asList(module1, module2, module3, module4));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->bar->quux->flux->]") + '|' +
+                    Pattern.quote("[->flux->bar->quux->]") + '|' +
+                    Pattern.quote("[->quux->flux->bar->]") + ")\\.", ex.getMessage()));
+        }
+    }
+    
     private static ArrayList<ModuleInfo> flushModules(final SerialDependencyResolver resolver, final int moduleCount)
     {
         final ArrayList<ModuleInfo> result = new ArrayList<ModuleInfo>();
