@@ -57,4 +57,26 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
             assertEquals("rootModules contains null element.", ex.getMessage());
         }
     }
+    
+    public void testUseNonInitialisedResolver_GetFreeModule()
+    {
+        try {
+            resolver.getFreeModule();
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("Resolver is not initialised.", ex.getMessage());
+        }
+    }
+    
+    public void testUseNonInitialisedResolver_ModuleProcessed()
+    {
+        try {
+            resolver.moduleProcessed(new ModuleInfo("foo"));
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("Resolver is not initialised.", ex.getMessage());
+        }
+    }
 }

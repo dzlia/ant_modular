@@ -51,6 +51,7 @@ public class SerialDependencyResolver implements DependencyResolver
     // returns a module that does not have dependencies
     public ModuleInfo getFreeModule()
     {
+        ensureInitialised();
         if (nodes.isEmpty()) {
             return null;
         }
@@ -64,6 +65,7 @@ public class SerialDependencyResolver implements DependencyResolver
     
     public void moduleProcessed(final ModuleInfo module)
     {
+        ensureInitialised();
         if (module == null) {
             throw new NullPointerException("module");
         }
@@ -80,6 +82,13 @@ public class SerialDependencyResolver implements DependencyResolver
         }
         
         throw new IllegalArgumentException("Alien module is passed.");
+    }
+    
+    private void ensureInitialised()
+    {
+        if (nodes == null) {
+            throw new IllegalStateException("Resolver is not initialised.");
+        }
     }
     
     private static class Node
