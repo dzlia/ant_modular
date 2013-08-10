@@ -22,6 +22,33 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import java.util.List;
+
 public class CyclicDependenciesDetectedException extends Exception
 {
+    private final List<ModuleInfo> loop;
+    
+    public CyclicDependenciesDetectedException(final List<ModuleInfo> loop)
+    {
+        super(errorMessage(loop));
+        this.loop = loop;
+    }
+    
+    public List<ModuleInfo> getLoop()
+    {
+        return loop;
+    }
+    
+    private static String errorMessage(final List<ModuleInfo> loop)
+    {
+        final StringBuilder buf = new StringBuilder("Cyclic dependencies detected: [");
+        if (!loop.isEmpty()) {
+            buf.append("->");
+            for (final ModuleInfo module : loop) {
+                buf.append(module.getPath()).append("->");
+            }
+        }
+        buf.append("].");
+        return buf.toString();
+    }
 }
