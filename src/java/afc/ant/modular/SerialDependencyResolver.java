@@ -149,8 +149,8 @@ public class SerialDependencyResolver implements DependencyResolver
         /* There are cycling dependencies detected. Obtaining here a single loop to report to the invoker.
          * The following holds:
          *  - each node has at least a single dependency
-         *  - walking in any direction from any starting node within the graph will lead to a loop
-         *  - the loop detected does not necessarily ends up with the starting node, some leading nodes could be truncated
+         *  - walking in any direction from any starting node within the graph will lead to a loop detected
+         *  - the loop detected does not necessarily end with the starting node, some leading nodes could be truncated
          */
         final LinkedHashSet<Node> path = new LinkedHashSet<Node>();
         for (Node node = anyNode(graph);; node = anyNode(node.dependencies)) {
