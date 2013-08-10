@@ -33,13 +33,18 @@ public class SerialDependencyResolver implements DependencyResolver
 {
     private HashSet<Node> nodes;
     
-    public void init(final Collection<ModuleInfo> modules) throws CyclicDependenciesDetectedException
+    public void init(final Collection<ModuleInfo> rootModules) throws CyclicDependenciesDetectedException
     {
-        if (modules == null) {
-            throw new NullPointerException("modules");
+        if (rootModules == null) {
+            throw new NullPointerException("rootModules");
         }
-        ensureNoLoops(modules);
-        nodes = buildNodeGraph(modules);
+        for (final ModuleInfo module : rootModules) {
+            if (module == null) {
+                throw new NullPointerException("rootModules contains null element.");
+            }
+        }
+        ensureNoLoops(rootModules);
+        nodes = buildNodeGraph(rootModules);
     }
     
     private static Node resolveNode(final ModuleInfo module, final IdentityHashMap<ModuleInfo, Node> registry)
@@ -107,9 +112,6 @@ public class SerialDependencyResolver implements DependencyResolver
         final HashSet<Node> nodeGraph = new HashSet<Node>();
         // TODO check that there are no missing and/or duplicate modules and all nodes are initialised fully
         for (final ModuleInfo module : modules) {
-            if (module == null) {
-                throw new NullPointerException("modules contains null elements.");
-            }
             final Node node = resolveNode(module, registry);
             // linking nodes in the same way as modules are linked
             for (final ModuleInfo dep : module.getDependencies()) {
@@ -124,6 +126,7 @@ public class SerialDependencyResolver implements DependencyResolver
     
     private static void ensureNoLoops(final Collection<ModuleInfo> modules) throws CyclicDependenciesDetectedException
     {
+        // TODO re-write the code to re-use node graph created for dependency resolution
         final HashSet<Node> graph = buildNodeGraph(modules);
         /* Remove nodes without dependencies from the graph while this is possible.
            Non-empty resulting graph means there are loops in there. */
