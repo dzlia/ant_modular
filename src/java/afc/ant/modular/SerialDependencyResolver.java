@@ -53,18 +53,30 @@ public class SerialDependencyResolver implements DependencyResolver
     public ModuleInfo getFreeModule()
     {
         ensureInitialised();
-        if (nodes.isEmpty()) {
-            return null;
-        }
         if (moduleAcquired != null) {
             throw new IllegalStateException("#getFreeModule() is called when there is a module being processed.");
         }
-        for (final Node node : nodes) {
+        if (nodes.isEmpty()) {
+            return null;
+        }
+        final Iterator<Node> i = nodes.iterator();
+        do {
+            final Node node = i.next();
             if (node.dependencies.size() == 0) {
                 moduleAcquired = node.module;
+                
+                /* Removing node from the graph here instead of #moduleProcessed to avoid another
+                 * search for the node when #moduleProcessed is invoked. All consistency and input validity
+                 * checks are performed so that the caller must follow the correct workflow.
+                 */
+                for (final Node depOf : node.dependencyOf) {
+                    depOf.dependencies.remove(node);
+                }
+                i.remove(); // means nodes.remove(node);
+                
                 return node.module;
             }
-        }
+        } while (i.hasNext());
         throw new IllegalStateException(); // cyclic dependency detection does not work properly.
     }
     
@@ -81,20 +93,7 @@ public class SerialDependencyResolver implements DependencyResolver
             throw new IllegalArgumentException(MessageFormat.format(
                     "The module ''{0}'' is not being processed.", module.getPath()));
         }
-        
-        // TODO improve performance
-        for (final Node node : nodes) {
-            if (node.module == module) {
-                for (final Node depOf : node.dependencyOf) {
-                    depOf.dependencies.remove(node);
-                }
-                nodes.remove(node);
-                moduleAcquired = null;
-                return;
-            }
-        }
-        
-        throw new IllegalArgumentException(MessageFormat.format("The module ''{0}'' is not being processed.", module.getPath()));
+        moduleAcquired = null;
     }
     
     private void ensureInitialised()
