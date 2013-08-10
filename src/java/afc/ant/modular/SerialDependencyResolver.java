@@ -22,9 +22,12 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 public class SerialDependencyResolver implements DependencyResolver
 {
@@ -35,24 +38,8 @@ public class SerialDependencyResolver implements DependencyResolver
         if (modules == null) {
             throw new NullPointerException("modules");
         }
-        final IdentityHashMap<ModuleInfo, Node> registry = new IdentityHashMap<ModuleInfo, Node>();
-        nodes = new HashSet<Node>();
-        int i = 0;
-        // TODO check that there are no missing modules and all nodes are initialised fully
-        for (final ModuleInfo module : modules) {
-            if (module == null) {
-                throw new NullPointerException("modules contains null elements.");
-            }
-            final Node node = resolveNode(module, registry);
-            // linking nodes in the same way as modules are linked
-            for (final ModuleInfo dep : module.getDependencies()) {
-                final Node depNode = resolveNode(dep, registry);
-                node.dependencies.add(depNode);
-                depNode.dependencyOf.add(node);
-            }
-            nodes.add(node);
-        }
-        // TODO add cyclic dependency checking
+        ensureNoLoops(modules);
+        nodes = buildNodeGraph(modules);
     }
     
     private static Node resolveNode(final ModuleInfo module, final IdentityHashMap<ModuleInfo, Node> registry)
@@ -112,5 +99,81 @@ public class SerialDependencyResolver implements DependencyResolver
         private final ModuleInfo module;
         private final HashSet<Node> dependencies;
         private final HashSet<Node> dependencyOf;
+    }
+    
+    private static HashSet<Node> buildNodeGraph(final Collection<ModuleInfo> modules)
+    {
+        final IdentityHashMap<ModuleInfo, Node> registry = new IdentityHashMap<ModuleInfo, Node>();
+        final HashSet<Node> nodeGraph = new HashSet<Node>();
+        // TODO check that there are no missing and/or duplicate modules and all nodes are initialised fully
+        for (final ModuleInfo module : modules) {
+            if (module == null) {
+                throw new NullPointerException("modules contains null elements.");
+            }
+            final Node node = resolveNode(module, registry);
+            // linking nodes in the same way as modules are linked
+            for (final ModuleInfo dep : module.getDependencies()) {
+                final Node depNode = resolveNode(dep, registry);
+                node.dependencies.add(depNode);
+                depNode.dependencyOf.add(node);
+            }
+            nodeGraph.add(node);
+        }
+        return nodeGraph;
+    }
+    
+    private static void ensureNoLoops(final Collection<ModuleInfo> modules) throws CyclicDependenciesDetectedException
+    {
+        final HashSet<Node> graph = buildNodeGraph(modules);
+        /* Remove nodes without dependencies from the graph while this is possible.
+           Non-empty resulting graph means there are loops in there. */
+        boolean stuck;
+        do {
+            stuck = true;
+            for (final Iterator<Node> i = graph.iterator(); i.hasNext();) {
+                final Node node = i.next();
+                if (node.dependencies.size() == 0) {
+                    for (final Node depOf : node.dependencyOf) {
+                        depOf.dependencies.remove(node);
+                    }
+                    i.remove(); // means graph.remove(node);
+                    stuck = false;
+                }
+            }
+        } while (!stuck);
+        
+        if (graph.isEmpty()) {
+            return;
+        }
+        
+        /* There are cycling dependencies detected. Obtaining here a single loop to report to the invoker.
+         * The following holds:
+         *  - each node has at least a single dependency
+         *  - walking in any direction from any starting node within the graph will lead to a loop
+         *  - the loop detected does not necessarily ends up with the starting node, some leading nodes could be truncated
+         */
+        final LinkedHashSet<Node> path = new LinkedHashSet<Node>();
+        for (Node node = anyNode(graph);; node = anyNode(node.dependencies)) {
+            if (!path.add(node)) {
+                int loopSize = path.size();
+                final Iterator<Node> it = path.iterator();
+                while (it.next() != node) {
+                    // skipping all leading nodes that are outside the loop
+                    --loopSize;
+                }
+                final ArrayList<ModuleInfo> loop = new ArrayList<ModuleInfo>(loopSize);
+                loop.add(node.module);
+                while (it.hasNext()) {
+                    loop.add(it.next().module);
+                }
+                assert loopSize == loop.size();
+                throw new CyclicDependenciesDetectedException(loop);
+            }
+        }
+    }
+    
+    private static Node anyNode(final HashSet<Node> nodes)
+    {
+        return nodes.iterator().next();
     }
 }

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
@@ -211,6 +212,133 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         assertTrue(order.contains(module4));
         assertTrue(order.indexOf(module1) < order.indexOf(module3));
         assertTrue(order.indexOf(module2) < order.indexOf(module3));
+    }
+    
+    public void testLoop_TwoModules()
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module1.addDependency(module2);
+        module2.addDependency(module1);
+        
+        try {
+            resolver.init(Arrays.asList(module1, module2));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->foo->bar->]") + '|' + Pattern.quote("[->bar->foo->]") + ")\\.", ex.getMessage()));
+        }
+    }
+    
+    public void testLoop_ThreeModules_AllInLoop()
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        module1.addDependency(module3);
+        module3.addDependency(module2);
+        module2.addDependency(module1);
+        
+        try {
+            resolver.init(Arrays.asList(module1, module2, module3));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->foo->baz->bar->]") + '|' +
+                    Pattern.quote("[->baz->bar->foo->]") + '|' +
+                    Pattern.quote("[->bar->foo->baz->]") + ")\\.", ex.getMessage()));
+        }
+    }
+    
+    public void testLoop_ThreeModules_TwoInLoop()
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        module1.addDependency(module3);
+        module3.addDependency(module1);
+        
+        try {
+            resolver.init(Arrays.asList(module1, module2, module3));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->foo->baz->]") + '|' +
+                    Pattern.quote("[->baz->foo->]") + ")\\.", ex.getMessage()));
+        }
+    }
+    
+    public void testLoop_FourModules_AllInLoop()
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        module1.addDependency(module3);
+        module3.addDependency(module2);
+        module2.addDependency(module4);
+        module4.addDependency(module1);
+        
+        try {
+            resolver.init(Arrays.asList(module1, module2, module3, module4));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->foo->baz->bar->quux->]") + '|' +
+                    Pattern.quote("[->quux->foo->baz->bar->]") + '|' +
+                    Pattern.quote("[->bar->quux->foo->baz->]") + '|' +
+                    Pattern.quote("[->baz->bar->quux->foo->]") + ")\\.", ex.getMessage()));
+        }
+    }
+    
+    public void testLoop_FourModules_ThreeInLoop()
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        module1.addDependency(module3);
+        module3.addDependency(module2);
+        module2.addDependency(module1);
+        
+        try {
+            resolver.init(Arrays.asList(module1, module2, module3, module4));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->foo->baz->bar->]") + '|' +
+                    Pattern.quote("[->bar->foo->baz->]") + '|' +
+                    Pattern.quote("[->baz->bar->foo->]") + ")\\.", ex.getMessage()));
+        }
+    }
+    
+    public void testLoop_FourModules_TwoLoops()
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        module1.addDependency(module3);
+        module3.addDependency(module1);
+        module2.addDependency(module4);
+        module4.addDependency(module2);
+        
+        try {
+            resolver.init(Arrays.asList(module1, module2, module3, module4));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->foo->baz]") + '|' +
+                    Pattern.quote("[->baz->foo->]") + '|' +
+                    Pattern.quote("[->bar->quux->]") + '|' +
+                    Pattern.quote("[->quux->bar->]") + ")\\.", ex.getMessage()));
+        }
     }
     
     private static ArrayList<ModuleInfo> flushModules(final SerialDependencyResolver resolver, final int moduleCount)
