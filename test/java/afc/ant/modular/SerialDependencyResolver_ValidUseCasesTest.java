@@ -334,7 +334,7 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         }
         catch (CyclicDependenciesDetectedException ex) {
             assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
-                    Pattern.quote("[->foo->baz]") + '|' +
+                    Pattern.quote("[->foo->baz->]") + '|' +
                     Pattern.quote("[->baz->foo->]") + '|' +
                     Pattern.quote("[->bar->quux->]") + '|' +
                     Pattern.quote("[->quux->bar->]") + ")\\.", ex.getMessage()));
