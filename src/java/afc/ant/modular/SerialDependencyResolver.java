@@ -47,13 +47,6 @@ public class SerialDependencyResolver implements DependencyResolver
         nodes = buildNodeGraph(rootModules);
     }
     
-    private static void registerNode(final Node node, final IdentityHashMap<ModuleInfo, Node> registry)
-    {
-        if (registry.put(node.module, node) != null) {
-            throw new IllegalStateException("Node already exists.");
-        }
-    }
-    
     // TODO prevent repeated calls of #getFreeModule without calling moduleProcessed
     // returns a module that does not have dependencies
     public ModuleInfo getFreeModule()
@@ -119,8 +112,12 @@ public class SerialDependencyResolver implements DependencyResolver
         if (registry.containsKey(module)) {
             return; // the module is already processed 
         }
+        
         final Node node = new Node(module);
-        registerNode(node, registry);
+        if (registry.put(node.module, node) != null) { // registering node assuming that each node could be registered only once.
+            throw new IllegalStateException("Node already exists.");
+        }
+        
         // linking nodes in the same way as modules are linked
         for (final ModuleInfo dep : module.getDependencies()) {
             addNodeDeep(dep, nodeGraph, registry);
