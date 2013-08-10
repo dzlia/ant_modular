@@ -71,6 +71,14 @@ public class ModuleInfo
         this.dependencies.addAll(dependencies);
     }
     
+    /**
+     * <p>Returns a set of modules which this module depends upon. The {@code ModuleInfo} objects returned are
+     * necessarily non-{@code null}. The set returned is unmodifiable. In addition, any further modification of
+     * this module's dependencies by means of the <tt>{@link #addDependency(ModuleInfo)}</tt> and
+     * <tt>{@link #setDependencies(Collection)}</tt> operations is immediately visible in the set returned.</p>
+     * 
+     * @return an unmodifiable set of this module's dependency modules.
+     */
     public Set<ModuleInfo> getDependencies()
     {
         return dependenciesView;
