@@ -67,7 +67,6 @@ public class ModuleInfo
                 throw new NullPointerException("dependencies contains null dependency.");
             }
         }
-        // TODO check each dependency to be non-null
         this.dependencies.clear();
         this.dependencies.addAll(dependencies);
     }
