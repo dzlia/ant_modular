@@ -32,6 +32,7 @@ import java.util.LinkedHashSet;
 public class SerialDependencyResolver implements DependencyResolver
 {
     private HashSet<Node> nodes;
+    private boolean moduleAcquired;
     
     public void init(final Collection<ModuleInfo> rootModules) throws CyclicDependenciesDetectedException
     {
@@ -47,7 +48,6 @@ public class SerialDependencyResolver implements DependencyResolver
         nodes = buildNodeGraph(rootModules);
     }
     
-    // TODO prevent repeated calls of #getFreeModule without calling moduleProcessed
     // returns a module that does not have dependencies
     public ModuleInfo getFreeModule()
     {
@@ -55,8 +55,12 @@ public class SerialDependencyResolver implements DependencyResolver
         if (nodes.isEmpty()) {
             return null;
         }
+        if (moduleAcquired) {
+            throw new IllegalStateException("#getFreeModule() is called when there is a module being processed.");
+        }
         for (final Node node : nodes) {
             if (node.dependencies.size() == 0) {
+                moduleAcquired = true;
                 return node.module;
             }
         }
@@ -77,6 +81,7 @@ public class SerialDependencyResolver implements DependencyResolver
                     depOf.dependencies.remove(node);
                 }
                 nodes.remove(node);
+                moduleAcquired = false;
                 return;
             }
         }

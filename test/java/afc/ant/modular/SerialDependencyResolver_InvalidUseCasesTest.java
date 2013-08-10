@@ -23,6 +23,7 @@
 package afc.ant.modular;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import junit.framework.TestCase;
 
@@ -78,5 +79,52 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
         catch (IllegalStateException ex) {
             assertEquals("Resolver is not initialised.", ex.getMessage());
         }
+    }
+    
+    public void testRepeatedCallGetFreeModule_ThereAreUnprocessedModules_NonLastModuleIsBeingProcessed() throws Exception
+    {
+        resolver.init(Arrays.asList(new ModuleInfo("foo"), new ModuleInfo("bar")));
+        resolver.getFreeModule();
+        
+        try {
+            resolver.getFreeModule();
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("#getFreeModule() is called when there is a module being processed.", ex.getMessage());
+        }
+    }
+    
+    public void testRepeatedCallGetFreeModule_ThereAreUnprocessedModules_LastModuleIsBeingProcessed() throws Exception
+    {
+        resolver.init(Arrays.asList(new ModuleInfo("foo"), new ModuleInfo("bar")));
+        resolver.moduleProcessed(resolver.getFreeModule());
+        resolver.getFreeModule();
+        
+        try {
+            resolver.getFreeModule();
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("#getFreeModule() is called when there is a module being processed.", ex.getMessage());
+        }
+    }
+    
+    public void testRepeatedCallGetFreeModule_ThereAreNoUnprocessedModules() throws Exception
+    {
+        resolver.init(Arrays.asList(new ModuleInfo("foo"), new ModuleInfo("bar")));
+        resolver.moduleProcessed(resolver.getFreeModule());
+        resolver.moduleProcessed(resolver.getFreeModule());
+        
+        assertEquals(null, resolver.getFreeModule());
+        assertEquals(null, resolver.getFreeModule()); // repeated #getFreeModule invocation
+    }
+    
+    public void testRepeatedCallGetFreeModule_EmptyModuleList() throws Exception
+    {
+        resolver.init(Collections.<ModuleInfo>emptyList());
+        
+        assertEquals(null, resolver.getFreeModule());
+        assertEquals(null, resolver.getFreeModule()); // repeated #getFreeModule invocation
     }
 }
