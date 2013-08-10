@@ -23,6 +23,7 @@
 package afc.ant.modular;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,9 +31,13 @@ public class ModuleInfo
 {
     private final String path;
     private final HashSet<ModuleInfo> dependencies = new HashSet<ModuleInfo>();
+    private final Set<ModuleInfo> dependenciesView = Collections.unmodifiableSet(dependencies);
     
     public ModuleInfo(final String path)
     {
+        if (path == null) {
+            throw new NullPointerException("path");
+        }
         this.path = path;
     }
     
@@ -46,6 +51,9 @@ public class ModuleInfo
         if (dependency == null) {
             throw new NullPointerException("dependency");
         }
+        if (dependency == this) {
+            throw new IllegalArgumentException("Cannot add itself as a dependency.");
+        }
         dependencies.add(dependency);
     }
     
@@ -56,7 +64,7 @@ public class ModuleInfo
         }
         for (final ModuleInfo dependency : dependencies) {
             if (dependency == null) {
-                throw new NullPointerException("dependencies contain null dependency.");
+                throw new NullPointerException("dependencies contains null dependency.");
             }
         }
         // TODO check each dependency to be non-null
@@ -66,6 +74,6 @@ public class ModuleInfo
     
     public Set<ModuleInfo> getDependencies()
     {
-        return dependencies;
+        return dependenciesView;
     }
 }
