@@ -394,6 +394,67 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         }
     }
     
+    /**
+     * <p>Test description: though discouraged using different instances of ModuleInfo with the same path is allowed.
+     * SerialDependencyResolver must treat them as different modules.</p>
+     */
+    public void testDifferentModulesWithTheSamePath_NoLoops() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("bar");
+        final ModuleInfo module4 = new ModuleInfo("bar");
+        final ModuleInfo module5 = new ModuleInfo("flux");
+        module3.addDependency(module1);
+        module3.addDependency(module2);
+        module2.addDependency(module4);
+        module4.addDependency(module5);
+        
+        
+        resolver.init(Arrays.asList(module1, module3, module4));
+
+        final ArrayList<ModuleInfo> order = flushModules(resolver, 5);
+        assertTrue(order.contains(module1));
+        assertTrue(order.contains(module2));
+        assertTrue(order.contains(module3));
+        assertTrue(order.contains(module4));
+        assertTrue(order.contains(module5));
+        assertTrue(order.indexOf(module1) < order.indexOf(module3));
+        assertTrue(order.indexOf(module2) < order.indexOf(module3));
+        assertTrue(order.indexOf(module4) < order.indexOf(module2));
+        assertTrue(order.indexOf(module5) < order.indexOf(module4));
+    }
+    
+    /**
+     * <p>Test description: though discouraged using different instances of ModuleInfo with the same path is allowed.
+     * SerialDependencyResolver must treat them as different modules.</p>
+     */
+    public void testDifferentModulesWithTheSamePath_Loop() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("bar");
+        final ModuleInfo module4 = new ModuleInfo("bar");
+        final ModuleInfo module5 = new ModuleInfo("flux");
+        module3.addDependency(module1);
+        module3.addDependency(module2);
+        module2.addDependency(module4);
+        module4.addDependency(module5);
+        module5.addDependency(module2);
+        
+        
+        try {
+            resolver.init(Arrays.asList(module1, module2, module3, module4));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->bar->bar->flux->]") + '|' +
+                    Pattern.quote("[->bar->bar->quux->]") + '|' +
+                    Pattern.quote("[->bar->flux->bar->]") + ")\\.", ex.getMessage()));
+        }
+    }
+    
     private static ArrayList<ModuleInfo> flushModules(final SerialDependencyResolver resolver, final int moduleCount)
     {
         final ArrayList<ModuleInfo> result = new ArrayList<ModuleInfo>();
