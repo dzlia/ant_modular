@@ -127,4 +127,206 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
         assertEquals(null, resolver.getFreeModule());
         assertEquals(null, resolver.getFreeModule()); // repeated #getFreeModule invocation
     }
+    
+    public void testCallModuleProcessed_NoModuleIsBeingProcessed_AlienModule_NoModuleWasEverProcessed() throws Exception
+    {
+        resolver.init(Arrays.asList(new ModuleInfo("foo"), new ModuleInfo("bar")));
+        
+        try {
+            resolver.moduleProcessed(new ModuleInfo("baz"));
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("No module is being processed.", ex.getMessage());
+        }
+    }
+    
+    public void testCallModuleProcessed_NoModuleIsBeingProcessed_AlienModule_SomeModulesWereProcessed() throws Exception
+    {
+        resolver.init(Arrays.asList(new ModuleInfo("foo"), new ModuleInfo("bar")));
+        resolver.moduleProcessed(resolver.getFreeModule());
+        
+        try {
+            resolver.moduleProcessed(new ModuleInfo("baz"));
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("No module is being processed.", ex.getMessage());
+        }
+    }
+    
+    public void testCallModuleProcessed_NoModuleIsBeingProcessed_NativeModule_NoModuleWasEverProcessed() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        module1.addDependency(module2);
+        module2.addDependency(module3);
+        
+        resolver.init(Arrays.asList(module1, module2, module3));
+        
+        try {
+            resolver.moduleProcessed(module3); // module3 is processed first because of dependencies
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("No module is being processed.", ex.getMessage());
+        }
+        
+        assertSame(module3, resolver.getFreeModule());
+        resolver.moduleProcessed(module3);
+        assertSame(module2, resolver.getFreeModule());
+        resolver.moduleProcessed(module2);
+        assertSame(module1, resolver.getFreeModule());
+        resolver.moduleProcessed(module1);
+        assertSame(null, resolver.getFreeModule());
+    }
+    
+    public void testCallModuleProcessed_NoModuleIsBeingProcessed_NativeModule_SomeModulesWereProcessed() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        module1.addDependency(module2);
+        module2.addDependency(module3);
+        
+        resolver.init(Arrays.asList(module1, module2, module3));
+        
+        resolver.moduleProcessed(resolver.getFreeModule());
+        resolver.moduleProcessed(resolver.getFreeModule());
+        
+        try {
+            resolver.moduleProcessed(module1); // module1 is processed last because of dependencies
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("No module is being processed.", ex.getMessage());
+        }
+        
+        assertSame(module1, resolver.getFreeModule());
+        resolver.moduleProcessed(module1);
+        assertSame(null, resolver.getFreeModule());
+    }
+    
+    public void testCallModuleProcessed_NoModuleIsBeingProcessed_NullModule_ThereAreModulesInQueue() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        module1.addDependency(module2);
+        module2.addDependency(module3);
+        
+        resolver.init(Arrays.asList(module1, module2, module3));
+        
+        resolver.moduleProcessed(resolver.getFreeModule());
+        
+        try {
+            resolver.moduleProcessed(null);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("module", ex.getMessage());
+        }
+        
+        assertSame(module2, resolver.getFreeModule());
+    }
+    
+    public void testCallModuleProcessed_NoModuleIsBeingProcessed_NullModule_ThereAreNoModulesInQueue() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        
+        resolver.init(Arrays.asList(module1));
+        
+        resolver.moduleProcessed(resolver.getFreeModule());
+        
+        try {
+            resolver.moduleProcessed(null);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("module", ex.getMessage());
+        }
+        
+        assertNull(resolver.getFreeModule());
+    }
+    
+    public void testCallModuleProcessed_SomeModuleIsBeingProcessed_AlienModule() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module1.addDependency(module2);
+        resolver.init(Arrays.asList(module1, module2));
+        
+        assertSame(module2, resolver.getFreeModule());
+        
+        try {
+            resolver.moduleProcessed(new ModuleInfo("baz"));
+            fail();
+        }
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'baz' is not being processed.", ex.getMessage());
+        }
+    }
+    
+    public void testCallModuleProcessed_SomeModuleIsBeingProcessed_WrongNativeModule() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        module1.addDependency(module2);
+        module2.addDependency(module3);
+        
+        resolver.init(Arrays.asList(module1, module2, module3));
+        
+        assertSame(module3, resolver.getFreeModule());
+        
+        try {
+            resolver.moduleProcessed(module2);
+            fail();
+        }
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'bar' is not being processed.", ex.getMessage());
+        }
+        
+        resolver.moduleProcessed(module3);
+        assertSame(module2, resolver.getFreeModule());
+    }
+    
+    public void testCallModuleProcessed_SomeModuleIsBeingProcessed_NullModule_ThereAreModulesInQueue() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        module1.addDependency(module2);
+        module2.addDependency(module3);
+        
+        resolver.init(Arrays.asList(module1, module2, module3));
+        
+        assertSame(module3, resolver.getFreeModule());
+        
+        try {
+            resolver.moduleProcessed(null);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("module", ex.getMessage());
+        }
+    }
+    
+    public void testCallModuleProcessed_SomeModuleIsBeingProcessed_NullModule_ThereAreNoModulesInQueue() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        
+        resolver.init(Arrays.asList(module1));
+        
+        assertSame(module1, resolver.getFreeModule());
+        
+        try {
+            resolver.moduleProcessed(null);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("module", ex.getMessage());
+        }
+    }
 }

@@ -22,6 +22,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ import java.util.LinkedHashSet;
 public class SerialDependencyResolver implements DependencyResolver
 {
     private HashSet<Node> nodes;
-    private boolean moduleAcquired;
+    private ModuleInfo moduleAcquired;
     
     public void init(final Collection<ModuleInfo> rootModules) throws CyclicDependenciesDetectedException
     {
@@ -55,12 +56,12 @@ public class SerialDependencyResolver implements DependencyResolver
         if (nodes.isEmpty()) {
             return null;
         }
-        if (moduleAcquired) {
+        if (moduleAcquired != null) {
             throw new IllegalStateException("#getFreeModule() is called when there is a module being processed.");
         }
         for (final Node node : nodes) {
             if (node.dependencies.size() == 0) {
-                moduleAcquired = true;
+                moduleAcquired = node.module;
                 return node.module;
             }
         }
@@ -73,6 +74,13 @@ public class SerialDependencyResolver implements DependencyResolver
         if (module == null) {
             throw new NullPointerException("module");
         }
+        if (moduleAcquired == null) {
+            throw new IllegalStateException("No module is being processed.");
+        }
+        if (moduleAcquired != module) {
+            throw new IllegalArgumentException(MessageFormat.format(
+                    "The module ''{0}'' is not being processed.", module.getPath()));
+        }
         
         // TODO improve performance
         for (final Node node : nodes) {
@@ -81,12 +89,12 @@ public class SerialDependencyResolver implements DependencyResolver
                     depOf.dependencies.remove(node);
                 }
                 nodes.remove(node);
-                moduleAcquired = false;
+                moduleAcquired = null;
                 return;
             }
         }
         
-        throw new IllegalArgumentException("Alien module is passed.");
+        throw new IllegalArgumentException(MessageFormat.format("The module ''{0}'' is not being processed.", module.getPath()));
     }
     
     private void ensureInitialised()
