@@ -280,4 +280,22 @@ public class ModuleInfoTest extends TestCase
         m1.addDependency(m2);
         assertTrue(m1.equals(m1));
     }
+    
+    public void testSetItselfByMeansOfSetDependencies()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m2 = new ModuleInfo("bar");
+        
+        m.addDependency(m2);
+        
+        try {
+            m.setDependencies(Arrays.asList(new ModuleInfo("baz"), m));
+            fail();
+        }
+        catch (IllegalArgumentException ex) {
+            assertEquals("Cannot add itself as a dependency.", ex.getMessage());
+        }
+        
+        assertEquals(Collections.singleton(m2), m.getDependencies());
+    }
 }

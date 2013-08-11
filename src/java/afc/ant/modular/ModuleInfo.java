@@ -66,9 +66,12 @@ public class ModuleInfo
      * passed to this {@code ModuleInfo}.</p>
      * 
      * @param dependencies {@code ModuleInfo} objects that this {@code ModuleInfo} is to depend upon.
-     *      This collection and all its elements are to be non-{@code null}.
+     *      This collection and all its elements are to be non-{@code null}. This collection must not
+     *      contain this {@code ModuleInfo}.
      * 
      * @throws NullPointerException if <i>dependencies</i> or any its element is {@code null}.
+     *      This {@code ModuleInfo} instance is not modified in this case.
+     * @throws IllegalArgumentException if <i>dependencies</i> contains this {@code ModuleInfo}.
      *      This {@code ModuleInfo} instance is not modified in this case.
      */
     public void setDependencies(final Collection<ModuleInfo> dependencies)
@@ -79,6 +82,9 @@ public class ModuleInfo
         for (final ModuleInfo dependency : dependencies) {
             if (dependency == null) {
                 throw new NullPointerException("dependencies contains null dependency.");
+            }
+            if (dependency == this) {
+                throw new IllegalArgumentException("Cannot add itself as a dependency.");
             }
         }
         this.dependencies.clear();
