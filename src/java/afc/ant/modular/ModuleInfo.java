@@ -57,6 +57,20 @@ public class ModuleInfo
         dependencies.add(dependency);
     }
     
+    /**
+     * <p>Replaces the dependencies of this {@code ModuleInfo} with given {@code ModuleInfo} objects.
+     * The new dependencies become visible immediately via a set returned by
+     * <tt>{@link #getDependencies()}</tt>.</p>
+     * 
+     * <p>The input collection is not modified by this function and ownership over it is not
+     * passed to this {@code ModuleInfo}.</p>
+     * 
+     * @param dependencies {@code ModuleInfo} objects that this {@code ModuleInfo} is to depend upon.
+     *      This collection and all its elements are to be non-{@code null}.
+     * 
+     * @throws NullPointerException if <i>dependencies</i> or any its element is {@code null}.
+     *      This {@code ModuleInfo} instance is not modified in this case.
+     */
     public void setDependencies(final Collection<ModuleInfo> dependencies)
     {
         if (dependencies == null) {
@@ -72,10 +86,11 @@ public class ModuleInfo
     }
     
     /**
-     * <p>Returns a set of modules which this module depends upon. The {@code ModuleInfo} objects returned are
-     * necessarily non-{@code null}. The set returned is unmodifiable. In addition, any further modification of
-     * this module's dependencies by means of the <tt>{@link #addDependency(ModuleInfo)}</tt> and
-     * <tt>{@link #setDependencies(Collection)}</tt> operations is immediately visible in the set returned.</p>
+     * <p>Returns a set of modules which this {@code ModuleInfo} depends upon. The {@code ModuleInfo} objects
+     * returned are necessarily non-{@code null}. The set returned is unmodifiable.
+     * In addition, any further modification of this module's dependencies by means of
+     * the <tt>{@link #addDependency(ModuleInfo)}</tt> and <tt>{@link #setDependencies(Collection)}</tt>
+     * operations is immediately visible in the set returned.</p>
      * 
      * @return an unmodifiable set of this module's dependency modules.
      */
