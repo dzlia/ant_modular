@@ -455,6 +455,208 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         }
     }
     
+    public void testReInit_InTheMiddle_ModuleNotAcquired() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module1.addDependency(module2);
+        
+        resolver.init(Arrays.asList(module1, module2));
+        
+        assertSame(module2, resolver.getFreeModule());
+        resolver.moduleProcessed(module2);
+        
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        module3.addDependency(module4);
+        
+        resolver.init(Arrays.asList(module3, module4));
+        
+        assertSame(module4, resolver.getFreeModule());
+        resolver.moduleProcessed(module4);
+        assertSame(module3, resolver.getFreeModule());
+        resolver.moduleProcessed(module3);
+        assertSame(null, resolver.getFreeModule());
+        
+        try {
+            resolver.moduleProcessed(module2);
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("No module is being processed.", ex.getMessage());
+        }
+        assertSame(null, resolver.getFreeModule());
+    }
+    
+    public void testReInit_InTheMiddle_ModuleAcquired() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module1.addDependency(module2);
+        
+        resolver.init(Arrays.asList(module1, module2));
+        
+        assertSame(module2, resolver.getFreeModule());
+        
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        module3.addDependency(module4);
+        
+        resolver.init(Arrays.asList(module3, module4));
+        
+        assertSame(module4, resolver.getFreeModule());
+        resolver.moduleProcessed(module4);
+        assertSame(module3, resolver.getFreeModule());
+        resolver.moduleProcessed(module3);
+        assertSame(null, resolver.getFreeModule());
+        
+        try {
+            resolver.moduleProcessed(module1);
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("No module is being processed.", ex.getMessage());
+        }
+        assertSame(null, resolver.getFreeModule());
+    }
+    
+    public void testReInit_InTheEnd_ModuleAcquired() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module1.addDependency(module2);
+        
+        resolver.init(Arrays.asList(module1, module2));
+        
+        assertSame(module2, resolver.getFreeModule());
+        resolver.moduleProcessed(module2);
+        assertSame(module1, resolver.getFreeModule());
+        resolver.moduleProcessed(module1);
+        
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        module3.addDependency(module4);
+        
+        resolver.init(Arrays.asList(module3, module4));
+        
+        assertSame(module4, resolver.getFreeModule());
+        resolver.moduleProcessed(module4);
+        assertSame(module3, resolver.getFreeModule());
+        resolver.moduleProcessed(module3);
+        assertSame(null, resolver.getFreeModule());
+        
+        try {
+            resolver.moduleProcessed(module1);
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("No module is being processed.", ex.getMessage());
+        }
+        assertSame(null, resolver.getFreeModule());
+    }
+    
+    public void testReInitFailed_InTheMiddle_ModuleNotAcquired() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module1.addDependency(module2);
+        
+        resolver.init(Arrays.asList(module1, module2));
+        
+        assertSame(module2, resolver.getFreeModule());
+        resolver.moduleProcessed(module2);
+        
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        module3.addDependency(module4);
+        module4.addDependency(module3);
+        
+        try {
+            resolver.init(Arrays.asList(module3, module4));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->quux->baz->]") + '|' +
+                    Pattern.quote("[->baz->quux->]") + ")\\.", ex.getMessage()));
+        }
+        
+        assertSame(module1, resolver.getFreeModule());
+        resolver.moduleProcessed(module1);
+        assertSame(null, resolver.getFreeModule());
+    }
+    
+    public void testReInitFailed_InTheMiddle_ModuleAcquired() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module1.addDependency(module2);
+        
+        resolver.init(Arrays.asList(module1, module2));
+        
+        assertSame(module2, resolver.getFreeModule());
+        
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        module3.addDependency(module4);
+        module4.addDependency(module3);
+        
+        try {
+            resolver.init(Arrays.asList(module3, module4));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->quux->baz->]") + '|' +
+                    Pattern.quote("[->baz->quux->]") + ")\\.", ex.getMessage()));
+        }
+        
+        try {
+            resolver.moduleProcessed(module1);
+            fail();
+        }
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'foo' is not being processed.", ex.getMessage());
+        }
+        resolver.moduleProcessed(module2);
+        
+        assertSame(module1, resolver.getFreeModule());
+        resolver.moduleProcessed(module1);
+        assertSame(null, resolver.getFreeModule());
+    }
+    
+    public void testReInitFailed_InTheEnd_ModuleAcquired() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module1.addDependency(module2);
+        
+        resolver.init(Arrays.asList(module1, module2));
+        
+        assertSame(module2, resolver.getFreeModule());
+        resolver.moduleProcessed(module2);
+        assertSame(module1, resolver.getFreeModule());
+        resolver.moduleProcessed(module1);
+        
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        module3.addDependency(module4);
+        module4.addDependency(module3);
+        
+        module4.addDependency(module3);
+        
+        try {
+            resolver.init(Arrays.asList(module3, module4));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->quux->baz->]") + '|' +
+                    Pattern.quote("[->baz->quux->]") + ")\\.", ex.getMessage()));
+        }
+        assertSame(null, resolver.getFreeModule());
+    }
+    
     private static ArrayList<ModuleInfo> flushModules(final SerialDependencyResolver resolver, final int moduleCount)
     {
         final ArrayList<ModuleInfo> result = new ArrayList<ModuleInfo>();

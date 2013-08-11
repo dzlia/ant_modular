@@ -47,6 +47,7 @@ public class SerialDependencyResolver implements DependencyResolver
         }
         ensureNoLoops(rootModules);
         nodes = buildNodeGraph(rootModules);
+        moduleAcquired = null;
     }
     
     // returns a module that does not have dependencies
