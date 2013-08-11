@@ -625,6 +625,75 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         assertSame(null, resolver.getFreeModule());
     }
     
+    public void testReInitDueToNullModule_InTheMiddle_ModuleAcquired() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module1.addDependency(module2);
+        
+        resolver.init(Arrays.asList(module1, module2));
+        
+        assertSame(module2, resolver.getFreeModule());
+        
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module4 = new ModuleInfo("quux");
+        module3.addDependency(module4);
+        module4.addDependency(module3);
+        
+        try {
+            resolver.init(Arrays.asList(module3, null));
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("rootModules contains null element.", ex.getMessage());
+        }
+        
+        try {
+            resolver.moduleProcessed(module1);
+            fail();
+        }
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'foo' is not being processed.", ex.getMessage());
+        }
+        resolver.moduleProcessed(module2);
+        
+        assertSame(module1, resolver.getFreeModule());
+        resolver.moduleProcessed(module1);
+        assertSame(null, resolver.getFreeModule());
+    }
+    
+    public void testReInitDueToNullRootModules_InTheMiddle_ModuleAcquired() throws Exception
+    {
+        final ModuleInfo module1 = new ModuleInfo("foo");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module1.addDependency(module2);
+        
+        resolver.init(Arrays.asList(module1, module2));
+        
+        assertSame(module2, resolver.getFreeModule());
+        
+        try {
+            resolver.init(null);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("rootModules", ex.getMessage());
+        }
+        
+        try {
+            resolver.moduleProcessed(module1);
+            fail();
+        }
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'foo' is not being processed.", ex.getMessage());
+        }
+        resolver.moduleProcessed(module2);
+        
+        assertSame(module1, resolver.getFreeModule());
+        resolver.moduleProcessed(module1);
+        assertSame(null, resolver.getFreeModule());
+    }
+    
     public void testReInitFailed_InTheEnd_ModuleAcquired() throws Exception
     {
         final ModuleInfo module1 = new ModuleInfo("foo");
