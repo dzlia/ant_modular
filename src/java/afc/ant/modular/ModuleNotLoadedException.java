@@ -24,6 +24,11 @@ package afc.ant.modular;
 
 public class ModuleNotLoadedException extends Exception
 {
+    public ModuleNotLoadedException()
+    {
+        this(null, null);
+    }
+    
     public ModuleNotLoadedException(final String path, final Throwable cause)
     {
         super(path, cause);

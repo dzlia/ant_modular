@@ -27,7 +27,9 @@ import java.util.HashMap;
 
 public class ModuleRegistry
 {
-    private final HashMap<String, ModuleInfo> modules;
+    private static final Object moduleNotLoaded = new Object();
+    
+    private final HashMap<String, Object> modules; // values are either ModuleInfo instances of 'moduleNotLoaded'
     private final ModuleLoader moduleLoader;
     
     public ModuleRegistry(final ModuleLoader moduleLoader)
@@ -36,7 +38,7 @@ public class ModuleRegistry
             throw new NullPointerException("moduleLoader");
         }
         this.moduleLoader = moduleLoader;
-        this.modules = new HashMap<String, ModuleInfo>();
+        this.modules = new HashMap<String, Object>();
     }
     
     public ModuleInfo resolveModule(final String path) throws ModuleNotLoadedException
@@ -44,15 +46,25 @@ public class ModuleRegistry
         if (path == null) {
             throw new NullPointerException("path");
         }
-        ModuleInfo module = modules.get(path);
-        if (module == null) {
-            module = moduleLoader.loadModule(path);
-            if (module == null) {
-                throw new NullPointerException(MessageFormat.format(
-                        "Module loader returned null for the path ''{0}''.", path));
-            }
-            modules.put(path, module);
+        
+        Object module = modules.get(path);
+        if (module == moduleNotLoaded) {
+            throw new ModuleNotLoadedException();
         }
-        return module;
+        try {
+            if (module == null) {
+                module = moduleLoader.loadModule(path);
+                if (module == null) {
+                    throw new NullPointerException(MessageFormat.format(
+                            "Module loader returned null for the path ''{0}''.", path));
+                }
+                modules.put(path, module);
+            }
+            return (ModuleInfo) module;
+        }
+        catch (ModuleNotLoadedException ex) {
+            modules.put(path, moduleNotLoaded);
+            throw ex;
+        }
     }
 }
