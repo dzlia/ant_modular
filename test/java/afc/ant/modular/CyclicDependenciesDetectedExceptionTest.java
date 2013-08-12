@@ -43,7 +43,7 @@ public class CyclicDependenciesDetectedExceptionTest extends TestCase
     
     public void testEmptyLoop()
     {
-        final ArrayList<ModuleInfo> loop = new ArrayList<ModuleInfo>(0);
+        final ArrayList<Module> loop = new ArrayList<Module>(0);
         final CyclicDependenciesDetectedException ex = new CyclicDependenciesDetectedException(loop);
         assertSame(loop, ex.getLoop());
         assertEquals(Collections.emptyList(), ex.getLoop());
@@ -52,8 +52,8 @@ public class CyclicDependenciesDetectedExceptionTest extends TestCase
     
     public void testSingleModuleInLoop()
     {
-        final ModuleInfo m1 = new ModuleInfo("foo");
-        final ArrayList<ModuleInfo> loop = new ArrayList<ModuleInfo>(0);
+        final Module m1 = new Module("foo");
+        final ArrayList<Module> loop = new ArrayList<Module>(0);
         loop.add(m1);
         final CyclicDependenciesDetectedException ex = new CyclicDependenciesDetectedException(loop);
         assertSame(loop, ex.getLoop());
@@ -63,9 +63,9 @@ public class CyclicDependenciesDetectedExceptionTest extends TestCase
     
     public void testTwoModulesInLoop()
     {
-        final ModuleInfo m1 = new ModuleInfo("foo");
-        final ModuleInfo m2 = new ModuleInfo("bar");
-        final ArrayList<ModuleInfo> loop = new ArrayList<ModuleInfo>(0);
+        final Module m1 = new Module("foo");
+        final Module m2 = new Module("bar");
+        final ArrayList<Module> loop = new ArrayList<Module>(0);
         loop.add(m1);
         loop.add(m2);
         final CyclicDependenciesDetectedException ex = new CyclicDependenciesDetectedException(loop);
@@ -76,10 +76,10 @@ public class CyclicDependenciesDetectedExceptionTest extends TestCase
     
     public void testThreeModulesInLoop()
     {
-        final ModuleInfo m1 = new ModuleInfo("foo");
-        final ModuleInfo m2 = new ModuleInfo("bar");
-        final ModuleInfo m3 = new ModuleInfo("baz");
-        final ArrayList<ModuleInfo> loop = new ArrayList<ModuleInfo>(0);
+        final Module m1 = new Module("foo");
+        final Module m2 = new Module("bar");
+        final Module m3 = new Module("baz");
+        final ArrayList<Module> loop = new ArrayList<Module>(0);
         loop.add(m1);
         loop.add(m2);
         loop.add(m3);
@@ -91,10 +91,10 @@ public class CyclicDependenciesDetectedExceptionTest extends TestCase
     
     public void testNullModuleInLoop()
     {
-        final ModuleInfo m1 = new ModuleInfo("foo");
-        final ModuleInfo m2 = null;
-        final ModuleInfo m3 = new ModuleInfo("baz");
-        final ArrayList<ModuleInfo> loop = new ArrayList<ModuleInfo>(0);
+        final Module m1 = new Module("foo");
+        final Module m2 = null;
+        final Module m3 = new Module("baz");
+        final ArrayList<Module> loop = new ArrayList<Module>(0);
         loop.add(m1);
         loop.add(m2);
         loop.add(m3);

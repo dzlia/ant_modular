@@ -26,25 +26,25 @@ import java.util.List;
 
 public class CyclicDependenciesDetectedException extends Exception
 {
-    private final List<ModuleInfo> loop;
+    private final List<Module> loop;
     
-    public CyclicDependenciesDetectedException(final List<ModuleInfo> loop)
+    public CyclicDependenciesDetectedException(final List<Module> loop)
     {
         super(errorMessage(loop));
         this.loop = loop;
     }
     
-    public List<ModuleInfo> getLoop()
+    public List<Module> getLoop()
     {
         return loop;
     }
     
-    private static String errorMessage(final List<ModuleInfo> loop)
+    private static String errorMessage(final List<Module> loop)
     {
         final StringBuilder buf = new StringBuilder("Cyclic dependencies detected: [");
         if (!loop.isEmpty()) {
             buf.append("->");
-            for (final ModuleInfo module : loop) {
+            for (final Module module : loop) {
                 buf.append(module.getPath()).append("->");
             }
         }

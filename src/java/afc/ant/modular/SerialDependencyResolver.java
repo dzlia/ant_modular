@@ -33,14 +33,14 @@ import java.util.LinkedHashSet;
 public class SerialDependencyResolver implements DependencyResolver
 {
     private HashSet<Node> nodes;
-    private ModuleInfo moduleAcquired;
+    private Module moduleAcquired;
     
-    public void init(final Collection<ModuleInfo> rootModules) throws CyclicDependenciesDetectedException
+    public void init(final Collection<Module> rootModules) throws CyclicDependenciesDetectedException
     {
         if (rootModules == null) {
             throw new NullPointerException("rootModules");
         }
-        for (final ModuleInfo module : rootModules) {
+        for (final Module module : rootModules) {
             if (module == null) {
                 throw new NullPointerException("rootModules contains null element.");
             }
@@ -51,7 +51,7 @@ public class SerialDependencyResolver implements DependencyResolver
     }
     
     // returns a module that does not have dependencies
-    public ModuleInfo getFreeModule()
+    public Module getFreeModule()
     {
         ensureInitialised();
         if (moduleAcquired != null) {
@@ -81,7 +81,7 @@ public class SerialDependencyResolver implements DependencyResolver
         throw new IllegalStateException(); // cyclic dependency detection does not work properly.
     }
     
-    public void moduleProcessed(final ModuleInfo module)
+    public void moduleProcessed(final Module module)
     {
         ensureInitialised();
         if (module == null) {
@@ -106,30 +106,30 @@ public class SerialDependencyResolver implements DependencyResolver
     
     private static class Node
     {
-        private Node(final ModuleInfo module)
+        private Node(final Module module)
         {
             this.module = module;
             dependencies = new HashSet<Node>();
             dependencyOf = new HashSet<Node>();
         }
         
-        private final ModuleInfo module;
+        private final Module module;
         private final HashSet<Node> dependencies;
         private final HashSet<Node> dependencyOf;
     }
     
-    private static HashSet<Node> buildNodeGraph(final Collection<ModuleInfo> rootModules)
+    private static HashSet<Node> buildNodeGraph(final Collection<Module> rootModules)
     {
-        final IdentityHashMap<ModuleInfo, Node> registry = new IdentityHashMap<ModuleInfo, Node>();
+        final IdentityHashMap<Module, Node> registry = new IdentityHashMap<Module, Node>();
         final HashSet<Node> nodeGraph = new HashSet<Node>();
-        for (final ModuleInfo module : rootModules) {
+        for (final Module module : rootModules) {
             addNodeDeep(module, nodeGraph, registry);
         }
         return nodeGraph;
     }
     
-    private static void addNodeDeep(final ModuleInfo module, final HashSet<Node> nodeGraph,
-            final IdentityHashMap<ModuleInfo, Node> registry)
+    private static void addNodeDeep(final Module module, final HashSet<Node> nodeGraph,
+            final IdentityHashMap<Module, Node> registry)
     {
         if (registry.containsKey(module)) {
             return; // the module is already processed 
@@ -141,7 +141,7 @@ public class SerialDependencyResolver implements DependencyResolver
         }
         
         // linking nodes in the same way as modules are linked
-        for (final ModuleInfo dep : module.getDependencies()) {
+        for (final Module dep : module.getDependencies()) {
             addNodeDeep(dep, nodeGraph, registry);
             final Node depNode = registry.get(dep);
             assert depNode != null;
@@ -151,7 +151,7 @@ public class SerialDependencyResolver implements DependencyResolver
         nodeGraph.add(node);
     }
     
-    private static void ensureNoLoops(final Collection<ModuleInfo> modules) throws CyclicDependenciesDetectedException
+    private static void ensureNoLoops(final Collection<Module> modules) throws CyclicDependenciesDetectedException
     {
         // TODO re-write the code to re-use node graph created for dependency resolution
         final HashSet<Node> graph = buildNodeGraph(modules);
@@ -192,7 +192,7 @@ public class SerialDependencyResolver implements DependencyResolver
                     // skipping all leading nodes that are outside the loop
                     --loopSize;
                 }
-                final ArrayList<ModuleInfo> loop = new ArrayList<ModuleInfo>(loopSize);
+                final ArrayList<Module> loop = new ArrayList<Module>(loopSize);
                 loop.add(node.module);
                 while (it.hasNext()) {
                     loop.add(it.next().module);

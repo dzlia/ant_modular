@@ -41,7 +41,7 @@ public class ModuleRegistry
         this.modules = new HashMap<String, Object>();
     }
     
-    public ModuleInfo resolveModule(final String path) throws ModuleNotLoadedException
+    public Module resolveModule(final String path) throws ModuleNotLoadedException
     {
         if (path == null) {
             throw new NullPointerException("path");
@@ -60,7 +60,7 @@ public class ModuleRegistry
                 }
                 modules.put(path, module);
             }
-            return (ModuleInfo) module;
+            return (Module) module;
         }
         catch (ModuleNotLoadedException ex) {
             modules.put(path, moduleNotLoaded);

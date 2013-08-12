@@ -27,13 +27,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ModuleInfo
+public class Module
 {
     private final String path;
-    private final HashSet<ModuleInfo> dependencies = new HashSet<ModuleInfo>();
-    private final Set<ModuleInfo> dependenciesView = Collections.unmodifiableSet(dependencies);
+    private final HashSet<Module> dependencies = new HashSet<Module>();
+    private final Set<Module> dependenciesView = Collections.unmodifiableSet(dependencies);
     
-    public ModuleInfo(final String path)
+    public Module(final String path)
     {
         if (path == null) {
             throw new NullPointerException("path");
@@ -46,7 +46,7 @@ public class ModuleInfo
         return path;
     }
     
-    public void addDependency(final ModuleInfo dependency)
+    public void addDependency(final Module dependency)
     {
         if (dependency == null) {
             throw new NullPointerException("dependency");
@@ -58,28 +58,28 @@ public class ModuleInfo
     }
     
     /**
-     * <p>Replaces the dependencies of this {@code ModuleInfo} with given {@code ModuleInfo} objects.
+     * <p>Replaces the dependencies of this {@code Module} with given {@code Module} objects.
      * The new dependencies become visible immediately via a set returned by
      * <tt>{@link #getDependencies()}</tt>.</p>
      * 
      * <p>The input collection is not modified by this function and ownership over it is not
-     * passed to this {@code ModuleInfo}.</p>
+     * passed to this {@code Module}.</p>
      * 
-     * @param dependencies {@code ModuleInfo} objects that this {@code ModuleInfo} is to depend upon.
+     * @param dependencies {@code Module} objects that this {@code Module} is to depend upon.
      *      This collection and all its elements are to be non-{@code null}. This collection must not
-     *      contain this {@code ModuleInfo}.
+     *      contain this {@code Module}.
      * 
      * @throws NullPointerException if <i>dependencies</i> or any its element is {@code null}.
-     *      This {@code ModuleInfo} instance is not modified in this case.
-     * @throws IllegalArgumentException if <i>dependencies</i> contains this {@code ModuleInfo}.
-     *      This {@code ModuleInfo} instance is not modified in this case.
+     *      This {@code Module} instance is not modified in this case.
+     * @throws IllegalArgumentException if <i>dependencies</i> contains this {@code Module}.
+     *      This {@code Module} instance is not modified in this case.
      */
-    public void setDependencies(final Collection<ModuleInfo> dependencies)
+    public void setDependencies(final Collection<Module> dependencies)
     {
         if (dependencies == null) {
             throw new NullPointerException("dependencies");
         }
-        for (final ModuleInfo dependency : dependencies) {
+        for (final Module dependency : dependencies) {
             if (dependency == null) {
                 throw new NullPointerException("dependencies contains null dependency.");
             }
@@ -92,15 +92,15 @@ public class ModuleInfo
     }
     
     /**
-     * <p>Returns a set of modules which this {@code ModuleInfo} depends upon. The {@code ModuleInfo} objects
+     * <p>Returns a set of modules which this {@code Module} depends upon. The {@code Module} objects
      * returned are necessarily non-{@code null}. The set returned is unmodifiable.
      * In addition, any further modification of this module's dependencies by means of
-     * the <tt>{@link #addDependency(ModuleInfo)}</tt> and <tt>{@link #setDependencies(Collection)}</tt>
+     * the <tt>{@link #addDependency(Module)}</tt> and <tt>{@link #setDependencies(Collection)}</tt>
      * operations is immediately visible in the set returned.</p>
      * 
      * @return an unmodifiable set of this module's dependency modules.
      */
-    public Set<ModuleInfo> getDependencies()
+    public Set<Module> getDependencies()
     {
         return dependenciesView;
     }

@@ -21,13 +21,13 @@ public class ModuleRegistryTest extends TestCase
     
     public void testCreateSingleModule() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("test");
-        final ModuleInfo dep = new ModuleInfo("bar");
+        final Module module = new Module("test");
+        final Module dep = new Module("bar");
         module.addDependency(dep);
         loader.results.add(module);
         
-        final ModuleInfo m1 = registry.resolveModule("foo");
-        final ModuleInfo m2 = registry.resolveModule("foo");
+        final Module m1 = registry.resolveModule("foo");
+        final Module m2 = registry.resolveModule("foo");
         
         assertSame(module, m1);
         assertSame(module, m2);
@@ -38,17 +38,17 @@ public class ModuleRegistryTest extends TestCase
     
     public void testCreateTwoModules() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("test");
-        final ModuleInfo dep = new ModuleInfo("quux");
-        final ModuleInfo module2 = new ModuleInfo("test");
+        final Module module = new Module("test");
+        final Module dep = new Module("quux");
+        final Module module2 = new Module("test");
         module.addDependency(dep);
         loader.results.add(module);
         loader.results.add(module2);
         
-        final ModuleInfo m1 = registry.resolveModule("foo");
-        final ModuleInfo m2 = registry.resolveModule("bar");
-        final ModuleInfo m3 = registry.resolveModule("foo");
-        final ModuleInfo m4 = registry.resolveModule("bar");
+        final Module m1 = registry.resolveModule("foo");
+        final Module m2 = registry.resolveModule("bar");
+        final Module m3 = registry.resolveModule("foo");
+        final Module m4 = registry.resolveModule("bar");
         
         assertSame(module, m1);
         assertSame(module2, m2);
@@ -62,15 +62,15 @@ public class ModuleRegistryTest extends TestCase
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_ModuleNotLoadedException() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("test");
-        final ModuleInfo dep = new ModuleInfo("quux");
+        final Module module = new Module("test");
+        final Module dep = new Module("quux");
         module.addDependency(dep);
         loader.results.add(module);
         
         final ModuleNotLoadedException exception = new ModuleNotLoadedException();
         loader.results.add(exception);
         
-        final ModuleInfo m1 = registry.resolveModule("foo");
+        final Module m1 = registry.resolveModule("foo");
         
         try {
             registry.resolveModule("bar");
@@ -80,7 +80,7 @@ public class ModuleRegistryTest extends TestCase
             assertSame(exception, ex);
         }
         
-        final ModuleInfo m2 = registry.resolveModule("foo");
+        final Module m2 = registry.resolveModule("foo");
         
         // another attempt to load the module
         try {
@@ -100,10 +100,10 @@ public class ModuleRegistryTest extends TestCase
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_RuntimeException() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("test");
-        final ModuleInfo dep = new ModuleInfo("quux");
+        final Module module = new Module("test");
+        final Module dep = new Module("quux");
         module.addDependency(dep);
-        final ModuleInfo module2 = new ModuleInfo("test2");
+        final Module module2 = new Module("test2");
         loader.results.add(module);
         
         final RuntimeException exception = new RuntimeException();
@@ -111,7 +111,7 @@ public class ModuleRegistryTest extends TestCase
         
         loader.results.add(module2);
         
-        final ModuleInfo m1 = registry.resolveModule("foo");
+        final Module m1 = registry.resolveModule("foo");
         
         try {
             registry.resolveModule("bar");
@@ -121,10 +121,10 @@ public class ModuleRegistryTest extends TestCase
             assertSame(exception, ex);
         }
         
-        final ModuleInfo m2 = registry.resolveModule("foo");
+        final Module m2 = registry.resolveModule("foo");
         
         // another attempt to load the module
-        final ModuleInfo m3 = registry.resolveModule("bar");
+        final Module m3 = registry.resolveModule("bar");
         
         assertSame(module, m1);
         assertSame(module, m2);
@@ -137,10 +137,10 @@ public class ModuleRegistryTest extends TestCase
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_Error() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("test");
-        final ModuleInfo dep = new ModuleInfo("quux");
+        final Module module = new Module("test");
+        final Module dep = new Module("quux");
         module.addDependency(dep);
-        final ModuleInfo module2 = new ModuleInfo("test2");
+        final Module module2 = new Module("test2");
         loader.results.add(module);
         
         final Error exception = new Error();
@@ -148,7 +148,7 @@ public class ModuleRegistryTest extends TestCase
         
         loader.results.add(module2);
         
-        final ModuleInfo m1 = registry.resolveModule("foo");
+        final Module m1 = registry.resolveModule("foo");
         
         try {
             registry.resolveModule("bar");
@@ -158,10 +158,10 @@ public class ModuleRegistryTest extends TestCase
             assertSame(exception, ex);
         }
         
-        final ModuleInfo m2 = registry.resolveModule("foo");
+        final Module m2 = registry.resolveModule("foo");
         
         // another attempt to load the module
-        final ModuleInfo m3 = registry.resolveModule("bar");
+        final Module m3 = registry.resolveModule("bar");
         
         assertSame(module, m1);
         assertSame(module, m2);
@@ -174,15 +174,15 @@ public class ModuleRegistryTest extends TestCase
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_NullIsReturned() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("test");
-        final ModuleInfo dep = new ModuleInfo("quux");
+        final Module module = new Module("test");
+        final Module dep = new Module("quux");
         module.addDependency(dep);
-        final ModuleInfo module2 = new ModuleInfo("test2");
+        final Module module2 = new Module("test2");
         loader.results.add(module);
         loader.results.add(null);
         loader.results.add(module2);
         
-        final ModuleInfo m1 = registry.resolveModule("foo");
+        final Module m1 = registry.resolveModule("foo");
         
         try {
             registry.resolveModule("bar");
@@ -192,10 +192,10 @@ public class ModuleRegistryTest extends TestCase
             assertEquals("Module loader returned null for the path 'bar'.", ex.getMessage());
         }
         
-        final ModuleInfo m2 = registry.resolveModule("foo");
+        final Module m2 = registry.resolveModule("foo");
         
         // another attempt to load the module
-        final ModuleInfo m3 = registry.resolveModule("bar");
+        final Module m3 = registry.resolveModule("bar");
         
         assertSame(module, m1);
         assertSame(module, m2);
@@ -208,7 +208,7 @@ public class ModuleRegistryTest extends TestCase
     
     public void testNullPath() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("test");
+        final Module module = new Module("test");
         loader.results.add(module);
         
         try {
@@ -219,7 +219,7 @@ public class ModuleRegistryTest extends TestCase
             assertEquals("path", ex.getMessage());
         }
         
-        final ModuleInfo m = registry.resolveModule("foo");
+        final Module m = registry.resolveModule("foo");
         
         assertSame(module, m);
         
@@ -242,7 +242,7 @@ public class ModuleRegistryTest extends TestCase
         public final ArrayList<String> paths = new ArrayList<String>();
         public final LinkedList<Object> results = new LinkedList<Object>();
         
-        public ModuleInfo loadModule(final String path) throws ModuleNotLoadedException
+        public Module loadModule(final String path) throws ModuleNotLoadedException
         {
             assertNotNull(path);
             paths.add(path);
@@ -257,7 +257,7 @@ public class ModuleRegistryTest extends TestCase
             if (result instanceof Error) {
                 throw (Error) result;
             }
-            return (ModuleInfo) result;
+            return (Module) result;
         }
     }
 }

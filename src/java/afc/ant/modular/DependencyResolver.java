@@ -26,10 +26,10 @@ import java.util.Collection;
 
 public interface DependencyResolver
 {
-    void init(Collection<ModuleInfo> modules) throws CyclicDependenciesDetectedException;
+    void init(Collection<Module> modules) throws CyclicDependenciesDetectedException;
     
     // returns a module that does not have dependencies
-    ModuleInfo getFreeModule();
+    Module getFreeModule();
     
-    void moduleProcessed(ModuleInfo module);
+    void moduleProcessed(Module module);
 }
