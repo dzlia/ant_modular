@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.apache.tools.ant.Project;
+
 import junit.framework.TestCase;
 
 public class ModuleRegistryTest extends TestCase
@@ -344,6 +346,11 @@ public class ModuleRegistryTest extends TestCase
     {
         public final ArrayList<String> paths = new ArrayList<String>();
         public final HashMap<String, Object> results = new HashMap<String, Object>();
+        
+        public void init(Project project)
+        {
+            throw new UnsupportedOperationException();
+        }
         
         public ModuleInfo loadModule(final String path) throws ModuleNotLoadedException
         {

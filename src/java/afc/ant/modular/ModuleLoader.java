@@ -22,7 +22,11 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import org.apache.tools.ant.Project;
+
 public interface ModuleLoader
 {
+    void init(Project project);
+    
     ModuleInfo loadModule(String path) throws ModuleNotLoadedException;
 }
