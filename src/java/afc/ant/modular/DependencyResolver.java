@@ -28,7 +28,7 @@ public interface DependencyResolver
 {
     void init(Collection<Module> modules) throws CyclicDependenciesDetectedException;
     
-    // returns a module that does not have dependencies
+    // returns a module that does not have dependencies unprocessed
     Module getFreeModule();
     
     void moduleProcessed(Module module);
