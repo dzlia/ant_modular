@@ -60,22 +60,18 @@ public class ModuleRegistry
                 throw new NullPointerException(MessageFormat.format(
                         "Module loader returned null for the path ''{0}''.", path));
             }
-            final Module module = deepToModule(moduleInfo);
+            final Module module = new Module(path);
+            /* The module under construction is put into the registry to prevent infinite
+               module loading in case of cycling dependencies, which causes stack overflow. */
             modules.put(path, module);
+            for (final String depPath : moduleInfo.getDependencies()) {
+                module.addDependency(resolveModule(depPath));
+            }
             return module;
         }
         catch (ModuleNotLoadedException ex) {
             modules.put(path, moduleNotLoaded);
             throw ex;
         }
-    }
-    
-    private Module deepToModule(final ModuleInfo moduleInfo) throws ModuleNotLoadedException
-    {
-        final Module module = new Module(moduleInfo.getPath());
-        for (final String depPath : moduleInfo.getDependencies()) {
-            module.addDependency(resolveModule(depPath));
-        }
-        return module;
     }
 }

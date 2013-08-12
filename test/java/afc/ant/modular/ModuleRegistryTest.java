@@ -335,6 +335,56 @@ public class ModuleRegistryTest extends TestCase
         }
     }
     
+    public void testCreateTwoModules_CyclicDependency() throws Exception
+    {
+        final ModuleInfo module = new ModuleInfo("foo");
+        module.addDependency("bar");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module2.addDependency("foo");
+        loader.results.put("foo", module);
+        loader.results.put("bar", module2);
+        
+        final Module m1 = registry.resolveModule("foo");
+        final Module m2 = registry.resolveModule("bar");
+        
+        assertModule(m1, "foo", m2);
+        assertModule(m2, "bar", m1);
+        
+        assertSame(m1, registry.resolveModule("foo"));
+        assertSame(m2, registry.resolveModule("bar"));
+        
+        assertEquals(2, loader.paths.size());
+        assertEquals(new HashSet<String>(Arrays.asList("foo", "bar")), new HashSet<String>(loader.paths));
+    }
+    
+    public void testCreateThreeModules_CyclicDependency() throws Exception
+    {
+        final ModuleInfo module = new ModuleInfo("foo");
+        module.addDependency("bar");
+        final ModuleInfo module2 = new ModuleInfo("bar");
+        module2.addDependency("baz");
+        final ModuleInfo module3 = new ModuleInfo("baz");
+        module3.addDependency("foo");
+        loader.results.put("foo", module);
+        loader.results.put("bar", module2);
+        loader.results.put("baz", module3);
+        
+        final Module m1 = registry.resolveModule("foo");
+        final Module m2 = registry.resolveModule("bar");
+        final Module m3 = registry.resolveModule("baz");
+        
+        assertModule(m1, "foo", m2);
+        assertModule(m2, "bar", m3);
+        assertModule(m3, "baz", m1);
+        
+        assertSame(m1, registry.resolveModule("foo"));
+        assertSame(m2, registry.resolveModule("bar"));
+        assertSame(m3, registry.resolveModule("baz"));
+        
+        assertEquals(3, loader.paths.size());
+        assertEquals(new HashSet<String>(Arrays.asList("foo", "bar", "baz")), new HashSet<String>(loader.paths));
+    }
+    
     private static void assertModule(final Module module, final String path, final Module... dependencies)
     {
         assertNotNull(module);
