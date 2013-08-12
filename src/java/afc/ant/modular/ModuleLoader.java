@@ -24,5 +24,5 @@ package afc.ant.modular;
 
 public interface ModuleLoader
 {
-    Module loadModule(String path) throws ModuleNotLoadedException;
+    ModuleInfo loadModule(String path) throws ModuleNotLoadedException;
 }

@@ -47,24 +47,35 @@ public class ModuleRegistry
             throw new NullPointerException("path");
         }
         
-        Object module = modules.get(path);
-        if (module == moduleNotLoaded) {
+        Object cachedModule = modules.get(path);
+        if (cachedModule == moduleNotLoaded) {
             throw new ModuleNotLoadedException();
         }
+        if (cachedModule != null) {
+            return (Module) cachedModule;
+        }
         try {
-            if (module == null) {
-                module = moduleLoader.loadModule(path);
-                if (module == null) {
-                    throw new NullPointerException(MessageFormat.format(
-                            "Module loader returned null for the path ''{0}''.", path));
-                }
-                modules.put(path, module);
+            final ModuleInfo moduleInfo = moduleLoader.loadModule(path);
+            if (moduleInfo == null) {
+                throw new NullPointerException(MessageFormat.format(
+                        "Module loader returned null for the path ''{0}''.", path));
             }
-            return (Module) module;
+            final Module module = deepToModule(moduleInfo);
+            modules.put(path, module);
+            return module;
         }
         catch (ModuleNotLoadedException ex) {
             modules.put(path, moduleNotLoaded);
             throw ex;
         }
+    }
+    
+    private Module deepToModule(final ModuleInfo moduleInfo) throws ModuleNotLoadedException
+    {
+        final Module module = new Module(moduleInfo.getPath());
+        for (final String depPath : moduleInfo.getDependencies()) {
+            module.addDependency(resolveModule(depPath));
+        }
+        return module;
     }
 }
