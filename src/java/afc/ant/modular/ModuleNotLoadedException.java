@@ -29,6 +29,11 @@ public class ModuleNotLoadedException extends Exception
         this(null, null);
     }
     
+    public ModuleNotLoadedException(final String path)
+    {
+        this(path, null);
+    }
+    
     public ModuleNotLoadedException(final String path, final Throwable cause)
     {
         super(path, cause);
