@@ -22,6 +22,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 
 import org.apache.tools.ant.BuildException;
@@ -35,8 +36,10 @@ public class CallTargetForModules extends Task
 {
     private CallTarget antcall;
     private ArrayList<ModuleElement> moduleElements;
+    private ModuleLoader moduleLoader;
     
     private boolean targetSet;
+    private boolean moduleLoaderCreated;
     
     @Override
     public void init() throws BuildException
@@ -51,14 +54,15 @@ public class CallTargetForModules extends Task
     public void execute() throws BuildException
     {
         if (!targetSet) {
-            throw new BuildException("target is not set.");
+            throw new BuildException("Target is not set.");
+        }
+        if (moduleLoader == null) {
+            throw new BuildException("Module loader is undefined.");
         }
         
-        // TODO make module loader configurable
-        final ModuleLoader loader = new ManifestModuleLoader();
-        loader.init(getProject());
+        moduleLoader.init(getProject());
         
-        final ModuleRegistry registry = new ModuleRegistry(loader);
+        final ModuleRegistry registry = new ModuleRegistry(moduleLoader);
         
         try {
             final ArrayList<Module> modules = new ArrayList<Module>(moduleElements.size());
@@ -104,6 +108,15 @@ public class CallTargetForModules extends Task
         return module;
     }
     
+    public ModuleLoaderElement createModuleLoader()
+    {
+        if (moduleLoaderCreated) {
+            throw new BuildException("Only a single 'moduleLoader' element is allowed.");
+        }
+        moduleLoaderCreated = true;
+        return new ModuleLoaderElement();
+    }
+    
     public void setTarget(final String target)
     {
         antcall.setTarget(target);
@@ -145,6 +158,36 @@ public class CallTargetForModules extends Task
                 throw new BuildException("Module path is undefined.");
             }
             this.path = path;
+        }
+    }
+    
+    public class ModuleLoaderElement
+    {
+        public void setClass(final String className)
+        {
+            if (className == null) {
+                throw new BuildException("Module loader class name is undefined.");
+            }
+            
+            try {
+                // TODO support custom classpath
+                final ClassLoader classLoader = CallTargetForModules.class.getClassLoader();
+                final Class<?> moduleLoaderClass = classLoader.loadClass(className);
+                if (!ModuleLoader.class.isAssignableFrom(moduleLoaderClass)) {
+                    throw new BuildException(MessageFormat.format("''{0}'' is not an subclass of ''{1}''.",
+                            moduleLoaderClass.getSimpleName(), ModuleLoader.class.getSimpleName()));
+                }
+                moduleLoader = (ModuleLoader) moduleLoaderClass.newInstance();
+            }
+            catch (ClassNotFoundException ex) {
+                throw new BuildException(MessageFormat.format("Unable to load class ''{0}''.", className), ex);
+            }
+            catch (IllegalAccessException ex) {
+                throw new BuildException(MessageFormat.format("Unable to instantiate class ''{0}''.", className), ex);
+            }
+            catch (InstantiationException ex) {
+                throw new BuildException(MessageFormat.format("Unable to instantiate class ''{0}''.", className), ex);
+            }
         }
     }
 }
