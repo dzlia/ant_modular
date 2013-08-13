@@ -163,7 +163,7 @@ public class CallTargetForModules extends Task
     
     public class ModuleLoaderElement
     {
-        public void setClass(final String className)
+        public void setClassname(final String className)
         {
             if (className == null) {
                 throw new BuildException("Module loader class name is undefined.");
