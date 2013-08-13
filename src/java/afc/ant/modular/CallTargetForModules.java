@@ -175,7 +175,7 @@ public class CallTargetForModules extends Task
                 final Class<?> moduleLoaderClass = classLoader.loadClass(className);
                 if (!ModuleLoader.class.isAssignableFrom(moduleLoaderClass)) {
                     throw new BuildException(MessageFormat.format("''{0}'' is not an subclass of ''{1}''.",
-                            moduleLoaderClass.getSimpleName(), ModuleLoader.class.getSimpleName()));
+                            moduleLoaderClass.getName(), ModuleLoader.class.getName()));
                 }
                 moduleLoader = (ModuleLoader) moduleLoaderClass.newInstance();
             }
