@@ -113,7 +113,7 @@ public class ManifestModuleLoader implements ModuleLoader
         catch (IOException ex) {
             throw new ModuleNotLoadedException(MessageFormat.format(
                     "An I/O error is encountered while loading the module with path ''{0}'' (''{1}'').",
-                    path, manifestFile.getAbsolutePath()));
+                    path, manifestFile.getAbsolutePath()), ex);
         }
     }
 }
