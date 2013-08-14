@@ -22,24 +22,25 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 
+import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.CallTarget;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.tools.ant.taskdefs.Ant.Reference;
+import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PropertySet;
+import org.apache.tools.ant.util.ClasspathUtils;
 
 public class CallTargetForModules extends Task
 {
     private CallTarget antcall;
     private ArrayList<ModuleElement> moduleElements;
-    private ModuleLoader moduleLoader;
+    private ModuleLoaderElement moduleLoaderElement;
     
     private boolean targetSet;
-    private boolean moduleLoaderCreated;
     
     @Override
     public void init() throws BuildException
@@ -56,9 +57,11 @@ public class CallTargetForModules extends Task
         if (!targetSet) {
             throw new BuildException("Target is not set.");
         }
-        if (moduleLoader == null) {
-            throw new BuildException("Module loader is undefined.");
+        if (moduleLoaderElement == null) {
+            throw new BuildException("The 'moduleLoader' element is required.");
         }
+        
+        final ModuleLoader moduleLoader = moduleLoaderElement.createLoader();
         
         moduleLoader.init(getProject());
         
@@ -110,11 +113,10 @@ public class CallTargetForModules extends Task
     
     public ModuleLoaderElement createModuleLoader()
     {
-        if (moduleLoaderCreated) {
+        if (moduleLoaderElement != null) {
             throw new BuildException("Only a single 'moduleLoader' element is allowed.");
         }
-        moduleLoaderCreated = true;
-        return new ModuleLoaderElement();
+        return moduleLoaderElement = new ModuleLoaderElement();
     }
     
     public void setTarget(final String target)
@@ -163,31 +165,42 @@ public class CallTargetForModules extends Task
     
     public class ModuleLoaderElement
     {
+        private final Path classpath;
+        private String className;
+        
+        public ModuleLoaderElement()
+        {
+            classpath = new Path(getProject());
+        }
+        
         public void setClassname(final String className)
+        {
+            this.className = className;
+        }
+        
+        public void setClasspath(final Path path)
+        {
+            classpath.append(path);
+        }
+        
+        public Path createClasspath()
+        {
+            return classpath.createPath();
+        }
+        
+        public void setClasspathRef(final Reference ref)
+        {
+            classpath.setRefid(ref);
+        }
+        
+        public ModuleLoader createLoader()
         {
             if (className == null) {
                 throw new BuildException("Module loader class name is undefined.");
             }
-            
-            try {
-                // TODO support custom classpath
-                final ClassLoader classLoader = CallTargetForModules.class.getClassLoader();
-                final Class<?> moduleLoaderClass = classLoader.loadClass(className);
-                if (!ModuleLoader.class.isAssignableFrom(moduleLoaderClass)) {
-                    throw new BuildException(MessageFormat.format("''{0}'' is not an subclass of ''{1}''.",
-                            moduleLoaderClass.getName(), ModuleLoader.class.getName()));
-                }
-                moduleLoader = (ModuleLoader) moduleLoaderClass.newInstance();
-            }
-            catch (ClassNotFoundException ex) {
-                throw new BuildException(MessageFormat.format("Unable to load class ''{0}''.", className), ex);
-            }
-            catch (IllegalAccessException ex) {
-                throw new BuildException(MessageFormat.format("Unable to instantiate class ''{0}''.", className), ex);
-            }
-            catch (InstantiationException ex) {
-                throw new BuildException(MessageFormat.format("Unable to instantiate class ''{0}''.", className), ex);
-            }
+            final AntClassLoader classLoader = new AntClassLoader(
+                    CallTargetForModules.class.getClassLoader(), getProject(), classpath);
+            return (ModuleLoader) ClasspathUtils.newInstance(className, classLoader, ModuleLoader.class);
         }
     }
 }
