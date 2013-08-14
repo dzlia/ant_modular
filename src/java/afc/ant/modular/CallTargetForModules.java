@@ -198,8 +198,9 @@ public class CallTargetForModules extends Task
             if (className == null) {
                 throw new BuildException("Module loader class name is undefined.");
             }
-            final AntClassLoader classLoader = new AntClassLoader(
-                    CallTargetForModules.class.getClassLoader(), getProject(), classpath);
+            final ClassLoader taskClassLoader = CallTargetForModules.class.getClassLoader();
+            final ClassLoader classLoader = classpath.size() == 0 ?
+                    taskClassLoader : new AntClassLoader(taskClassLoader, getProject(), classpath);
             return (ModuleLoader) ClasspathUtils.newInstance(className, classLoader, ModuleLoader.class);
         }
     }
