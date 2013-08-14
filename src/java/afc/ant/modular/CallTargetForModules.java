@@ -150,6 +150,7 @@ public class CallTargetForModules extends Task
         antcall.addPropertyset(propertySet);
     }
     
+    // TODO support defining modules using regular expressions
     public static class ModuleElement
     {
         private String path;
