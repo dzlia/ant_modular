@@ -3,7 +3,10 @@ package afc.ant.modular;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import junit.framework.TestCase;
 
@@ -26,6 +29,7 @@ public class ModuleInfoTest extends TestCase
         
         assertSame("", m.getPath());
         assertEquals(Collections.emptySet(), m.getDependencies());
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testConstructWithNonEmptyPath()
@@ -34,6 +38,7 @@ public class ModuleInfoTest extends TestCase
         
         assertSame("a/b/c", m.getPath());
         assertEquals(Collections.emptySet(), m.getDependencies());
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testSetValidDependencies()
@@ -51,6 +56,8 @@ public class ModuleInfoTest extends TestCase
         
         deps.clear();
         assertEquals(expectedDeps, m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testReSetValidDependencies()
@@ -62,6 +69,27 @@ public class ModuleInfoTest extends TestCase
         
         m.setDependencies(Arrays.asList("baz", "quux"));
         assertEquals(new HashSet<String>(Arrays.asList("baz", "quux")), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
+    }
+    
+    public void testSetValidDependencies_InputCollectionDoesNotSupportNullElements()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        final TreeSet<String> deps = new TreeSet<String>();
+        deps.add("bar");
+        deps.add("baz");
+        
+        final HashSet<String> expectedDeps = new HashSet<String>(Arrays.asList("bar", "baz"));
+        m.setDependencies(deps);
+        assertSame("foo", m.getPath());
+        assertEquals(expectedDeps, m.getDependencies());
+        assertEquals(new HashSet<String>(Arrays.asList("bar", "baz")), deps);
+        
+        deps.clear();
+        assertEquals(expectedDeps, m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testTryAddDependencyViaGetter()
@@ -79,6 +107,8 @@ public class ModuleInfoTest extends TestCase
             // expected
         }
         assertEquals(new HashSet<String>(Arrays.asList("bar", "baz")), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testTryAddNullDependencyViaGetter()
@@ -96,6 +126,8 @@ public class ModuleInfoTest extends TestCase
             // expected
         }
         assertEquals(new HashSet<String>(Arrays.asList("bar", "baz")), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testTryClearDependenciesViaGetter()
@@ -113,6 +145,8 @@ public class ModuleInfoTest extends TestCase
             // expected
         }
         assertEquals(new HashSet<String>(Arrays.asList("bar", "baz")), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testSetNullDependencies()
@@ -131,6 +165,8 @@ public class ModuleInfoTest extends TestCase
             assertEquals("dependencies", ex.getMessage());
         }
         assertEquals(new HashSet<String>(Arrays.asList("bar", "baz")), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testSetDependenciesWithNullElement()
@@ -149,6 +185,8 @@ public class ModuleInfoTest extends TestCase
             assertEquals("dependencies contains null dependency.", ex.getMessage());
         }
         assertEquals(new HashSet<String>(Arrays.asList("bar", "baz")), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testAddDependency_NoOtherDependencies()
@@ -158,6 +196,8 @@ public class ModuleInfoTest extends TestCase
         m.addDependency("bar");
         assertSame("foo", m.getPath());
         assertEquals(new HashSet<String>(Arrays.asList("bar")), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testAddDependency_ToExistingDependencies()
@@ -171,6 +211,8 @@ public class ModuleInfoTest extends TestCase
         m.addDependency("baz");
         assertSame("foo", m.getPath());
         assertEquals(new HashSet<String>(Arrays.asList("bar", "baz")), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testAddDependency_NullDependency()
@@ -190,6 +232,8 @@ public class ModuleInfoTest extends TestCase
         }
         assertSame("foo", m.getPath());
         assertEquals(new HashSet<String>(Collections.singletonList("bar")), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     public void testAddDependency_AddItselfAsDependency()
@@ -213,6 +257,8 @@ public class ModuleInfoTest extends TestCase
         m.addDependency("baz");
         assertSame("foo", m.getPath());
         assertEquals(new HashSet<String>(Arrays.asList("bar", "baz")), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
     /**
@@ -233,6 +279,9 @@ public class ModuleInfoTest extends TestCase
         
         m1.addDependency("bar");
         assertTrue(m1.equals(m1));
+        
+        m1.addAttribute("baz", "quux");
+        assertTrue(m1.equals(m1));
     }
     
     public void testSetDependencyToItselfByMeansOfSetDependencies()
@@ -250,5 +299,218 @@ public class ModuleInfoTest extends TestCase
         }
         
         assertEquals(Collections.singleton("bar"), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
+    }
+    
+    public void testSetAttributes()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        final HashMap<String, Object> attributes = new HashMap<String, Object>();
+        attributes.put("bar", new Object());
+        attributes.put("baz", Integer.valueOf(2000));
+        attributes.put("quux", null);
+        
+        final HashMap<String, Object> expectedAttributes = new HashMap<String, Object>(attributes);
+        m.setAttributes(attributes);
+        assertSame("foo", m.getPath());
+        assertEquals(expectedAttributes, m.getAttributes());
+        assertEquals(Collections.emptySet(), m.getDependencies());
+        assertEquals(expectedAttributes, attributes); // ensure input attributes are not modified by #setAttributes
+        
+        attributes.clear();
+        assertEquals(expectedAttributes, m.getAttributes());
+        
+        assertEquals(Collections.emptySet(), m.getDependencies());
+    }
+    
+    public void testReSetAttributes()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        final HashMap<String, Object> attributes = new HashMap<String, Object>();
+        final Object o = new Object();
+        attributes.put("bar", o);
+        attributes.put("baz", Integer.valueOf(2000));
+        attributes.put("quux", null);
+        
+        final HashMap<String, Object> expectedAttributes = new HashMap<String, Object>(attributes);
+        m.setAttributes(attributes);
+        assertEquals(expectedAttributes, m.getAttributes());
+        
+        final HashMap<String, Object> attributes2 = new HashMap<String, Object>();
+        attributes2.put("111", "222");
+        attributes2.put("baz", "");
+        attributes2.put("quux", new Object());
+        
+        final HashMap<String, Object> expectedAttributes2 = new HashMap<String, Object>(attributes2);
+        m.setAttributes(attributes2);
+        assertEquals(expectedAttributes2, m.getAttributes());
+        assertEquals(expectedAttributes2, attributes2); // ensure input attributes are not modified by #setAttributes
+        
+        assertEquals(Collections.emptySet(), m.getDependencies());
+    }
+    
+    public void testReSetAttributes_WithNullAttributeName_InputMapSupportsNullKeys()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        m.addDependency("zoo");
+        
+        final HashMap<String, Object> attributes = new HashMap<String, Object>();
+        final Object o = new Object();
+        attributes.put("bar", o);
+        attributes.put("baz", Integer.valueOf(2000));
+        attributes.put("quux", null);
+        
+        final HashMap<String, Object> expectedAttributes = new HashMap<String, Object>(attributes);
+        m.setAttributes(attributes);
+        assertEquals(expectedAttributes, m.getAttributes());
+        
+        final HashMap<String, Object> attributes2 = new HashMap<String, Object>();
+        attributes2.put("111", "222");
+        attributes2.put(null, "");
+        attributes2.put("quux", new Object());
+        
+        try {
+            m.setAttributes(attributes2);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("attributes contains an attribute with null name.", ex.getMessage());
+        }
+        assertEquals(expectedAttributes, m.getAttributes());
+        
+        assertEquals(Collections.singleton("zoo"), m.getDependencies());
+    }
+    
+    public void testSetAttributes_InputMapDoesNotSupportNullKeys()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        m.addDependency("zoo");
+        
+        final TreeMap<String, Object> attributes = new TreeMap<String, Object>();
+        final Object o = new Object();
+        attributes.put("bar", o);
+        attributes.put("baz", Integer.valueOf(2000));
+        attributes.put("quux", null);
+        
+        final HashMap<String, Object> expectedAttributes = new HashMap<String, Object>(attributes);
+        m.setAttributes(attributes);
+        assertEquals(expectedAttributes, m.getAttributes());
+        
+        assertEquals(Collections.singleton("zoo"), m.getDependencies());
+    }
+    
+    public void testTryAddAttributeViaGetter()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        
+        m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
+        assertEquals(Collections.singletonMap("bar", "baz"), m.getAttributes());
+        
+        try {
+            m.getAttributes().put("quux", "zoo");
+            fail();
+        }
+        catch (RuntimeException ex) {
+            // expected
+        }
+        assertEquals(Collections.singletonMap("bar", "baz"), m.getAttributes());
+        
+        assertEquals(Collections.emptySet(), m.getDependencies());
+    }
+    
+    public void testTryClearAttributesViaGetter()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        
+        m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
+        assertEquals(Collections.singletonMap("bar", "baz"), m.getAttributes());
+        
+        try {
+            m.getAttributes().clear();
+            fail();
+        }
+        catch (RuntimeException ex) {
+            // expected
+        }
+        assertEquals(Collections.singletonMap("bar", "baz"), m.getAttributes());
+        
+        assertEquals(Collections.emptySet(), m.getDependencies());
+    }
+    
+    public void testSetNullAttributes()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        
+        m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
+        
+        try {
+            m.setDependencies(null);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("dependencies", ex.getMessage());
+        }
+        m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
+        
+        assertEquals(Collections.emptySet(), m.getDependencies());
+    }
+    
+    public void testAddAttribute_NoOtherAttributes()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        final Object val = new Object();
+        
+        m.addAttribute("bar", val);
+        assertSame("foo", m.getPath());
+        assertEquals(Collections.singletonMap("bar", val), m.getAttributes());
+        
+        assertEquals(Collections.emptySet(), m.getDependencies());
+    }
+    
+    public void testAddAttribute_ToExistingAttributes()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        m.addDependency("quux");
+        
+        final Object val = new Object();
+        
+        m.setAttributes(Collections.singletonMap("bar", val));
+        assertSame("foo", m.getPath());
+        assertEquals(Collections.singletonMap("bar", val), m.getAttributes());
+        
+        m.addAttribute("baz", "444");
+        assertSame("foo", m.getPath());
+        
+        final HashMap<String, Object> attributes = new HashMap<String, Object>();
+        attributes.put("bar", val);
+        attributes.put("baz", "444");
+        assertEquals(attributes, m.getAttributes());
+        
+        assertEquals(Collections.singleton("quux"), m.getDependencies());
+    }
+    
+    public void testAddAttribute_NullAttribute()
+    {
+        final ModuleInfo m = new ModuleInfo("foo");
+        m.addDependency("quux");
+        
+        final Object val = new Object();
+        
+        m.setAttributes(Collections.singletonMap("bar", val));
+        assertSame("foo", m.getPath());
+        assertEquals(Collections.singletonMap("bar", val), m.getAttributes());
+        
+        try {
+            m.addAttribute(null, "123");
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("attributeName", ex.getMessage());
+        }
+        assertSame("foo", m.getPath());
+        assertEquals(Collections.singletonMap("bar", val), m.getAttributes());
+        
+        assertEquals(Collections.singleton("quux"), m.getDependencies());
     }
 }

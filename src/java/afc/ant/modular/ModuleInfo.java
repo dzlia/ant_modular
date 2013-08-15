@@ -24,7 +24,9 @@ package afc.ant.modular;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class ModuleInfo
@@ -32,6 +34,8 @@ public class ModuleInfo
     private final String path;
     private final HashSet<String> dependencies = new HashSet<String>();
     private final Set<String> dependenciesView = Collections.unmodifiableSet(dependencies);
+    private final HashMap<String, Object> attributes = new HashMap<String, Object>();
+    private final Map<String, Object> attributesView = Collections.unmodifiableMap(attributes);
     
     public ModuleInfo(final String path)
     {
@@ -79,6 +83,7 @@ public class ModuleInfo
         if (dependencies == null) {
             throw new NullPointerException("dependencies");
         }
+        // Iteration is used instead of Collection#contains because not all maps support null keys.
         for (final String dependency : dependencies) {
             if (dependency == null) {
                 throw new NullPointerException("dependencies contains null dependency.");
@@ -103,5 +108,55 @@ public class ModuleInfo
     public Set<String> getDependencies()
     {
         return dependenciesView;
+    }
+    
+    public void addAttribute(final String attributeName, final Object value)
+    {
+        if (attributeName == null) {
+            throw new NullPointerException("attributeName");
+        }
+        attributes.put(attributeName, value);
+    }
+    
+    /**
+     * <p>Replaces the attributes of this {@code ModuleInfo} with given attributes.
+     * The new attributes become visible immediately via a set returned by
+     * <tt>{@link #getAttributes()}</tt>.</p>
+     * 
+     * <p>The input map is not modified by this function and ownership over it is not
+     * passed to this {@code ModuleInfo}.</p>
+     * 
+     * @param attributes the new attributes to be assigned this {@code ModuleInfo}. is to depend upon.
+     *      This map must be non-{@code null}.
+     * 
+     * @throws NullPointerException if <i>attributes</i> is {@code null}.
+     *      This {@code ModuleInfo} instance is not modified in this case.
+     */
+    public void setAttributes(final Map<String, Object> attributes)
+    {
+        if (attributes == null) {
+            throw new NullPointerException("attributes");
+        }
+        // Iteration is used instead of Map#containsKey because not all maps support null keys.
+        for (final String attributeName : attributes.keySet()) {
+            if (attributeName == null) {
+                throw new NullPointerException("attributes contains an attribute with null name.");
+            }
+        }
+        this.attributes.clear();
+        this.attributes.putAll(attributes);
+    }
+    
+    /**
+     * <p>Returns this module's attributes. The map returned is necessarily non-{@code null} and unmodifiable.
+     * In addition, any further modification of this {@code ModuleInfo}'s attributes by means of
+     * the <tt>{@link #addAttribute(String, Object)}</tt> and <tt>{@link #setAttributes(Map)}</tt>
+     * operations is immediately visible in the map returned.</p>
+     * 
+     * @return an unmodifiable map of this module's attributes.
+     */
+    public Map<String, Object> getAttributes()
+    {
+        return attributesView;
     }
 }
