@@ -79,7 +79,7 @@ public class Module
         if (dependencies == null) {
             throw new NullPointerException("dependencies");
         }
-        // Iteration is used instead of Collection#contains because not all maps support null keys.
+        // Iteration is used instead of Collection#contains because not all collections support null elements.
         for (final Module dependency : dependencies) {
             if (dependency == null) {
                 throw new NullPointerException("dependencies contains null dependency.");
