@@ -1,9 +1,11 @@
 package afc.ant.modular;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -72,6 +74,62 @@ public class ModuleTest extends TestCase
         
         m.setDependencies(Arrays.asList(m3, m4));
         assertEquals(new HashSet<Module>(Arrays.asList(m3, m4)), m.getDependencies());
+    }
+    
+    public void testSetValidDependencies_InputCollectionDoesNotSupportNullElements()
+    {
+        final Module m = new Module("foo");
+        final Module m2 = new Module("bar");
+        final Module m3 = new Module("baz");
+        final List<Module> deps = new AbstractList<Module>() {
+            private final ArrayList<Module> list = new ArrayList<Module>();
+            
+            @Override
+            public boolean contains(final Object element)
+            {
+                throw new NullPointerException();
+            }
+            
+            @Override
+            public void add(final int index, final Module element)
+            {
+                list.add(index, element);
+            }
+
+            @Override
+            public Module get(final int index)
+            {
+                return list.get(index);
+            }
+            
+            @Override
+            public Module remove(final int index)
+            {
+                return list.remove(index);
+            }
+
+            @Override
+            public int size()
+            {
+                return list.size();
+            }
+        };
+        deps.add(m2);
+        deps.add(m3);
+        m2.setDependencies(Collections.singleton(m3));
+        
+        final HashSet<Module> expectedDeps = new HashSet<Module>(Arrays.asList(m2, m3));
+        m.setDependencies(deps);
+        assertSame("foo", m.getPath());
+        assertEquals(expectedDeps, m.getDependencies());
+        assertEquals(Arrays.asList(m2, m3), deps);
+        
+        deps.clear();
+        assertEquals(expectedDeps, m.getDependencies());
+        
+        // ensure deps of m2 and m3 are not modified
+        assertEquals(Collections.singleton(m3), m2.getDependencies());
+        assertEquals(Collections.emptySet(), m3.getDependencies());
     }
     
     public void testTryAddDependencyViaGetter()
