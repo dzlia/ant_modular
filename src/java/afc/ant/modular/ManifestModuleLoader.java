@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 
 import org.apache.tools.ant.Project;
 
+// TODO parse Class-Path and other attributes
 public class ManifestModuleLoader implements ModuleLoader
 {
     private static final Name ATTRIB_DEPENDENCIES = new Name("Depends");
@@ -55,11 +56,10 @@ public class ManifestModuleLoader implements ModuleLoader
         if (project == null) {
             throw new IllegalStateException("This ManifestModuleLoader is not initialised.");
         }
-        final Manifest manifest = readManifest(path);
         
+        final Attributes attributes = readManifestBuildSection(path);
         final ModuleInfo moduleInfo = new ModuleInfo(path);
         
-        final Attributes attributes = manifest.getMainAttributes();
         addDependencies(attributes, moduleInfo);
         
         return moduleInfo;
@@ -77,7 +77,7 @@ public class ManifestModuleLoader implements ModuleLoader
         }
     }
     
-    private Manifest readManifest(final String path) throws ModuleNotLoadedException
+    private Attributes readManifestBuildSection(final String path) throws ModuleNotLoadedException
     {
         final File moduleDir = new File(project.getBaseDir(), path);
         if (!moduleDir.exists()) {
@@ -104,7 +104,15 @@ public class ManifestModuleLoader implements ModuleLoader
         try {
             final FileInputStream in = new FileInputStream(manifestFile);
             try {
-                return new Manifest(in);
+                final Manifest manifest = new Manifest(in);
+                final String buildSectionName = "Build";
+                final Attributes buildAttributes = manifest.getAttributes(buildSectionName);
+                if (buildAttributes == null) {
+                    throw new ModuleNotLoadedException(MessageFormat.format(
+                            "The module ''{0}'' does not have the ''{2}'' section in its manifest (''{1}'').",
+                            path, manifestFile.getAbsolutePath(), buildSectionName));
+                }
+                return buildAttributes;
             }
             finally {
                 in.close();
