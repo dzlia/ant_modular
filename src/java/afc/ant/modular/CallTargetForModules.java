@@ -89,10 +89,10 @@ public class CallTargetForModules extends Task
             }
         }
         catch (ModuleNotLoadedException ex) {
-            throw new BuildException(ex);
+            throw new BuildException(ex.getMessage(), ex);
         }
         catch (CyclicDependenciesDetectedException ex) {
-            throw new BuildException(ex);
+            throw new BuildException(ex.getMessage(), ex);
         }
     }
     
