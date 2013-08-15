@@ -61,13 +61,13 @@ public class ModuleRegistry
                         "Module loader returned null for the path ''{0}''.", path));
             }
             final Module module = new Module(path);
+            module.setAttributes(moduleInfo.getAttributes());
             /* The module under construction is put into the registry to prevent infinite
                module loading in case of cycling dependencies, which causes stack overflow. */
             modules.put(path, module);
             for (final String depPath : moduleInfo.getDependencies()) {
                 module.addDependency(resolveModule(depPath));
             }
-            module.setAttributes(moduleInfo.getAttributes());
             return module;
         }
         catch (ModuleNotLoadedException ex) {
