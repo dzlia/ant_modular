@@ -67,6 +67,7 @@ public class ModuleRegistry
             for (final String depPath : moduleInfo.getDependencies()) {
                 module.addDependency(resolveModule(depPath));
             }
+            module.setAttributes(moduleInfo.getAttributes());
             return module;
         }
         catch (ModuleNotLoadedException ex) {

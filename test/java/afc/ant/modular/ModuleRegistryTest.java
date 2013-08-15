@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.apache.tools.ant.Project;
 
@@ -22,7 +23,7 @@ public class ModuleRegistryTest extends TestCase
         registry = new ModuleRegistry(loader);
     }
     
-    public void testCreateSingleModuleWithADependency() throws Exception
+    public void testCreateSingleModuleWithADependency_NoAttributes() throws Exception
     {
         final ModuleInfo module = new ModuleInfo("foo");
         final ModuleInfo dep = new ModuleInfo("bar");
@@ -42,10 +43,35 @@ public class ModuleRegistryTest extends TestCase
         assertEquals(new HashSet<String>(Arrays.asList("foo", "bar")), new HashSet<String>(loader.paths));
     }
     
+    public void testCreateSingleModuleWithADependency_WithAttributes() throws Exception
+    {
+        final ModuleInfo module = new ModuleInfo("foo");
+        module.addAttribute("1", "2");
+        module.addAttribute("3", "4");
+        final ModuleInfo dep = new ModuleInfo("bar");
+        final Object val = new Object();
+        dep.addAttribute("5", val);
+        module.addDependency("bar");
+        loader.results.put("foo", module);
+        loader.results.put("bar", dep);
+        
+        final Module m1 = registry.resolveModule("foo");
+        final Module m2 = registry.resolveModule("bar");
+        
+        assertModule(m1, "foo", map("1", "2", "3", "4"), m2);
+        assertModule(m2, "bar", map("5", val));
+        
+        assertSame(m1, registry.resolveModule("foo"));
+        
+        assertEquals(2, loader.paths.size());
+        assertEquals(new HashSet<String>(Arrays.asList("foo", "bar")), new HashSet<String>(loader.paths));
+    }
+    
     public void testCreateTwoIndependentModules() throws Exception
     {
         final ModuleInfo module = new ModuleInfo("foo");
         final ModuleInfo module2 = new ModuleInfo("bar");
+        module2.addAttribute("qqq", "www");
         loader.results.put("foo", module);
         loader.results.put("bar", module2);
         
@@ -61,7 +87,7 @@ public class ModuleRegistryTest extends TestCase
         assertSame(m2, m4);
         
         assertModule(m1, "foo");
-        assertModule(m2, "bar");
+        assertModule(m2, "bar", map("qqq", "www"));
         
         assertEquals(2, loader.paths.size());
         assertEquals(new HashSet<String>(Arrays.asList("foo", "bar")), new HashSet<String>(loader.paths));
@@ -387,8 +413,15 @@ public class ModuleRegistryTest extends TestCase
     
     private static void assertModule(final Module module, final String path, final Module... dependencies)
     {
+        assertModule(module, path, Collections.<String, Object>emptyMap(), dependencies);
+    }
+    
+    private static void assertModule(final Module module, final String path, final Map<String, Object> attributes,
+            final Module... dependencies)
+    {
         assertNotNull(module);
         assertEquals(path, module.getPath());
+        assertEquals(attributes, module.getAttributes());
         assertEquals(new HashSet<Module>(Arrays.asList(dependencies)), module.getDependencies());
     }
     
@@ -419,5 +452,15 @@ public class ModuleRegistryTest extends TestCase
             }
             return (ModuleInfo) result;
         }
+    }
+    
+    private static HashMap<String, Object> map(Object... parts)
+    {
+        assertTrue(parts.length % 2 == 0);
+        final HashMap<String, Object> map = new HashMap<String, Object>();
+        for (int i = 0; i < parts.length; i+=2) {
+            map.put((String) parts[i], parts[i+1]);
+        }
+        return map;
     }
 }
