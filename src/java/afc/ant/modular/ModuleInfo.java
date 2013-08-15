@@ -126,7 +126,7 @@ public class ModuleInfo
      * <p>The input map is not modified by this function and ownership over it is not
      * passed to this {@code ModuleInfo}.</p>
      * 
-     * @param attributes the new attributes to be assigned this {@code ModuleInfo}. is to depend upon.
+     * @param attributes the new attributes to be assigned this {@code ModuleInfo}.
      *      This map must be non-{@code null}.
      * 
      * @throws NullPointerException if <i>attributes</i> is {@code null}.
