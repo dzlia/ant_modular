@@ -37,6 +37,7 @@
 	<target name="jar" depends="compile">
 		<jar destfile="${jar.file}">
 			<zipfileset dir="${classes.dir}" includes="**"/>
+			<zipfileset dir="${src.dir}" includes="afc/ant/modular/ant_modular.properties"/>
 			<zipfileset file="${copyright.file}" prefix="META-INF"/>
 		</jar>
 	</target>
