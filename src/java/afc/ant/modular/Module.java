@@ -37,7 +37,8 @@ public class Module
     private final HashMap<String, Object> attributes = new HashMap<String, Object>();
     private final Map<String, Object> attributesView = Collections.unmodifiableMap(attributes);
     
-    public Module(final String path)
+    // path is assumed to end with '/'
+    Module(final String path)
     {
         if (path == null) {
             throw new NullPointerException("path");
