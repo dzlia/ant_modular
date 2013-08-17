@@ -54,7 +54,7 @@ public class ManifestModuleLoaderTest extends TestCase
         
         assertNotNull(moduleInfo);
         assertEquals("WithDeps_NoAttributes", moduleInfo.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("foo", "bar", "baz/quux")), moduleInfo.getDependencies());
+        assertEquals(new HashSet<String>(Arrays.asList("foo", "\u0142aska", "baz/quux")), moduleInfo.getDependencies());
         assertEquals(Collections.emptyMap(), moduleInfo.getAttributes());
     }
 }

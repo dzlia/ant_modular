@@ -25,6 +25,7 @@ package afc.ant.modular;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -32,7 +33,9 @@ import java.util.jar.Attributes.Name;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ProjectComponent;
+import org.apache.tools.ant.launch.Locator;
 
 // TODO parse Class-Path and other attributes
 public class ManifestModuleLoader extends ProjectComponent implements ModuleLoader
@@ -53,13 +56,14 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
     
     private static void addDependencies(final Attributes attributes, final ModuleInfo moduleInfo)
     {
-        final String deps = attributes.getValue(ATTRIB_DEPENDENCIES);
+        final String deps = (String) attributes.remove(ATTRIB_DEPENDENCIES);
         if (deps == null) {
             return;
         }
         final Matcher m = dependenciesPattern.matcher(deps);
         while (m.find()) {
-            moduleInfo.addDependency(m.group());
+            final String path = decodeUri(m.group());
+            moduleInfo.addDependency(path);
         }
     }
     
@@ -108,6 +112,16 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
             throw new ModuleNotLoadedException(MessageFormat.format(
                     "An I/O error is encountered while loading the module with path ''{0}'' (''{1}'').",
                     path, manifestFile.getAbsolutePath()), ex);
+        }
+    }
+    
+    private static String decodeUri(final String str)
+    {
+        try {
+            return Locator.decodeUri(str);
+        }
+        catch (UnsupportedEncodingException ex) {
+            throw new BuildException("Unable to decode URI.", ex);
         }
     }
 }
