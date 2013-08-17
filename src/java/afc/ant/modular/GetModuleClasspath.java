@@ -3,7 +3,6 @@ package afc.ant.modular;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +12,6 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Path;
-import org.apache.tools.ant.types.Path.PathElement;
 
 public class GetModuleClasspath extends Task
 {
@@ -94,20 +92,12 @@ public class GetModuleClasspath extends Task
                 continue;
             }
             final String modulePath = (String) callFunction(module, "getPath");
-            if (!(o instanceof Collection)) {
+            if (!(o instanceof Path)) {
                 throw new BuildException(MessageFormat.format(
-                        "The attribute ''{0}'' of the module ''{1}'' is not a list of string.",
+                        "The attribute ''{0}'' of the module ''{1}'' is not an Ant path.",
                         sourceAttribute.name, modulePath));
             }
-            for (final Object e : ((Collection<?>) o)) {
-                if (!(e instanceof String)) {
-                    throw new BuildException(MessageFormat.format(
-                            "The attribute ''{0}'' of the module ''{1}'' is not a list of string.",
-                            sourceAttribute.name, modulePath));
-                }
-                final PathElement pathElement = classpath.createPathElement();
-                pathElement.setPath(modulePath + '/' + (String) e);
-            }
+            classpath.add((Path) o);
         }
     }
     
