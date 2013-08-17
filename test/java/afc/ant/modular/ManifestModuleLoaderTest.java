@@ -24,7 +24,7 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testLoadModule_NoDependencies_NoAttributes() throws Exception
     {
-        loader.init(project);
+        loader.setProject(project);
         
         final ModuleInfo moduleInfo = loader.loadModule("NoDeps_NoAttributes");
         
@@ -36,7 +36,7 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testLoadModule_EmptyDependencies_NoAttributes() throws Exception
     {
-        loader.init(project);
+        loader.setProject(project);
         
         final ModuleInfo moduleInfo = loader.loadModule("EmptyDeps_NoAttributes");
         
@@ -48,7 +48,7 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testLoadModule_WithDependencies_NoAttributes() throws Exception
     {
-        loader.init(project);
+        loader.setProject(project);
         
         final ModuleInfo moduleInfo = loader.loadModule("WithDeps_NoAttributes");
         

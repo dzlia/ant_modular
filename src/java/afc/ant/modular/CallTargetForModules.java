@@ -61,8 +61,6 @@ public class CallTargetForModules extends Task
             throw new BuildException("The module loader element is required.");
         }
         
-        moduleLoader.init(getProject());
-        
         final ModuleRegistry registry = new ModuleRegistry(moduleLoader);
         
         try {

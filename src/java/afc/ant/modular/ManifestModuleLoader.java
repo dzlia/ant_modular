@@ -32,31 +32,17 @@ import java.util.jar.Attributes.Name;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.tools.ant.Project;
+import org.apache.tools.ant.ProjectComponent;
 
 // TODO parse Class-Path and other attributes
-public class ManifestModuleLoader implements ModuleLoader
+public class ManifestModuleLoader extends ProjectComponent implements ModuleLoader
 {
     private static final Name ATTRIB_DEPENDENCIES = new Name("Depends");
     
     private static final Pattern dependenciesPattern = Pattern.compile("\\S+");
     
-    private Project project;
-    
-    public void init(final Project project)
-    {
-        if (project == null) {
-            throw new NullPointerException("project");
-        }
-        this.project = project;
-    }
-    
     public ModuleInfo loadModule(final String path) throws ModuleNotLoadedException
     {
-        if (project == null) {
-            throw new IllegalStateException("This ManifestModuleLoader is not initialised.");
-        }
-        
         final Attributes attributes = readManifestBuildSection(path);
         final ModuleInfo moduleInfo = new ModuleInfo(path);
         
@@ -79,7 +65,7 @@ public class ManifestModuleLoader implements ModuleLoader
     
     private Attributes readManifestBuildSection(final String path) throws ModuleNotLoadedException
     {
-        final File moduleDir = new File(project.getBaseDir(), path);
+        final File moduleDir = new File(getProject().getBaseDir(), path);
         if (!moduleDir.exists()) {
             throw new ModuleNotLoadedException(MessageFormat.format(
                     "The module with path ''{0}'' (''{1}'') does not exist.", path, moduleDir.getAbsolutePath()));
