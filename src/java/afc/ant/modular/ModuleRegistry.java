@@ -47,7 +47,8 @@ public class ModuleRegistry
             throw new NullPointerException("path");
         }
         
-        Object cachedModule = modules.get(path);
+        final String normalisedPath = ModuleInfo.normalisePath(path);
+        Object cachedModule = modules.get(normalisedPath);
         if (cachedModule == moduleNotLoaded) {
             throw new ModuleNotLoadedException();
         }
@@ -55,23 +56,23 @@ public class ModuleRegistry
             return (Module) cachedModule;
         }
         try {
-            final ModuleInfo moduleInfo = moduleLoader.loadModule(path);
+            final ModuleInfo moduleInfo = moduleLoader.loadModule(normalisedPath);
             if (moduleInfo == null) {
                 throw new NullPointerException(MessageFormat.format(
-                        "Module loader returned null for the path ''{0}''.", path));
+                        "Module loader returned null for the path ''{0}''.", normalisedPath));
             }
-            final Module module = new Module(path);
+            final Module module = new Module(normalisedPath);
             module.setAttributes(moduleInfo.getAttributes());
             /* The module under construction is put into the registry to prevent infinite
                module loading in case of cycling dependencies, which causes stack overflow. */
-            modules.put(path, module);
+            modules.put(normalisedPath, module);
             for (final String depPath : moduleInfo.getDependencies()) {
                 module.addDependency(resolveModule(depPath));
             }
             return module;
         }
         catch (ModuleNotLoadedException ex) {
-            modules.put(path, moduleNotLoaded);
+            modules.put(normalisedPath, moduleNotLoaded);
             throw ex;
         }
     }

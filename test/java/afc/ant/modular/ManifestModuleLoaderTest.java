@@ -29,7 +29,7 @@ public class ManifestModuleLoaderTest extends TestCase
         final ModuleInfo moduleInfo = loader.loadModule("NoDeps_NoAttributes");
         
         assertNotNull(moduleInfo);
-        assertEquals("NoDeps_NoAttributes", moduleInfo.getPath());
+        assertEquals("NoDeps_NoAttributes/", moduleInfo.getPath());
         assertEquals(Collections.emptySet(), moduleInfo.getDependencies());
         assertEquals(Collections.emptyMap(), moduleInfo.getAttributes());
     }
@@ -38,10 +38,10 @@ public class ManifestModuleLoaderTest extends TestCase
     {
         loader.setProject(project);
         
-        final ModuleInfo moduleInfo = loader.loadModule("EmptyDeps_NoAttributes");
+        final ModuleInfo moduleInfo = loader.loadModule("EmptyDeps_NoAttributes/");
         
         assertNotNull(moduleInfo);
-        assertEquals("EmptyDeps_NoAttributes", moduleInfo.getPath());
+        assertEquals("EmptyDeps_NoAttributes/", moduleInfo.getPath());
         assertEquals(Collections.emptySet(), moduleInfo.getDependencies());
         assertEquals(Collections.emptyMap(), moduleInfo.getAttributes());
     }
@@ -53,8 +53,8 @@ public class ManifestModuleLoaderTest extends TestCase
         final ModuleInfo moduleInfo = loader.loadModule("WithDeps_NoAttributes");
         
         assertNotNull(moduleInfo);
-        assertEquals("WithDeps_NoAttributes", moduleInfo.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("foo", "\u0142aska", "baz/quux")), moduleInfo.getDependencies());
+        assertEquals("WithDeps_NoAttributes/", moduleInfo.getPath());
+        assertEquals(new HashSet<String>(Arrays.asList("foo/", "\u0142aska/", "baz/quux/")), moduleInfo.getDependencies());
         assertEquals(Collections.emptyMap(), moduleInfo.getAttributes());
     }
 }

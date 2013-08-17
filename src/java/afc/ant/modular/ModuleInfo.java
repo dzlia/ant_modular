@@ -42,7 +42,7 @@ public class ModuleInfo
         if (path == null) {
             throw new NullPointerException("path");
         }
-        this.path = path;
+        this.path = normalisePath(path);
     }
     
     public String getPath()
@@ -55,16 +55,17 @@ public class ModuleInfo
         if (dependency == null) {
             throw new NullPointerException("dependency");
         }
-        if (dependency.equals(path)) {
+        final String normalisedDependency = normalisePath(dependency);
+        if (normalisedDependency.equals(path)) {
             throw new IllegalArgumentException("Cannot add itself as a dependency.");
         }
-        dependencies.add(dependency);
+        dependencies.add(normalisedDependency);
     }
     
     /**
      * <p>Replaces the dependencies of this {@code ModuleInfo} with given module paths.
-     * The new dependencies become visible immediately via a set returned by
-     * <tt>{@link #getDependencies()}</tt>.</p>
+     * The dependencies assigned are normalised, if needed. The new dependencies become
+     * visible immediately via a set returned by <tt>{@link #getDependencies()}</tt>.</p>
      * 
      * <p>The input collection is not modified by this function and ownership over it is not
      * passed to this {@code ModuleInfo}.</p>
@@ -75,8 +76,8 @@ public class ModuleInfo
      * 
      * @throws NullPointerException if <i>dependencies</i> or any its element is {@code null}.
      *      This {@code ModuleInfo} instance is not modified in this case.
-     * @throws IllegalArgumentException if <i>dependencies</i> contains this {@code ModuleInfo}'s path.
-     *      This {@code ModuleInfo} instance is not modified in this case.
+     * @throws IllegalArgumentException if <i>dependencies</i> contains this {@code ModuleInfo}'s path
+     *      (normalised or non-normalised). This {@code ModuleInfo} instance is not modified in this case.
      */
     public void setDependencies(final Collection<String> dependencies)
     {
@@ -88,12 +89,15 @@ public class ModuleInfo
             if (dependency == null) {
                 throw new NullPointerException("dependencies contains null dependency.");
             }
-            if (dependency.equals(path)) {
+            final String normalisedDependency = normalisePath(dependency);
+            if (normalisedDependency.equals(path)) {
                 throw new IllegalArgumentException("Cannot add itself as a dependency.");
             }
         }
         this.dependencies.clear();
-        this.dependencies.addAll(dependencies);
+        for (final String dependency : dependencies) {
+            this.dependencies.add(normalisePath(dependency));
+        }
     }
     
     /**
@@ -158,5 +162,16 @@ public class ModuleInfo
     public Map<String, Object> getAttributes()
     {
         return attributesView;
+    }
+    
+    static String normalisePath(final String path)
+    {
+        if (path.length() == 0) {
+            return "/";
+        }
+        if (path.charAt(path.length()-1) != '/') {
+            return path + '/';
+        }
+        return path;
     }
 }
