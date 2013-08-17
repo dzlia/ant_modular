@@ -24,21 +24,18 @@ package afc.ant.modular;
 
 import java.util.ArrayList;
 
-import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.CallTarget;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.tools.ant.taskdefs.Ant.Reference;
-import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PropertySet;
-import org.apache.tools.ant.util.ClasspathUtils;
 
 public class CallTargetForModules extends Task
 {
     private CallTarget antcall;
     private ArrayList<ModuleElement> moduleElements;
-    private ModuleLoaderElement moduleLoaderElement;
+    private ModuleLoader moduleLoader;
     // If defined then the correspondent Module object is set to this property for each module being processed.
     private String moduleProperty;
     
@@ -60,11 +57,9 @@ public class CallTargetForModules extends Task
         if (!targetSet) {
             throw new BuildException("Target is not set.");
         }
-        if (moduleLoaderElement == null) {
-            throw new BuildException("The 'moduleLoader' element is required.");
+        if (moduleLoader == null) {
+            throw new BuildException("The module loader element is required.");
         }
-        
-        final ModuleLoader moduleLoader = moduleLoaderElement.createLoader();
         
         moduleLoader.init(getProject());
         
@@ -116,12 +111,12 @@ public class CallTargetForModules extends Task
         return module;
     }
     
-    public ModuleLoaderElement createModuleLoader()
+    public void addConfigured(final ModuleLoader loader)
     {
-        if (moduleLoaderElement != null) {
-            throw new BuildException("Only a single 'moduleLoader' element is allowed.");
+        if (moduleLoader != null) {
+            throw new BuildException("Only a single module loader element is allowed.");
         }
-        return moduleLoaderElement = new ModuleLoaderElement();
+        moduleLoader = loader;
     }
     
     public void setModuleProperty(final String propertyName)
@@ -171,48 +166,6 @@ public class CallTargetForModules extends Task
                 throw new BuildException("Module path is undefined.");
             }
             this.path = path;
-        }
-    }
-    
-    public class ModuleLoaderElement
-    {
-        private final Path classpath;
-        private String className;
-        
-        public ModuleLoaderElement()
-        {
-            classpath = new Path(getProject());
-        }
-        
-        public void setClassname(final String className)
-        {
-            this.className = className;
-        }
-        
-        public void setClasspath(final Path path)
-        {
-            classpath.append(path);
-        }
-        
-        public Path createClasspath()
-        {
-            return classpath.createPath();
-        }
-        
-        public void setClasspathRef(final Reference ref)
-        {
-            classpath.setRefid(ref);
-        }
-        
-        public ModuleLoader createLoader()
-        {
-            if (className == null) {
-                throw new BuildException("Module loader class name is undefined.");
-            }
-            final ClassLoader taskClassLoader = CallTargetForModules.class.getClassLoader();
-            final ClassLoader classLoader = classpath.size() == 0 ?
-                    taskClassLoader : new AntClassLoader(taskClassLoader, getProject(), classpath);
-            return (ModuleLoader) ClasspathUtils.newInstance(className, classLoader, ModuleLoader.class);
         }
     }
 }
