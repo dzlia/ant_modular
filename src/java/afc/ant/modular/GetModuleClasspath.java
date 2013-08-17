@@ -69,9 +69,15 @@ public class GetModuleClasspath extends Task
     private void appendClasspathElements(final Object /*Module*/ module, final Path classpath,
             final LinkedHashSet<Object> processedModules)
     {
+        if (processedModules.contains(module)) {
+            /* Each module is processed only once. In addition, if there are
+               cyclic dependencies then there is no infinite recursion. */
+            return;
+        }
+        processedModules.add(module);
+        
         appendElements(module, classpath);
         
-        processedModules.add(module);
         for (final Object /*Module*/ dep : (Set<?>) callFunction(module, "getDependencies")) {
             appendClasspathElements(dep, classpath, processedModules);
         }
