@@ -39,12 +39,15 @@ public class CallTargetForModules extends Task
     private CallTarget antcall;
     private ArrayList<ModuleElement> moduleElements;
     private ModuleLoaderElement moduleLoaderElement;
+    // If defined then the correspondent Module object is set to this property for each module being processed.
+    private String moduleProperty;
     
     private boolean targetSet;
     
     @Override
     public void init() throws BuildException
     {
+        moduleProperty = null;
         targetSet = false;
         moduleElements = new ArrayList<ModuleElement>();
         antcall = (CallTarget) getProject().createTask("antcall");
@@ -98,9 +101,11 @@ public class CallTargetForModules extends Task
     
     private void callTarget(final Module module)
     {
-        final Property param = antcall.createParam();
-        param.setName("module");
-        param.setValue(module);
+        if (moduleProperty != null) {
+            final Property param = antcall.createParam();
+            param.setName(moduleProperty);
+            param.setValue(module);
+        }
         antcall.perform();
     }
     
@@ -117,6 +122,11 @@ public class CallTargetForModules extends Task
             throw new BuildException("Only a single 'moduleLoader' element is allowed.");
         }
         return moduleLoaderElement = new ModuleLoaderElement();
+    }
+    
+    public void setModuleProperty(final String propertyName)
+    {
+        moduleProperty = propertyName;
     }
     
     public void setTarget(final String target)
