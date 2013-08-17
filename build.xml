@@ -1,6 +1,7 @@
 <project name="Ant Modular" default="make" basedir=".">
 	<property name="build.dir" value="${basedir}/build"/>
 	<property name="src.dir" value="${basedir}/src/java"/>
+	<property name="src.resources.dir" value="${basedir}/src/resources"/>
 	<property name="classes.dir" value="${build.dir}/classes"/>
 	<property name="lib.dir" value="${basedir}/lib"/>
 	<property name="jar.name" value="ant_modular.jar"/>
@@ -37,7 +38,7 @@
 	<target name="jar" depends="compile">
 		<jar destfile="${jar.file}">
 			<zipfileset dir="${classes.dir}" includes="**"/>
-			<zipfileset dir="${src.dir}" includes="afc/ant/modular/ant_modular.properties"/>
+			<zipfileset dir="${src.resources.dir}" includes="afc/ant/modular/ant_modular.properties"/>
 			<zipfileset file="${copyright.file}" prefix="META-INF"/>
 		</jar>
 	</target>
