@@ -20,6 +20,7 @@ public class GetModuleClasspath extends Task
     private String moduleProperty;
     private final ArrayList<SourceAttribute> sourceAttributes = new ArrayList<SourceAttribute>();
     private String classpathProperty;
+    private boolean includeDependencies;
     
     @Override
     public void execute()
@@ -78,8 +79,10 @@ public class GetModuleClasspath extends Task
         
         appendElements(module, classpath);
         
-        for (final Object /*Module*/ dep : (Set<?>) callFunction(module, "getDependencies")) {
-            appendClasspathElements(dep, classpath, processedModules);
+        if (includeDependencies) {
+            for (final Object /*Module*/ dep : (Set<?>) callFunction(module, "getDependencies")) {
+                appendClasspathElements(dep, classpath, processedModules);
+            }
         }
     }
     
@@ -138,6 +141,11 @@ public class GetModuleClasspath extends Task
     public void setClasspathProperty(final String name)
     {
         classpathProperty = name;
+    }
+    
+    public void setIncludeDependencies(final boolean option)
+    {
+        includeDependencies = option;
     }
     
     private static Object callFunction(final Object module, final String functionName)
