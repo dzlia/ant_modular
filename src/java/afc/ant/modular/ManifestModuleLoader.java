@@ -27,6 +27,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes.Name;
@@ -36,13 +38,16 @@ import java.util.regex.Pattern;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.launch.Locator;
+import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.types.Path.PathElement;
 
-// TODO parse Class-Path and other attributes
 public class ManifestModuleLoader extends ProjectComponent implements ModuleLoader
 {
     private static final Name ATTRIB_DEPENDENCIES = new Name("Depends");
     
-    private static final Pattern dependenciesPattern = Pattern.compile("\\S+");
+    private static final Pattern listElementPattern = Pattern.compile("\\S+");
+    
+    private final ArrayList<ClasspathAttribute> classpathAttributes = new ArrayList<ClasspathAttribute>();
     
     public ModuleInfo loadModule(final String path) throws ModuleNotLoadedException
     {
@@ -50,7 +55,12 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         final ModuleInfo moduleInfo = new ModuleInfo(path);
         
         addDependencies(attributes, moduleInfo);
-        
+        addClasspathAttributes(attributes, moduleInfo);
+        // merging remaining attributes without modification
+        for (final Map.Entry<Object, Object> entry : attributes.entrySet()) {
+            final Name key = (Name) entry.getKey();
+            moduleInfo.addAttribute(key.toString(), entry.getValue());
+        }
         return moduleInfo;
     }
     
@@ -60,10 +70,30 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         if (deps == null) {
             return;
         }
-        final Matcher m = dependenciesPattern.matcher(deps);
+        final Matcher m = listElementPattern.matcher(deps);
         while (m.find()) {
             final String path = decodeUri(m.group());
             moduleInfo.addDependency(path);
+        }
+    }
+    
+    private void addClasspathAttributes(final Attributes attributes, final ModuleInfo moduleInfo)
+    {
+        for (final ClasspathAttribute attrib : classpathAttributes) {
+            if (attrib.name == null) {
+                throw new BuildException("A 'classpathAttribute' element with undefined name is encountered.");
+            }
+            final String value = (String) attributes.remove(new Name(attrib.name));
+            if (value == null) {
+                continue;
+            }
+            final Path classpath = new Path(getProject());
+            final Matcher m = listElementPattern.matcher(value);
+            while (m.find()) {
+                final PathElement element = classpath.createPathElement();
+                element.setPath(moduleInfo.getPath() + decodeUri(m.group()));
+            }
+            moduleInfo.addAttribute(attrib.name, classpath);
         }
     }
     
@@ -113,6 +143,23 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
                     "An I/O error is encountered while loading the module with path ''{0}'' (''{1}'').",
                     path, manifestFile.getAbsolutePath()), ex);
         }
+    }
+    
+    public static class ClasspathAttribute
+    {
+        private String name;
+        
+        public void setName(final String name)
+        {
+            this.name = name;
+        }
+    }
+    
+    public ClasspathAttribute createClasspathAttribute()
+    {
+        final ClasspathAttribute val = new ClasspathAttribute();
+        classpathAttributes.add(val);
+        return val;
     }
     
     private static String decodeUri(final String str)
