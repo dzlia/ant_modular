@@ -93,3 +93,44 @@ Module meta information can have any format, given that there is a `ModuleLoader
 is capable of loading this information into the Ant Modular object model.
 Meta information should provide information about modules this module directly depends upon.
 Other attributes are of free choice.
+
+Example
+-------
+	<project xmlns:am="afc.ant.modular" name="Ant Modular" default="make" basedir=".">
+		<typedef resource="afc/ant/modular/ant_modular.properties" classpath="ant_modular.jar" uri="afc.ant.modular"/>
+		
+		<target name="run">
+			<am:callTargetForModules target="moduleTarget" moduleProperty="module">
+				<module path="foo"/>
+				<am:manifestModuleLoader>
+					<classpathAttribute name="Class-Path"/>
+				</am:manifestModuleLoader>
+			</am:callTargetForModules>
+		</target>
+		
+		<target name="moduleTarget">
+			<am:getModulePath moduleProperty="module" outputProperty="module.path"/>
+			<echo message="Module dir: ${basedir}/${module.path}"/>
+		</target>
+	</project>
+
+Given that the module `foo` depends on the module `bar`, when the `run` target is called then the output looks as follows:
+
+	$ ant run
+	Buildfile: /somedir/buildtest/build.xml
+	
+	run:
+	
+	moduleTarget:
+	     [echo] Module dir: /somedir/buildtest/bar/
+	
+	moduleTarget:
+	     [echo] Module dir: /somedir/buildtest/foo/
+	
+	BUILD SUCCESSFUL
+
+System requirements
+-------------------
+
+* Ant 1.6.0+
+* Java 1.5+
