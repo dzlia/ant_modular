@@ -102,7 +102,7 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         final File moduleDir = new File(getProject().getBaseDir(), path);
         if (!moduleDir.exists()) {
             throw new ModuleNotLoadedException(MessageFormat.format(
-                    "The module with path ''{0}'' (''{1}'') does not exist.", path, moduleDir.getAbsolutePath()));
+                    "The module ''{0}'' (''{1}'') does not exist.", path, moduleDir.getAbsolutePath()));
         }
         if (!moduleDir.isDirectory()) {
             throw new ModuleNotLoadedException(MessageFormat.format(
@@ -112,12 +112,12 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         final File manifestFile = new File(moduleDir, "META-INF/MANIFEST.MF");
         if (!manifestFile.exists()) {
             throw new ModuleNotLoadedException(MessageFormat.format(
-                    "The module with path ''{0}'' does not have the manifest (''{1}'').",
+                    "The module ''{0}'' does not have the manifest (''{1}'').",
                     path, manifestFile.getAbsolutePath()));
         }
         if (!manifestFile.isFile()) {
             throw new ModuleNotLoadedException(MessageFormat.format(
-                    "The module with path ''{0}'' have the manifest that is not a file (''{1}'').",
+                    "The module ''{0}'' has the manifest that is not a file (''{1}'').",
                     path, manifestFile.getAbsolutePath()));
         }
         
@@ -140,7 +140,7 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         }
         catch (IOException ex) {
             throw new ModuleNotLoadedException(MessageFormat.format(
-                    "An I/O error is encountered while loading the module with path ''{0}'' (''{1}'').",
+                    "An I/O error is encountered while loading the manifest of the module ''{0}'' (''{1}'').",
                     path, manifestFile.getAbsolutePath()), ex);
         }
     }

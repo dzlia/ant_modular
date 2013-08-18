@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
 
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.resources.FileResource;
@@ -139,6 +140,136 @@ public class ManifestModuleLoaderTest extends TestCase
         
         assertPath(moduleInfo.getAttributes().get("Attrib2"),
                 new File(moduleDir, "a"), new File(moduleDir, "b"), new File(moduleDir, "cc/\u0141/e"));
+    }
+    
+    public void testLoadModule_ClasspathAttributeHasNoName() throws Exception
+    {
+        loader.setProject(project);
+        loader.createClasspathAttribute().setName("Attrib2");
+        
+        try {
+            loader.createClasspathAttribute(); // no name is set
+            loader.loadModule("WithDeps_NoAttributes");
+            
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("A 'classpathAttribute' element with undefined name is encountered.", ex.getMessage());
+        }
+    }
+    
+    public void testCannotLoadModule_ModuleDoesNotExist() throws Exception
+    {
+        loader.setProject(project);
+        
+        try {
+            loader.loadModule("NoSuchModule");
+            
+            fail();
+        }
+        catch (ModuleNotLoadedException ex) {
+            assertEquals("The module 'NoSuchModule' ('" +
+                    new File(baseDir, "NoSuchModule").getAbsolutePath() + "') does not exist.", ex.getMessage());
+        }
+    }
+    
+    public void testCannotLoadModule_ModuleDoesNotHaveManifest() throws Exception
+    {
+        loader.setProject(project);
+        
+        try {
+            loader.loadModule("ModuleWithNoManifest");
+            
+            fail();
+        }
+        catch (ModuleNotLoadedException ex) {
+            assertEquals("The module 'ModuleWithNoManifest' does not have the manifest ('" +
+                    new File(baseDir, "ModuleWithNoManifest/META-INF/MANIFEST.MF").getAbsolutePath() + "').",
+                    ex.getMessage());
+        }
+    }
+    
+    public void testCannotLoadModule_ModuleDoesNotHaveMETAINFDirectory() throws Exception
+    {
+        loader.setProject(project);
+        
+        try {
+            loader.loadModule("ModuleWithNoMetainf");
+            
+            fail();
+        }
+        catch (ModuleNotLoadedException ex) {
+            assertEquals("The module 'ModuleWithNoMetainf' does not have the manifest ('" +
+                    new File(baseDir, "ModuleWithNoMetainf/META-INF/MANIFEST.MF").getAbsolutePath() + "').",
+                    ex.getMessage());
+        }
+    }
+    
+    public void testCannotLoadModule_ModuleManifestIsNotAFile() throws Exception
+    {
+        loader.setProject(project);
+        
+        try {
+            loader.loadModule("ModuleWithManifestAsDir");
+            
+            fail();
+        }
+        catch (ModuleNotLoadedException ex) {
+            assertEquals("The module 'ModuleWithManifestAsDir' has the manifest that is not a file ('" +
+                    new File(baseDir, "ModuleWithManifestAsDir/META-INF/MANIFEST.MF").getAbsolutePath() + "').",
+                    ex.getMessage());
+        }
+    }
+    
+    public void testCannotLoadModule_ModuleManifestIsMalformed() throws Exception
+    {
+        loader.setProject(project);
+        
+        try {
+            loader.loadModule("ModuleWithMalformedManifest");
+            
+            fail();
+        }
+        catch (ModuleNotLoadedException ex) {
+            /* The message is not the beast for a malformed manifest. It is caused by the fact that
+               java.util.jar.Manifest#read does not distinguish real I/O errors and malformed format errors. */
+            assertEquals("An I/O error is encountered while loading the manifest of " +
+                    "the module 'ModuleWithMalformedManifest' ('" +
+                    new File(baseDir, "ModuleWithMalformedManifest/META-INF/MANIFEST.MF").getAbsolutePath() + "').",
+                    ex.getMessage());
+        }
+    }
+    
+    public void testCannotLoadModule_ModuleManifestDoesNotHaveBuildSection() throws Exception
+    {
+        loader.setProject(project);
+        
+        try {
+            loader.loadModule("NoBuildSection");
+            
+            fail();
+        }
+        catch (ModuleNotLoadedException ex) {
+            assertEquals("The module 'NoBuildSection' does not have the 'Build' section in its manifest ('" +
+                    new File(baseDir, "NoBuildSection/META-INF/MANIFEST.MF").getAbsolutePath() + "').",
+                    ex.getMessage());
+        }
+    }
+    
+    public void testCannotLoadModule_ModulePathIsNotADirectory() throws Exception
+    {
+        loader.setProject(project);
+        
+        try {
+            loader.loadModule("ModuleIsNotADirectory");
+            
+            fail();
+        }
+        catch (ModuleNotLoadedException ex) {
+            assertEquals("The module path 'ModuleIsNotADirectory' ('" +
+                    new File(baseDir, "ModuleIsNotADirectory").getAbsolutePath() + "') is not a directory.",
+                    ex.getMessage());
+        }
     }
     
     private static void assertPath(final Object pathObject, final File... expectedElements)
