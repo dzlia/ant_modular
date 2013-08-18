@@ -15,20 +15,20 @@ public class GetModuleClasspath extends Task
 {
     private String moduleProperty;
     private final ArrayList<SourceAttribute> sourceAttributes = new ArrayList<SourceAttribute>();
-    private String classpathProperty;
+    private String outputProperty;
     private boolean includeDependencies;
     
     @Override
     public void execute()
     {
         if (moduleProperty == null) {
-            throw new BuildException("Module property is undefined.");
+            throw new BuildException("'moduleProperty' is undefined.");
         }
         if (sourceAttributes.isEmpty()) {
             throw new BuildException("Source attributes are not defined.");
         }
-        if (classpathProperty == null) {
-            throw new BuildException("Classpath property is undefined.");
+        if (outputProperty == null) {
+            throw new BuildException("'outputProperty' is undefined.");
         }
         for (final SourceAttribute sourceAttribute : sourceAttributes) {
             if (sourceAttribute.name == null) {
@@ -60,7 +60,7 @@ public class GetModuleClasspath extends Task
         final Path classpath = new Path(project);
         appendClasspathElements(moduleObject, classpath, new LinkedHashSet<Object>());
         
-        propHelper.setProperty(classpathProperty, classpath, false);
+        propHelper.setProperty(outputProperty, classpath, false);
     }
     
     private void appendClasspathElements(final Object /*Module*/ module, final Path classpath,
@@ -126,9 +126,9 @@ public class GetModuleClasspath extends Task
         }
     }
     
-    public void setClasspathProperty(final String name)
+    public void setOutputProperty(final String name)
     {
-        classpathProperty = name;
+        outputProperty = name;
     }
     
     public void setIncludeDependencies(final boolean option)
