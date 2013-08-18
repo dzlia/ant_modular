@@ -19,18 +19,18 @@ Maven tends to be an 'all-in-one' solution with declarative scripting and predef
 build process.
 
 Ant is an imperative toolkit which does not impose any limitations. Ant Modular just
-adds module dependency management on top native Ant facilities.
+adds module dependency management on top of native Ant facilities.
 
 ### Why not Gradle?
 
-Gradle has embedded module support, though it is easy to build up a build environment that is hard to
-understand and maintain. If you like Ant for its simplicity and ability to control everything but lack
-module dependency management then give Ant Modular a try.
+Gradle has embedded module dependencies support, though it is easy to build up a build environment that is
+difficult to understand and maintain. If you like Ant for its simplicity and ability to control everything
+but lack module dependency management then give Ant Modular a try.
 
 ### Why not Ivy?
 
-Ivy solve a different task. It manages build artifacts (libraries, resources, etc.), not dependencies
-between modules. So Ant Modular can co-operate with Ivy with clear separation of responsibilities.
+Ivy solves a different task. It manages build artifacts (libraries, resources, etc.), not dependencies
+between modules. Therefore, Ant Modular can co-operate with Ivy with clear separation of responsibilities.
 
 Introduction
 ------------
