@@ -1,11 +1,9 @@
 package afc.ant.modular;
 
-import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -78,7 +76,7 @@ public class GetModuleClasspath extends Task
         appendElements(module, classpath);
         
         if (includeDependencies) {
-            for (final Object /*Module*/ dep : (Set<?>) callFunction(module, "getDependencies")) {
+            for (final Object /*Module*/ dep : ModuleUtil.getDependencies(module)) {
                 appendClasspathElements(dep, classpath, processedModules);
             }
         }
@@ -86,16 +84,16 @@ public class GetModuleClasspath extends Task
     
     private void appendElements(final Object /*Module*/ module, final Path classpath)
     {
+        final Map<String, Object> attributes = ModuleUtil.getAttributes(module);
         for (final SourceAttribute sourceAttribute : sourceAttributes) {
-            final Object o = ((Map<String, Object>) callFunction(module, "getAttributes")).get(sourceAttribute.name);
+            final Object o = attributes.get(sourceAttribute.name);
             if (o == null) {
                 continue;
             }
-            final String modulePath = (String) callFunction(module, "getPath");
             if (!(o instanceof Path)) {
                 throw new BuildException(MessageFormat.format(
                         "The attribute ''{0}'' of the module ''{1}'' is not an Ant path.",
-                        sourceAttribute.name, modulePath));
+                        sourceAttribute.name, ModuleUtil.getPath(module)));
             }
             classpath.add((Path) o);
         }
@@ -136,21 +134,5 @@ public class GetModuleClasspath extends Task
     public void setIncludeDependencies(final boolean option)
     {
         includeDependencies = option;
-    }
-    
-    private static Object callFunction(final Object module, final String functionName)
-    {
-        try {
-            return module.getClass().getMethod(functionName).invoke(module);
-        }
-        catch (IllegalAccessException ex) {
-            throw new BuildException("Unable to get module attributes.", ex);
-        }
-        catch (NoSuchMethodException ex) {
-            throw new BuildException("Unable to get module attributes.", ex);
-        }
-        catch (InvocationTargetException ex) {
-            throw new BuildException("Unable to get module attributes.", ex);
-        }
     }
 }
