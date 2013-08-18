@@ -1,7 +1,6 @@
 package afc.ant.modular;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,7 +39,7 @@ public class ModuleRegistryTest extends TestCase
         assertSame(m1, registry.resolveModule("foo"));
         
         assertEquals(2, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(loader.paths));
     }
     
     public void testCreateSingleModuleWithADependency_WithAttributes() throws Exception
@@ -64,7 +63,7 @@ public class ModuleRegistryTest extends TestCase
         assertSame(m1, registry.resolveModule("foo/"));
         
         assertEquals(2, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(loader.paths));
     }
     
     public void testCreateTwoIndependentModules() throws Exception
@@ -81,7 +80,7 @@ public class ModuleRegistryTest extends TestCase
         final Module m4 = registry.resolveModule("bar");
         
         assertEquals(2, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(loader.paths));
         
         assertSame(m1, m3);
         assertSame(m2, m4);
@@ -90,7 +89,7 @@ public class ModuleRegistryTest extends TestCase
         assertModule(m2, "bar/", TestUtil.map("qqq", "www"));
         
         assertEquals(2, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(loader.paths));
     }
     
     public void testCreateTwoModulesAndDirectDependencies() throws Exception
@@ -112,7 +111,7 @@ public class ModuleRegistryTest extends TestCase
         final Module m4 = registry.resolveModule("bar");
         
         assertEquals(4, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/", "baz/", "quux/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/"), new HashSet<String>(loader.paths));
         
         assertSame(m1, m3);
         assertSame(m2, m4);
@@ -126,7 +125,7 @@ public class ModuleRegistryTest extends TestCase
         assertModule(m6, "quux/");
         
         assertEquals(4, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/", "baz/", "quux/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/"), new HashSet<String>(loader.paths));
     }
     
     public void testCreateTwoModulesAndDeepDependencies() throws Exception
@@ -151,8 +150,7 @@ public class ModuleRegistryTest extends TestCase
         final Module m4 = registry.resolveModule("bar");
         
         assertEquals(5, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/", "baz/", "quux/", "zoo/")),
-                new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/", "zoo/"), new HashSet<String>(loader.paths));
         
         assertSame(m1, m3);
         assertSame(m2, m4);
@@ -171,8 +169,7 @@ public class ModuleRegistryTest extends TestCase
         assertSame(m7, m8);
         
         assertEquals(5, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/", "baz/", "quux/", "zoo/")),
-                new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/", "zoo/"), new HashSet<String>(loader.paths));
     }
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_ModuleNotLoadedException() throws Exception
@@ -214,7 +211,7 @@ public class ModuleRegistryTest extends TestCase
         assertModule(m3, "quux/");
         
         assertEquals(3, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/", "quux/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(loader.paths));
     }
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_RuntimeException() throws Exception
@@ -253,7 +250,7 @@ public class ModuleRegistryTest extends TestCase
         assertModule(m4, "quux/");
         
         assertEquals(4, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/", "quux/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(loader.paths));
     }
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_Error() throws Exception
@@ -292,7 +289,7 @@ public class ModuleRegistryTest extends TestCase
         assertModule(m4, "quux/");
         
         assertEquals(4, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/", "quux/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(loader.paths));
     }
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_NullIsReturned() throws Exception
@@ -329,7 +326,7 @@ public class ModuleRegistryTest extends TestCase
         assertModule(m4, "quux/");
         
         assertEquals(4, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/", "quux/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(loader.paths));
     }
     
     public void testNullPath() throws Exception
@@ -382,7 +379,7 @@ public class ModuleRegistryTest extends TestCase
         assertSame(m2, registry.resolveModule("bar"));
         
         assertEquals(2, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(loader.paths));
     }
     
     public void testCreateThreeModules_CyclicDependency() throws Exception
@@ -410,7 +407,7 @@ public class ModuleRegistryTest extends TestCase
         assertSame(m3, registry.resolveModule("baz"));
         
         assertEquals(3, loader.paths.size());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/", "baz/")), new HashSet<String>(loader.paths));
+        assertEquals(TestUtil.set("foo/", "bar/", "baz/"), new HashSet<String>(loader.paths));
     }
     
     private static void assertModule(final Module module, final String path, final Module... dependencies)
@@ -424,7 +421,7 @@ public class ModuleRegistryTest extends TestCase
         assertNotNull(module);
         assertEquals(path, module.getPath());
         assertEquals(attributes, module.getAttributes());
-        assertEquals(new HashSet<Module>(Arrays.asList(dependencies)), module.getDependencies());
+        assertEquals(TestUtil.set(dependencies), module.getDependencies());
     }
     
     private static class MockModuleLoader implements ModuleLoader

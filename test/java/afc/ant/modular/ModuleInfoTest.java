@@ -57,7 +57,7 @@ public class ModuleInfoTest extends TestCase
         deps.add("bar/");
         deps.add("baz");
         
-        final HashSet<String> expectedDeps = new HashSet<String>(Arrays.asList("bar/", "baz/"));
+        final HashSet<String> expectedDeps = TestUtil.set("bar/", "baz/");
         m.setDependencies(deps);
         assertEquals("foo/", m.getPath());
         assertEquals(expectedDeps, m.getDependencies());
@@ -77,7 +77,7 @@ public class ModuleInfoTest extends TestCase
         assertEquals(Collections.singleton("bar/"), m.getDependencies());
         
         m.setDependencies(Arrays.asList("baz", "quux"));
-        assertEquals(new HashSet<String>(Arrays.asList("baz/", "quux/")), m.getDependencies());
+        assertEquals(TestUtil.set("baz/", "quux/"), m.getDependencies());
         
         assertEquals(Collections.emptyMap(), m.getAttributes());
     }
@@ -89,11 +89,11 @@ public class ModuleInfoTest extends TestCase
         deps.add("bar");
         deps.add("baz");
         
-        final HashSet<String> expectedDeps = new HashSet<String>(Arrays.asList("bar/", "baz/"));
+        final HashSet<String> expectedDeps = TestUtil.set("bar/", "baz/");
         m.setDependencies(deps);
         assertEquals("foo/", m.getPath());
         assertEquals(expectedDeps, m.getDependencies());
-        assertEquals(new HashSet<String>(Arrays.asList("bar", "baz")), deps);
+        assertEquals(TestUtil.set("bar", "baz"), deps);
         
         deps.clear();
         assertEquals(expectedDeps, m.getDependencies());
@@ -106,7 +106,7 @@ public class ModuleInfoTest extends TestCase
         final ModuleInfo m = new ModuleInfo("foo");
         
         m.setDependencies(Arrays.asList("bar", "baz"));
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         try {
             m.getDependencies().add("quux");
@@ -115,7 +115,7 @@ public class ModuleInfoTest extends TestCase
         catch (RuntimeException ex) {
             // expected
         }
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         assertEquals(Collections.emptyMap(), m.getAttributes());
     }
@@ -125,7 +125,7 @@ public class ModuleInfoTest extends TestCase
         final ModuleInfo m = new ModuleInfo("foo");
         
         m.setDependencies(Arrays.asList("bar", "baz"));
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         try {
             m.getDependencies().add(null);
@@ -134,7 +134,7 @@ public class ModuleInfoTest extends TestCase
         catch (RuntimeException ex) {
             // expected
         }
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         assertEquals(Collections.emptyMap(), m.getAttributes());
     }
@@ -144,7 +144,7 @@ public class ModuleInfoTest extends TestCase
         final ModuleInfo m = new ModuleInfo("foo");
 
         m.setDependencies(Arrays.asList("bar", "baz"));
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         try {
             m.getDependencies().clear();
@@ -153,7 +153,7 @@ public class ModuleInfoTest extends TestCase
         catch (RuntimeException ex) {
             // expected
         }
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         assertEquals(Collections.emptyMap(), m.getAttributes());
     }
@@ -164,7 +164,7 @@ public class ModuleInfoTest extends TestCase
         
         m.setDependencies(Arrays.asList("bar", "baz"));
         assertEquals("foo/", m.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         try {
             m.setDependencies(null);
@@ -173,7 +173,7 @@ public class ModuleInfoTest extends TestCase
         catch (NullPointerException ex) {
             assertEquals("dependencies", ex.getMessage());
         }
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         assertEquals(Collections.emptyMap(), m.getAttributes());
     }
@@ -184,7 +184,7 @@ public class ModuleInfoTest extends TestCase
         
         m.setDependencies(Arrays.asList("bar", "baz/"));
         assertEquals("foo/", m.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         try {
             m.setDependencies(Arrays.asList("quux", null));
@@ -193,7 +193,7 @@ public class ModuleInfoTest extends TestCase
         catch (NullPointerException ex) {
             assertEquals("dependencies contains null dependency.", ex.getMessage());
         }
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         assertEquals(Collections.emptyMap(), m.getAttributes());
     }
@@ -219,7 +219,7 @@ public class ModuleInfoTest extends TestCase
         
         m.addDependency("baz");
         assertEquals("foo/", m.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         assertEquals(Collections.emptyMap(), m.getAttributes());
     }
@@ -265,7 +265,7 @@ public class ModuleInfoTest extends TestCase
             
         m.addDependency("baz");
         assertEquals("foo/", m.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         assertEquals(Collections.emptyMap(), m.getAttributes());
     }
@@ -290,7 +290,7 @@ public class ModuleInfoTest extends TestCase
             
         m.addDependency("baz");
         assertEquals("foo/", m.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("bar/", "baz/")), m.getDependencies());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
         
         assertEquals(Collections.emptyMap(), m.getAttributes());
     }

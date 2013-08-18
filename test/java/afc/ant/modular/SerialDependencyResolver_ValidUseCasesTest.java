@@ -89,7 +89,7 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         resolver.moduleProcessed(m2);
         assertSame(null, resolver.getFreeModule());
         
-        assertEquals(new HashSet<Module>(Arrays.asList(module1, module2)), returnedModules);
+        assertEquals(TestUtil.set(module1, module2), returnedModules);
     }
     
     

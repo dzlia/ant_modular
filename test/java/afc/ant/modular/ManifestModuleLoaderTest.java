@@ -1,9 +1,7 @@
 package afc.ant.modular;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 
 import org.apache.tools.ant.Project;
@@ -60,7 +58,7 @@ public class ManifestModuleLoaderTest extends TestCase
         
         assertNotNull(moduleInfo);
         assertEquals("WithDeps_NoAttributes/", moduleInfo.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "\u0142aska/", "baz/quux/")), moduleInfo.getDependencies());
+        assertEquals(TestUtil.set("foo/", "\u0142aska/", "baz/quux/"), moduleInfo.getDependencies());
         assertEquals(Collections.emptyMap(), moduleInfo.getAttributes());
     }
     
@@ -72,7 +70,7 @@ public class ManifestModuleLoaderTest extends TestCase
         
         assertNotNull(moduleInfo);
         assertEquals("WithDeps_WithAttributes/", moduleInfo.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/baz/")), moduleInfo.getDependencies());
+        assertEquals(TestUtil.set("foo/", "bar/baz/"), moduleInfo.getDependencies());
         assertEquals(TestUtil.map("Attrib1", "", "Attrib2", "a b  cc/%C5%81/e", "Attrib3", "hello, world!", "aTTRIB4", "12345"),
                 moduleInfo.getAttributes());
     }
@@ -88,7 +86,7 @@ public class ManifestModuleLoaderTest extends TestCase
         
         assertNotNull(moduleInfo);
         assertEquals("WithDeps_WithAttributes/", moduleInfo.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/baz/")), moduleInfo.getDependencies());
+        assertEquals(TestUtil.set("foo/", "bar/baz/"), moduleInfo.getDependencies());
         assertEquals(TestUtil.set("Attrib1", "ATTRIB2", "Attrib3", "aTTRIB4"), moduleInfo.getAttributes().keySet());
         assertEquals("", moduleInfo.getAttributes().get("Attrib1"));
         assertEquals("hello, world!", moduleInfo.getAttributes().get("Attrib3"));
@@ -110,7 +108,7 @@ public class ManifestModuleLoaderTest extends TestCase
         
         assertNotNull(moduleInfo);
         assertEquals("WithDeps_WithAttributes/", moduleInfo.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/baz/")), moduleInfo.getDependencies());
+        assertEquals(TestUtil.set("foo/", "bar/baz/"), moduleInfo.getDependencies());
         assertEquals(TestUtil.set("Attrib1", "Attrib2", "Attrib3", "Attrib4"), moduleInfo.getAttributes().keySet());
         assertEquals("", moduleInfo.getAttributes().get("Attrib1"));
         assertEquals("hello, world!", moduleInfo.getAttributes().get("Attrib3"));
@@ -133,7 +131,7 @@ public class ManifestModuleLoaderTest extends TestCase
         
         assertNotNull(moduleInfo);
         assertEquals("WithDeps_WithAttributes/", moduleInfo.getPath());
-        assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/baz/")), moduleInfo.getDependencies());
+        assertEquals(TestUtil.set("foo/", "bar/baz/"), moduleInfo.getDependencies());
         assertEquals(TestUtil.set("Attrib1", "Attrib2", "Attrib3", "aTTRIB4"), moduleInfo.getAttributes().keySet());
         assertEquals("", moduleInfo.getAttributes().get("Attrib1"));
         assertEquals("hello, world!", moduleInfo.getAttributes().get("Attrib3"));

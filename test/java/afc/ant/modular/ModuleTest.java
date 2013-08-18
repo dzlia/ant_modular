@@ -50,7 +50,7 @@ public class ModuleTest extends TestCase
         deps.add(m3);
         m2.setDependencies(Collections.singleton(m3));
         
-        final HashSet<Module> expectedDeps = new HashSet<Module>(Arrays.asList(m2, m3));
+        final HashSet<Module> expectedDeps = TestUtil.set(m2, m3);
         m.setDependencies(deps);
         assertSame("foo", m.getPath());
         assertEquals(expectedDeps, m.getDependencies());
@@ -72,10 +72,10 @@ public class ModuleTest extends TestCase
         final Module m4 = new Module("quux");
 
         m.setDependencies(Arrays.asList(m2));
-        assertEquals(new HashSet<Module>(Arrays.asList(m2)), m.getDependencies());
+        assertEquals(Collections.singleton(m2), m.getDependencies());
         
         m.setDependencies(Arrays.asList(m3, m4));
-        assertEquals(new HashSet<Module>(Arrays.asList(m3, m4)), m.getDependencies());
+        assertEquals(TestUtil.set(m3, m4), m.getDependencies());
     }
     
     public void testSetValidDependencies_InputCollectionDoesNotSupportNullElements()
@@ -120,7 +120,7 @@ public class ModuleTest extends TestCase
         deps.add(m3);
         m2.setDependencies(Collections.singleton(m3));
         
-        final HashSet<Module> expectedDeps = new HashSet<Module>(Arrays.asList(m2, m3));
+        final HashSet<Module> expectedDeps = TestUtil.set(m2, m3);
         m.setDependencies(deps);
         assertSame("foo", m.getPath());
         assertEquals(expectedDeps, m.getDependencies());
@@ -141,7 +141,7 @@ public class ModuleTest extends TestCase
         final Module m3 = new Module("baz");
         
         m.setDependencies(Arrays.asList(m2, m3));
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
             m.getDependencies().add(new Module("quux"));
@@ -150,7 +150,7 @@ public class ModuleTest extends TestCase
         catch (RuntimeException ex) {
             // expected
         }
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
     }
     
     public void testTryAddNullDependencyViaGetter()
@@ -160,7 +160,7 @@ public class ModuleTest extends TestCase
         final Module m3 = new Module("baz");
         
         m.setDependencies(Arrays.asList(m2, m3));
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
             m.getDependencies().add(null);
@@ -169,7 +169,7 @@ public class ModuleTest extends TestCase
         catch (RuntimeException ex) {
             // expected
         }
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
     }
     
     public void testTryClearDependenciesViaGetter()
@@ -179,7 +179,7 @@ public class ModuleTest extends TestCase
         final Module m3 = new Module("baz");
 
         m.setDependencies(Arrays.asList(m2, m3));
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
             m.getDependencies().clear();
@@ -188,7 +188,7 @@ public class ModuleTest extends TestCase
         catch (RuntimeException ex) {
             // expected
         }
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
     }
     
     public void testSetNullDependencies()
@@ -199,7 +199,7 @@ public class ModuleTest extends TestCase
         
         m.setDependencies(Arrays.asList(m2, m3));
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
             m.setDependencies(null);
@@ -208,7 +208,7 @@ public class ModuleTest extends TestCase
         catch (NullPointerException ex) {
             assertEquals("dependencies", ex.getMessage());
         }
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
     }
     
     public void testSetDependenciesWithNullElement()
@@ -219,7 +219,7 @@ public class ModuleTest extends TestCase
         
         m.setDependencies(Arrays.asList(m2, m3));
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
             m.setDependencies(Arrays.asList(new Module("quux"), null));
@@ -228,7 +228,7 @@ public class ModuleTest extends TestCase
         catch (NullPointerException ex) {
             assertEquals("dependencies contains null dependency.", ex.getMessage());
         }
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
     }
     
     public void testAddDependency_NoOtherDependencies()
@@ -238,7 +238,7 @@ public class ModuleTest extends TestCase
         
         m.addDependency(m2);
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Arrays.asList(m2)), m.getDependencies());
+        assertEquals(Collections.singleton(m2), m.getDependencies());
     }
     
     public void testAddDependency_ToExistingDependencies()
@@ -249,11 +249,11 @@ public class ModuleTest extends TestCase
         
         m.setDependencies(Arrays.asList(m2));
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Arrays.asList(m2)), m.getDependencies());
+        assertEquals(Collections.singleton(m2), m.getDependencies());
         
         m.addDependency(m3);
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
     }
     
     public void testAddDependency_NullDependency()
@@ -263,7 +263,7 @@ public class ModuleTest extends TestCase
         
         m.setDependencies(Collections.singletonList(m2));
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Collections.singletonList(m2)), m.getDependencies());
+        assertEquals(Collections.singleton(m2), m.getDependencies());
         
         try {
             m.addDependency(null);
@@ -273,7 +273,7 @@ public class ModuleTest extends TestCase
             assertEquals("dependency", ex.getMessage());
         }
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Collections.singletonList(m2)), m.getDependencies());
+        assertEquals(Collections.singleton(m2), m.getDependencies());
     }
     
     public void testAddDependency_AddItselfAsDependency()
@@ -284,7 +284,7 @@ public class ModuleTest extends TestCase
         
         m.setDependencies(Collections.singletonList(m2));
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Collections.singletonList(m2)), m.getDependencies());
+        assertEquals(Collections.singleton(m2), m.getDependencies());
         
         try {
             m.addDependency(m);
@@ -294,11 +294,11 @@ public class ModuleTest extends TestCase
             assertEquals("Cannot add itself as a dependency.", ex.getMessage());
         }
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Collections.singletonList(m2)), m.getDependencies());
+        assertEquals(Collections.singleton(m2), m.getDependencies());
             
         m.addDependency(m3);
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
     }
     
     /**
@@ -313,11 +313,11 @@ public class ModuleTest extends TestCase
         
         m.setDependencies(Collections.singletonList(m2));
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Collections.singletonList(m2)), m.getDependencies());
+        assertEquals(Collections.singleton(m2), m.getDependencies());
         
         m.addDependency(m3);
         assertSame("foo", m.getPath());
-        assertEquals(new HashSet<Module>(Arrays.asList(m2, m3)), m.getDependencies());
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         assertEquals(Collections.emptySet(), m3.getDependencies());
     }
     
