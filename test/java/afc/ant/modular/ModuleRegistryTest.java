@@ -58,8 +58,8 @@ public class ModuleRegistryTest extends TestCase
         final Module m1 = registry.resolveModule("foo");
         final Module m2 = registry.resolveModule("bar");
         
-        assertModule(m1, "foo/", map("1", "2", "3", "4"), m2);
-        assertModule(m2, "bar/", map("5", val));
+        assertModule(m1, "foo/", TestUtil.map("1", "2", "3", "4"), m2);
+        assertModule(m2, "bar/", TestUtil.map("5", val));
         
         assertSame(m1, registry.resolveModule("foo/"));
         
@@ -87,7 +87,7 @@ public class ModuleRegistryTest extends TestCase
         assertSame(m2, m4);
         
         assertModule(m1, "foo/");
-        assertModule(m2, "bar/", map("qqq", "www"));
+        assertModule(m2, "bar/", TestUtil.map("qqq", "www"));
         
         assertEquals(2, loader.paths.size());
         assertEquals(new HashSet<String>(Arrays.asList("foo/", "bar/")), new HashSet<String>(loader.paths));
@@ -454,15 +454,5 @@ public class ModuleRegistryTest extends TestCase
             }
             return (ModuleInfo) result;
         }
-    }
-    
-    private static HashMap<String, Object> map(Object... parts)
-    {
-        assertTrue(parts.length % 2 == 0);
-        final HashMap<String, Object> map = new HashMap<String, Object>();
-        for (int i = 0; i < parts.length; i+=2) {
-            map.put((String) parts[i], parts[i+1]);
-        }
-        return map;
     }
 }
