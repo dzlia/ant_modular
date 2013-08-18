@@ -40,6 +40,11 @@
 			<zipfileset dir="${classes.dir}" includes="**"/>
 			<zipfileset dir="${src.resources.dir}" includes="afc/ant/modular/ant_modular.properties"/>
 			<zipfileset file="${copyright.file}" prefix="META-INF"/>
+			<manifest>
+				<attribute name="Implementation-Title" value="Ant Modular"/>
+				<attribute name="Implementation-Version" value="UPSTREAM"/>
+				<attribute name="Implementation-Vendor" value="D&#378;mitry La&#365;&#269;uk"/>
+			</manifest>
 		</jar>
 	</target>
 	
