@@ -35,17 +35,18 @@ public class GetModuleAttribute extends Task
     private String outputProperty;
     private String name;
     
+    @SuppressWarnings("deprecation")
     @Override
     public void execute()
     {
         if (moduleProperty == null) {
-            throw new BuildException("'moduleProperty' is undefined.");
+            throw new BuildException("The attribute 'moduleProperty' is undefined.");
         }
         if (outputProperty == null) {
-            throw new BuildException("'outputProperty' is undefined.");
+            throw new BuildException("The attribute 'outputProperty' is undefined.");
         }
         if (name == null) {
-            throw new BuildException("'name' is undefined.");
+            throw new BuildException("The attribute 'name' is undefined.");
         }
         final Project project = getProject();
         final PropertyHelper propHelper = PropertyHelper.getPropertyHelper(project);
@@ -69,7 +70,7 @@ public class GetModuleAttribute extends Task
                     moduleProperty, Module.class.getName(), moduleObject.getClass().getName()));
         }
         
-        propHelper.setProperty(outputProperty, ModuleUtil.getAttributes(moduleObject).get(name), false);
+        propHelper.setNewProperty("", outputProperty, ModuleUtil.getAttributes(moduleObject).get(name));
     }
     
     public void setModuleProperty(final String moduleProperty)
