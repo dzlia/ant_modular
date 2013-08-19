@@ -9,6 +9,14 @@ import org.apache.tools.ant.BuildException;
 
 public class ModuleUtil
 {
+    public static boolean isModule(final Object module)
+    {
+        if (module == null) {
+            return false;
+        }
+        return module.getClass().getName().equals(Module.class.getName());
+    }
+    
     // Uses reflection to call the getter to support Module objects loaded by different class loaders.
     public static String getPath(final Object module)
     {

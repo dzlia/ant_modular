@@ -34,14 +34,15 @@ public class GetModulePath extends Task
     private String moduleProperty;
     private String outputProperty;
     
+    @SuppressWarnings("deprecation")
     @Override
     public void execute()
     {
         if (moduleProperty == null) {
-            throw new BuildException("'moduleProperty' is undefined.");
+            throw new BuildException("The attribute 'moduleProperty' is undefined.");
         }
         if (outputProperty == null) {
-            throw new BuildException("'outputProperty' is undefined.");
+            throw new BuildException("The attribute 'outputProperty' is undefined.");
         }
         final Project project = getProject();
         final PropertyHelper propHelper = PropertyHelper.getPropertyHelper(project);
@@ -59,13 +60,13 @@ public class GetModulePath extends Task
          * Reflection is used to handle the original module object with any configuration of
          * Ant class loader hierarchy.
          */
-        if (!moduleObject.getClass().getName().equals(Module.class.getName())) {
+        if (!ModuleUtil.isModule(moduleObject)) {
             throw new BuildException(MessageFormat.format(
                     "Invalid module type is found under the property ''{0}''. Expected: ''{1}'', found: ''{2}''.",
                     moduleProperty, Module.class.getName(), moduleObject.getClass().getName()));
         }
         
-        propHelper.setProperty(outputProperty, ModuleUtil.getPath(moduleObject), false);
+        propHelper.setNewProperty("", outputProperty, ModuleUtil.getPath(moduleObject));
     }
     
     public void setModuleProperty(final String moduleProperty)
