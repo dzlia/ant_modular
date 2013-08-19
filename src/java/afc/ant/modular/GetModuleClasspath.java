@@ -73,7 +73,7 @@ public class GetModuleClasspath extends Task
          * Reflection is used to handle the original module object with any configuration of
          * Ant class loader hierarchy.
          */
-        if (!moduleObject.getClass().getName().equals(Module.class.getName())) {
+        if (!ModuleUtil.isModule(moduleObject)) {
             throw new BuildException(MessageFormat.format(
                     "Invalid module type is found under the property ''{0}''. Expected: ''{1}'', found: ''{2}''.",
                     moduleProperty, Module.class.getName(), moduleObject.getClass().getName()));
