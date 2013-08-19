@@ -31,6 +31,8 @@ public class GetModulePathTest extends TestCase
         {
             assertEquals("The attribute 'moduleProperty' is undefined.", ex.getMessage());
         }
+        
+        assertEquals(null, PropertyHelper.getProperty(project, "out"));
     }
     
     public void testNoOutputProperty()
@@ -48,6 +50,8 @@ public class GetModulePathTest extends TestCase
         {
             assertEquals("The attribute 'outputProperty' is undefined.", ex.getMessage());
         }
+        
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
     }
     
     public void testNoModuleUnderThePropery()
@@ -63,11 +67,15 @@ public class GetModulePathTest extends TestCase
         {
             assertEquals("No module is found under the property 'in'.", ex.getMessage());
         }
+        
+        assertEquals(null, PropertyHelper.getProperty(project, "out"));
+        assertSame(null, PropertyHelper.getProperty(project, "in"));
     }
     
     public void testInvalidModuleType()
     {
-        PropertyHelper.setProperty(project, "in", Integer.valueOf(0));
+        final Object invalidModule = Integer.valueOf(0);
+        PropertyHelper.setProperty(project, "in", invalidModule);
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
@@ -81,6 +89,9 @@ public class GetModulePathTest extends TestCase
             assertEquals("Invalid module type is found under the property 'in'. " +
                     "Expected: 'afc.ant.modular.Module', found: 'java.lang.Integer'.", ex.getMessage());
         }
+        
+        assertEquals(null, PropertyHelper.getProperty(project, "out"));
+        assertSame(invalidModule, PropertyHelper.getProperty(project, "in"));
     }
     
     public void testSuccessfulExecution()
