@@ -44,13 +44,13 @@ public class GetModuleClasspath extends Task
     public void execute()
     {
         if (moduleProperty == null) {
-            throw new BuildException("'moduleProperty' is undefined.");
+            throw new BuildException("The attribute 'moduleProperty' is undefined.");
         }
         if (sourceAttributes.isEmpty()) {
             throw new BuildException("Source attributes are not defined.");
         }
         if (outputProperty == null) {
-            throw new BuildException("'outputProperty' is undefined.");
+            throw new BuildException("The attribute 'outputProperty' is undefined.");
         }
         for (final SourceAttribute sourceAttribute : sourceAttributes) {
             if (sourceAttribute.name == null) {
