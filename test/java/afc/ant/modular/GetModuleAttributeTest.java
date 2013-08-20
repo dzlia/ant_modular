@@ -82,6 +82,29 @@ public class GetModuleAttributeTest extends TestCase
         assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
+    public void testNoNameProperty()
+    {
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.map("attrib", "1", "attrib2", "3"));
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        
+        try {
+            task.execute();
+            fail();
+        }
+        catch (BuildException ex)
+        {
+            assertEquals("The attribute 'name' is undefined.", ex.getMessage());
+        }
+        
+        assertEquals(null, PropertyHelper.getProperty(project, "out"));
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
+    }
+    
     public void testNoModuleUnderThePropery()
     {
         task.setModuleProperty("in");
