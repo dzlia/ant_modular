@@ -59,14 +59,14 @@ public interface ModuleLoader
      * cannot be loaded then an exception {@link afc.ant.modular.ModuleNotLoadedException}
      * is thrown.</p>
      * 
-     * @param path the module path. It is a path relative to the root directory
-     *      of all modules (generally an Ant project base directory).
+     * @param path the module path. It is a path relative to the directory that is the root
+     *      for all modules (generally an Ant project base directory).
      *      It must not be {@code null}.
      * 
      * @return a {@link afc.ant.modular.ModuleInfo} object that is initialised
      *      with the module path, dependencies and attributes. It is never {@code null}.
      * 
-     * @throws ModuleNotLoadedException if module meta information cannot be loaded.
+     * @throws ModuleNotLoadedException if the module meta information cannot be loaded.
      */
     ModuleInfo loadModule(String path) throws ModuleNotLoadedException;
 }
