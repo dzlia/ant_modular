@@ -22,7 +22,51 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+/**
+ * <p>An interface of an Ant type that loads meta information about a module.
+ * This information is stored in {@link afc.ant.modular.ModuleInfo}
+ * objects as attributes in the form of {@code key->value}.
+ * An implementation of this interface is free to choose any representation of
+ * module meta information, except the following:
+ * <ul>
+ *  <li>the module path is stored in the
+ *      {@link afc.ant.modular.ModuleInfo#getPath() path} property</li>
+ *  <li>the module dependee modules are stored as their paths in the
+ *      {@link afc.ant.modular.ModuleInfo#getDependencies() dependencies}
+ *      property</li>
+ *  <li>for the sake of inter-operability, it is recommended (though not required)
+ *      that the module classpath attributes are stored as
+ *      {@link org.apache.tools.ant.types.Path} objects</li>
+ * </ul><br/>
+ * The dependee modules should not be resolved recursively.</p>
+ * 
+ * <p>Additional notes:
+ * <ul>
+ *  <li>{@code ModuleLoader} instance are used in the single threaded execution model</li>
+ *  <li>no caching of meta information is generally needed. Each module is loaded
+ *      only once</li>
+ *  <li>implementations of this interface are used by the task
+ *      {@link afc.ant.modular.CallTargetForModules} as pluggable components
+ *      to define a way in which module meta information is to be loaded</p>
+ * </ul></p>
+ *
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
 public interface ModuleLoader
 {
+    /**
+     * <p>Loads meta information of the module with the given path. If the module information
+     * cannot be loaded then an exception <tt>{@link afc.ant.modular.ModuleNotLoadedException}</tt>
+     * is thrown.</p>
+     * 
+     * @param path the module path. It is a path relative to the root directory
+     *      of all modules (generally an Ant project base directory).
+     *      It must not be {@code null}.
+     * 
+     * @return a <tt>{@link afc.ant.modular.ModuleInfo}</tt> object that is initialised
+     *      with the module path, dependencies and attributes. It is never {@code null}.
+     * 
+     * @throws ModuleNotLoadedException if module meta information cannot be loaded.
+     */
     ModuleInfo loadModule(String path) throws ModuleNotLoadedException;
 }
