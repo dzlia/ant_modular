@@ -47,7 +47,7 @@ package afc.ant.modular;
  *      only once</li>
  *  <li>implementations of this interface are used by the task
  *      {@link afc.ant.modular.CallTargetForModules} as pluggable components
- *      to define a way in which module meta information is to be loaded</p>
+ *      to define a way in which module meta information is to be loaded</li>
  * </ul></p>
  *
  * @author D&#378;mitry La&#365;&#269;uk
