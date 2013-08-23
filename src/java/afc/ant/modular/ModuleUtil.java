@@ -192,13 +192,13 @@ public class ModuleUtil
             return module.getClass().getMethod(functionName).invoke(module);
         }
         catch (IllegalAccessException ex) {
-            throw new BuildException("Unable to get module attributes.", ex);
+            throw new BuildException(MessageFormat.format("Unable to invoke module#{0}().", functionName), ex);
         }
         catch (NoSuchMethodException ex) {
-            throw new BuildException("Unable to get module attributes.", ex);
+            throw new BuildException(MessageFormat.format("Unable to invoke module#{0}().", functionName), ex);
         }
         catch (InvocationTargetException ex) {
-            throw new BuildException("Unable to get module attributes.", ex);
+            throw new BuildException(MessageFormat.format("Unable to invoke module#{0}().", functionName), ex);
         }
     }
 }
