@@ -81,7 +81,7 @@ public class GetModuleClasspath extends Task
         final Path classpath = new Path(project);
         appendClasspathElements(moduleObject, classpath, new LinkedHashSet<Object>());
         
-        propHelper.setProperty(outputProperty, classpath, false);
+        propHelper.setNewProperty("", outputProperty, classpath);
     }
     
     private void appendClasspathElements(final Object /*Module*/ module, final Path classpath,

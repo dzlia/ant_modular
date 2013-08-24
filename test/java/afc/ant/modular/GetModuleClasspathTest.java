@@ -242,6 +242,26 @@ public class GetModuleClasspathTest extends TestCase
         assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
+    public void testSingleClasspathAttribute_NoClasspathProperty_NoDependencies_OutputPropertyAlreadyDefined()
+    {
+        final Object value = new Object();
+        PropertyHelper.setProperty(project, "out", value);
+        
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.map("attrib", "1", "attrib2", "3"));
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        task.setSourceAttribute("cp");
+        
+        task.execute();
+        
+        assertSame(value, PropertyHelper.getProperty(project, "out"));
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
+    }
+    
     public void testSingleClasspathAttribute_NoClasspathProperty_WithDependencies()
     {
         final Module module = new Module("foo");
