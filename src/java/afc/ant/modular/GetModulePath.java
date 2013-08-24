@@ -34,7 +34,6 @@ public class GetModulePath extends Task
     private String moduleProperty;
     private String outputProperty;
     
-    @SuppressWarnings("deprecation")
     @Override
     public void execute()
     {

@@ -35,7 +35,6 @@ public class GetModuleAttribute extends Task
     private String outputProperty;
     private String name;
     
-    @SuppressWarnings("deprecation")
     @Override
     public void execute()
     {
