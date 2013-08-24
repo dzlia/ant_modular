@@ -66,11 +66,10 @@ public class GetModuleClasspath extends Task
         }
         
         /* This task is invoked from within a target that is called by CallTargetForModules.
-         * A new project is created for this target and therefore a new class loader.
-         * Multiple instances of the Module class could be created: one for the module instance
-         * that is put by CallTargetForModules and one that is loaded by this class' class loader.
+         * A new project is created for this target and therefore this tag library could be
+         * re-defined and loaded by a new class loader.
          * 
-         * Reflection is used to handle the original module object with any configuration of
+         * ModuleUtil is used to handle the original module object with any configuration of
          * Ant class loader hierarchy.
          */
         if (!ModuleUtil.isModule(moduleObject)) {
