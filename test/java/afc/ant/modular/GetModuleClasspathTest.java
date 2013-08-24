@@ -168,7 +168,35 @@ public class GetModuleClasspathTest extends TestCase
         assertEquals(TestUtil.map("attrib", "1", "attrib2", "3", "cp", "12345"), module.getAttributes());
     }
     
-    public void testSingleClasspathAttribute_ClasspathPropertyWithWrongType_DependeeModule()
+    public void testSingleClasspathAttribute_DependeeModuleWithCPPropertyWithWrongType()
+    {
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.map("attrib", "1", "attrib2", "3"));
+        final Module dep = new Module("bar");
+        dep.setAttributes(TestUtil.map("cp", Integer.valueOf(2)));
+        module.addDependency(dep);
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        task.setSourceAttribute("cp");
+        task.setIncludeDependencies(true);
+        
+        try {
+            task.execute();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("The attribute 'cp' of the module 'bar' is not an Ant path.", ex.getMessage());
+        }
+        
+        assertEquals(null, PropertyHelper.getProperty(project, "out"));
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
+        assertEquals(TestUtil.map("cp", Integer.valueOf(2)), dep.getAttributes());
+    }
+    
+    public void testSingleClasspathAttribute_DependeeModuleWithCPPropertyWithWrongType_DepsNotIncludedImplicitly()
     {
         final Module module = new Module("foo");
         module.setAttributes(TestUtil.map("attrib", "1", "attrib2", "3"));
@@ -181,15 +209,13 @@ public class GetModuleClasspathTest extends TestCase
         task.setOutputProperty("out");
         task.setSourceAttribute("cp");
         
-        try {
-            task.execute();
-            fail();
-        }
-        catch (BuildException ex) {
-            assertEquals("The attribute 'cp' of the module 'bar' is not an Ant path.", ex.getMessage());
-        }
+        task.execute();
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
+        final Object outObject = PropertyHelper.getProperty(project, "out");
+        assertTrue(outObject instanceof Path);
+        final Path classpath = (Path) outObject;
+        assertEquals(0, classpath.size());
+        
         assertSame(module, PropertyHelper.getProperty(project, "in"));
         assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
         assertEquals(TestUtil.map("cp", Integer.valueOf(2)), dep.getAttributes());

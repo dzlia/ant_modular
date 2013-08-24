@@ -38,7 +38,7 @@ public class GetModuleClasspath extends Task
     private String moduleProperty;
     private final ArrayList<SourceAttribute> sourceAttributes = new ArrayList<SourceAttribute>();
     private String outputProperty;
-    private boolean includeDependencies = true;
+    private boolean includeDependencies = false;
     
     @Override
     public void execute()
