@@ -48,7 +48,7 @@ public class ModuleRegistry
         }
         
         final String normalisedPath = ModuleInfo.normalisePath(path);
-        Object cachedModule = modules.get(normalisedPath);
+        final Object cachedModule = modules.get(normalisedPath);
         if (cachedModule == moduleNotLoaded) {
             throw new ModuleNotLoadedException(normalisedPath);
         }
