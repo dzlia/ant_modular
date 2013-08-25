@@ -201,7 +201,8 @@ public class ModuleRegistryTest extends TestCase
             fail();
         }
         catch (ModuleNotLoadedException ex) {
-            // expected
+            // the normalised path is expected in the exception message
+            assertEquals("bar/", ex.getMessage());
         }
         
         final Module m3 = registry.resolveModule("quux");
