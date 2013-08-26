@@ -22,20 +22,58 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+/**
+ * <p>Indicates that a module meta information is not loaded by a {@link ModuleLoader}
+ * implementation. Optionally, it provides an explanatory message and/or
+ * a cause exception.</p>
+ * 
+ * <p>Since the process of module resolution is recursive it is possible that
+ * the caller sees {@code ModuleNotLoadedException} that is related to a module
+ * is different from the module that was requested. This is possible for clients of
+ * {@link ModuleRegistry}.</p>
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ * 
+ * @see ModuleLoader
+ * @see ModuleRegistry
+ */
 public class ModuleNotLoadedException extends Exception
 {
+    /**
+     * <p>Creates an instance of {@code ModuleNotLoadedException} with undefined
+     * explanatory message and cause exception.</p>
+     */
     public ModuleNotLoadedException()
     {
         this(null, null);
     }
     
-    public ModuleNotLoadedException(final String path)
+    /**
+     * <p>Creates an instance of {@code ModuleNotLoadedException} with the given
+     * explanatory message and undefined cause exception.</p>
+     * 
+     * @param message the explanatory message. It is recommended that the message
+     *      contains information about the path of the module that is not loaded.
+     *      {@code null} is allowed and indicates an undefined message.
+     */
+    public ModuleNotLoadedException(final String message)
     {
-        this(path, null);
+        this(message, null);
     }
     
-    public ModuleNotLoadedException(final String path, final Throwable cause)
+    /**
+     * <p>Creates an instance of {@code ModuleNotLoadedException} with the given
+     * explanatory message and cause exception. It is recommended that the message
+     * contains information about the path of the module that is not loaded.</p>
+     * 
+     * @param message the explanatory message. It is recommended that the message
+     *      contains information about the path of the module that is not loaded.
+     *      {@code null} is allowed and indicates an undefined message.
+     * @param cause the cause exception. {@code null} is allowed and indicates
+     *      no cause exception.
+     */
+    public ModuleNotLoadedException(final String message, final Throwable cause)
     {
-        super(path, cause);
+        super(message, cause);
     }
 }
