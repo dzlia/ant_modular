@@ -153,58 +153,42 @@ public class SerialDependencyResolver implements DependencyResolver
     
     private static void ensureNoLoops(final Collection<Module> modules) throws CyclicDependenciesDetectedException
     {
-        // TODO re-write the code to re-use node graph created for dependency resolution
-        final HashSet<Node> graph = buildNodeGraph(modules);
-        /* Remove nodes without dependencies from the graph while this is possible.
-           Non-empty resulting graph means there are loops in there. */
-        boolean stuck;
-        do {
-            stuck = true;
-            for (final Iterator<Node> i = graph.iterator(); i.hasNext();) {
-                final Node node = i.next();
-                if (node.dependencies.size() == 0) {
-                    for (final Node depOf : node.dependencyOf) {
-                        depOf.dependencies.remove(node);
-                    }
-                    i.remove(); // means graph.remove(node);
-                    stuck = false;
-                }
-            }
-        } while (!stuck);
-        
-        if (graph.isEmpty()) {
-            return;
-        }
-        
-        /* There are cycling dependencies detected. Obtaining here a single loop to report to the invoker.
-         * 
-         * The following holds:
-         *  - each node has at least a single dependency
-         *  - walking in any direction from any starting node within the graph will lead to a loop detected
-         *  - the loop detected does not necessarily end with the starting node, some leading nodes could be truncated
-         */
-        final LinkedHashSet<Node> path = new LinkedHashSet<Node>();
-        for (Node node = anyNode(graph);; node = anyNode(node.dependencies)) {
-            if (!path.add(node)) { // the node is already visited so the loop is detected
-                int loopSize = path.size();
-                final Iterator<Node> it = path.iterator();
-                while (it.next() != node) {
-                    // skipping all leading nodes that are outside the loop
-                    --loopSize;
-                }
-                final ArrayList<Module> loop = new ArrayList<Module>(loopSize);
-                loop.add(node.module);
-                while (it.hasNext()) {
-                    loop.add(it.next().module);
-                }
-                assert loopSize == loop.size();
-                throw new CyclicDependenciesDetectedException(loop);
-            }
+        final HashSet<Module> cleanModules = new HashSet<Module>();
+        final LinkedHashSet<Module> path = new LinkedHashSet<Module>();
+        for (final Module module : modules) {
+            ensureNoLoops(module, path, cleanModules);
         }
     }
     
-    private static Node anyNode(final HashSet<Node> nodes)
+    private static void ensureNoLoops(final Module module, final LinkedHashSet<Module> path,
+            final HashSet<Module> cleanModules) throws CyclicDependenciesDetectedException
     {
-        return nodes.iterator().next();
+        if (cleanModules.contains(module)) {
+            return;
+        }
+        if (path.add(module)) {
+            for (final Module dep : module.getDependencies()) {
+                ensureNoLoops(dep, path, cleanModules);
+            }
+            path.remove(module);
+            cleanModules.add(module);
+            return;
+        }
+        
+        /* A loop is detected. It does not necessarily end with the starting node,
+           some leading nodes could be truncated. */
+        int loopSize = path.size();
+        final Iterator<Module> it = path.iterator();
+        while (it.next() != module) {
+            // skipping all leading nodes that are outside the loop
+            --loopSize;
+        }
+        final ArrayList<Module> loop = new ArrayList<Module>(loopSize);
+        loop.add(module);
+        while (it.hasNext()) {
+            loop.add(it.next());
+        }
+        assert loopSize == loop.size();
+        throw new CyclicDependenciesDetectedException(loop);
     }
 }
