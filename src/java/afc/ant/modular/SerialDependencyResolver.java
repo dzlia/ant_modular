@@ -63,7 +63,7 @@ public class SerialDependencyResolver implements DependencyResolver
         final Iterator<Node> i = nodes.iterator();
         do {
             final Node node = i.next();
-            if (node.dependencies.size() == 0) {
+            if (node.dependencyCount == 0) {
                 moduleAcquired = node.module;
                 
                 /* Removing node from the graph here instead of #moduleProcessed to avoid another
@@ -71,7 +71,7 @@ public class SerialDependencyResolver implements DependencyResolver
                  * checks are performed so that the caller must follow the correct workflow.
                  */
                 for (final Node depOf : node.dependencyOf) {
-                    depOf.dependencies.remove(node);
+                    --depOf.dependencyCount;
                 }
                 i.remove(); // means nodes.remove(node);
                 
@@ -109,12 +109,14 @@ public class SerialDependencyResolver implements DependencyResolver
         private Node(final Module module)
         {
             this.module = module;
-            dependencies = new HashSet<Node>();
+            dependencyCount = module.getDependencies().size();
             dependencyOf = new HashSet<Node>();
         }
         
         private final Module module;
-        private final HashSet<Node> dependencies;
+        /* Knowing just dependency count is enough to detect the moment
+           when this node has no dependencies remaining. */
+        private int dependencyCount;
         private final HashSet<Node> dependencyOf;
     }
     
@@ -145,7 +147,6 @@ public class SerialDependencyResolver implements DependencyResolver
             addNodeDeep(dep, nodeGraph, registry);
             final Node depNode = registry.get(dep);
             assert depNode != null;
-            node.dependencies.add(depNode);
             depNode.dependencyOf.add(node);
         }
         nodeGraph.add(node);
