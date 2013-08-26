@@ -70,8 +70,8 @@ public class SerialDependencyResolver implements DependencyResolver
                  * search for the node when #moduleProcessed is invoked. All consistency and input validity
                  * checks are performed so that the caller must follow the correct workflow.
                  */
-                for (final Node depOf : node.dependencyOf) {
-                    --depOf.dependencyCount;
+                for (int j = 0, n = node.dependencyOf.size(); j < n; ++j) {
+                     --node.dependencyOf.get(j).dependencyCount;
                 }
                 i.remove(); // means nodes.remove(node);
                 
@@ -110,18 +110,21 @@ public class SerialDependencyResolver implements DependencyResolver
         {
             this.module = module;
             dependencyCount = module.getDependencies().size();
-            dependencyOf = new HashSet<Node>();
+            dependencyOf = new ArrayList<Node>();
         }
         
         private final Module module;
         /* Knowing just dependency count is enough to detect the moment
            when this node has no dependencies remaining. */
         private int dependencyCount;
-        private final HashSet<Node> dependencyOf;
+        private final ArrayList<Node> dependencyOf;
     }
     
     private static HashSet<Node> buildNodeGraph(final Collection<Module> rootModules)
     {
+        /* TODO it is known that there are no loops in the dependency graph.
+           Use it knowledge to eliminate unnecessary checks OR merge buildNodeGraph() with
+           ensureNoLoops() so that loops are checked for while the node graph is being built. */
         final IdentityHashMap<Module, Node> registry = new IdentityHashMap<Module, Node>();
         final HashSet<Node> nodeGraph = new HashSet<Node>();
         for (final Module module : rootModules) {
