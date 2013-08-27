@@ -51,7 +51,7 @@ public class Module
         return path;
     }
     
-    public void addDependency(final Module dependency)
+    void addDependency(final Module dependency)
     {
         if (dependency == null) {
             throw new NullPointerException("dependency");
@@ -79,7 +79,7 @@ public class Module
      * @throws IllegalArgumentException if <i>dependencies</i> contains this {@code Module}.
      *      This {@code Module} instance is not modified in this case.
      */
-    public void setDependencies(final Collection<Module> dependencies)
+    void setDependencies(final Collection<Module> dependencies)
     {
         if (dependencies == null) {
             throw new NullPointerException("dependencies");
