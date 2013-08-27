@@ -121,7 +121,7 @@ public class SerialDependencyResolver implements DependencyResolver
         /* TODO it is known that there are no loops in the dependency graph.
            Use it knowledge to eliminate unnecessary checks OR merge buildNodeGraph() with
            ensureNoLoops() so that loops are checked for while the node graph is being built. */
-        final IdentityHashMap<Module, Node> registry = new IdentityHashMap<Module, Node>();
+        final IdentityHashMap<Module, Node> registry = new IdentityHashMap<Module, Node>(rootModules.size());
         // shortlist stores the leaves of the inverted dependency graph.
         final ArrayList<Node> shortlist = new ArrayList<Node>();
         for (final Module module : rootModules) {
@@ -130,30 +130,29 @@ public class SerialDependencyResolver implements DependencyResolver
         return shortlist;
     }
     
-    private static void addNodeDeep(final Module module, final ArrayList<Node> shortlist,
+    private static Node addNodeDeep(final Module module, final ArrayList<Node> shortlist,
             final IdentityHashMap<Module, Node> registry)
     {
-        if (registry.containsKey(module)) {
-            return; // the module is already processed 
+        Node node = registry.get(module);
+        if (node != null) {
+            return node; // the module is already processed 
         }
         
-        final Node node = new Node(module);
-        if (registry.put(node.module, node) != null) { // registering node assuming that each node could be registered only once.
-            throw new IllegalStateException("Node already exists.");
-        }
+        node = new Node(module);
+        registry.put(module, node);
         
         final Set<Module> deps = module.getDependencies();
         if (deps.isEmpty()) {
             shortlist.add(node);
-            return;
+        } else {
+            // inverted dependencies are assigned
+            for (final Module dep : module.getDependencies()) {
+                final Node depNode = addNodeDeep(dep, shortlist, registry);
+                assert depNode != null;
+                depNode.dependencyOf.add(node);
+            }
         }
-        // inverted dependencies are assigned
-        for (final Module dep : module.getDependencies()) {
-            addNodeDeep(dep, shortlist, registry);
-            final Node depNode = registry.get(dep);
-            assert depNode != null;
-            depNode.dependencyOf.add(node);
-        }
+        return node;
     }
     
     private static void ensureNoLoops(final Collection<Module> modules) throws CyclicDependenciesDetectedException
