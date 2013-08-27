@@ -121,7 +121,7 @@ public class SerialDependencyResolver implements DependencyResolver
         /* TODO it is known that there are no loops in the dependency graph.
            Use it knowledge to eliminate unnecessary checks OR merge buildNodeGraph() with
            ensureNoLoops() so that loops are checked for while the node graph is being built. */
-        final IdentityHashMap<Module, Node> registry = new IdentityHashMap<Module, Node>(rootModules.size());
+        final IdentityHashMap<Module, Node> registry = new IdentityHashMap<Module, Node>();
         // shortlist stores the leaves of the inverted dependency graph.
         final ArrayList<Node> shortlist = new ArrayList<Node>();
         for (final Module module : rootModules) {
