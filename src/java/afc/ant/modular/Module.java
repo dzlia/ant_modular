@@ -64,7 +64,7 @@ public final class Module
     /**
      * <p>Replaces the dependencies of this {@code Module} with given {@code Module} objects.
      * The new dependencies become visible immediately via a set returned by
-     * <tt>{@link #getDependencies()}</tt>.</p>
+     * {@link #getDependencies()}.</p>
      * 
      * <p>The input collection is not modified by this function and ownership over it is not
      * passed to this {@code Module}.</p>
@@ -97,13 +97,12 @@ public final class Module
     }
     
     /**
-     * <p>Returns a set of modules which this {@code Module} depends upon. The {@code Module} objects
-     * returned are necessarily non-{@code null}. The set returned is unmodifiable.
-     * In addition, any further modification of this module's dependencies by means of
-     * the <tt>{@link #addDependency(Module)}</tt> and <tt>{@link #setDependencies(Collection)}</tt>
-     * operations is immediately visible in the set returned.</p>
+     * <p>Returns a set of modules which this {@code Module} depends upon. The {@code Module}
+     * objects returned are necessarily non-{@code null}. The set returned is unmodifiable.
+     * In addition, any further modification of this module's dependencies is immediately
+     * visible in the set returned.</p>
      * 
-     * @return an unmodifiable set of this module's dependency modules.
+     * @return an unmodifiable set of this module's dependee modules.
      */
     public Set<Module> getDependencies()
     {
@@ -121,7 +120,7 @@ public final class Module
     /**
      * <p>Replaces the attributes of this {@code Module} with given attributes.
      * The new attributes become visible immediately via a set returned by
-     * <tt>{@link #getAttributes()}</tt>.</p>
+     * {@link #getAttributes()}.</p>
      * 
      * <p>The input map is not modified by this function and ownership over it is not
      * passed to this {@code Module}.</p>
@@ -148,10 +147,10 @@ public final class Module
     }
     
     /**
-     * <p>Returns this {@code Module}'s attributes. The map returned is necessarily non-{@code null} and unmodifiable.
-     * In addition, any further modification of this {@code Module}'s attributes by means of
-     * the <tt>{@link #addAttribute(String, Object)}</tt> and <tt>{@link #setAttributes(Map)}</tt>
-     * operations is immediately visible in the map returned.</p>
+     * <p>Returns this {@code Module}'s attributes. The map returned is necessarily
+     * non-{@code null} and unmodifiable. In addition, any further modification of this
+     * {@code Module}'s attributes by means of the {@link #addAttribute(String, Object)}
+     * and {@link #setAttributes(Map)} operations is immediately visible in the map returned.</p>
      * 
      * @return an unmodifiable map of this {@code Module}'s attributes.
      */
