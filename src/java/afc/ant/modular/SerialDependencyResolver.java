@@ -29,10 +29,11 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class SerialDependencyResolver implements DependencyResolver
 {
-    private HashSet<Node> nodes;
+    private ArrayList<Node> shortlist;
     private Module moduleAcquired;
     
     public void init(final Collection<Module> rootModules) throws CyclicDependenciesDetectedException
@@ -46,7 +47,7 @@ public class SerialDependencyResolver implements DependencyResolver
             }
         }
         ensureNoLoops(rootModules);
-        nodes = buildNodeGraph(rootModules);
+        shortlist = buildNodeGraph(rootModules);
         moduleAcquired = null;
     }
     
@@ -57,28 +58,23 @@ public class SerialDependencyResolver implements DependencyResolver
         if (moduleAcquired != null) {
             throw new IllegalStateException("#getFreeModule() is called when there is a module being processed.");
         }
-        if (nodes.isEmpty()) {
+        if (shortlist.isEmpty()) {
             return null;
         }
-        final Iterator<Node> i = nodes.iterator();
-        do {
-            final Node node = i.next();
-            if (node.dependencyCount == 0) {
-                moduleAcquired = node.module;
-                
-                /* Removing node from the graph here instead of #moduleProcessed to avoid another
-                 * search for the node when #moduleProcessed is invoked. All consistency and input validity
-                 * checks are performed so that the caller must follow the correct workflow.
-                 */
-                for (int j = 0, n = node.dependencyOf.size(); j < n; ++j) {
-                     --node.dependencyOf.get(j).dependencyCount;
-                }
-                i.remove(); // means nodes.remove(node);
-                
-                return node.module;
+        /* Removing node from the graph here instead of #moduleProcessed to avoid searching
+         * for the node when #moduleProcessed is invoked. All consistency and input validity
+         * checks are performed so that the caller must follow the correct workflow.
+         */
+        final Node node = shortlist.remove(shortlist.size()-1);
+        
+        for (int j = 0, n = node.dependencyOf.size(); j < n; ++j) {
+            final Node depOf = node.dependencyOf.get(j);
+            if (--depOf.dependencyCount == 0) {
+                // all modules with no dependencies go to the shortlist
+                shortlist.add(depOf);
             }
-        } while (i.hasNext());
-        throw new IllegalStateException(); // cyclic dependency detection does not work properly.
+        }
+        return moduleAcquired = node.module;
     }
     
     public void moduleProcessed(final Module module)
@@ -99,7 +95,7 @@ public class SerialDependencyResolver implements DependencyResolver
     
     private void ensureInitialised()
     {
-        if (nodes == null) {
+        if (shortlist == null) {
             throw new IllegalStateException("Resolver is not initialised.");
         }
     }
@@ -120,20 +116,21 @@ public class SerialDependencyResolver implements DependencyResolver
         private final ArrayList<Node> dependencyOf;
     }
     
-    private static HashSet<Node> buildNodeGraph(final Collection<Module> rootModules)
+    private static ArrayList<Node> buildNodeGraph(final Collection<Module> rootModules)
     {
         /* TODO it is known that there are no loops in the dependency graph.
            Use it knowledge to eliminate unnecessary checks OR merge buildNodeGraph() with
            ensureNoLoops() so that loops are checked for while the node graph is being built. */
         final IdentityHashMap<Module, Node> registry = new IdentityHashMap<Module, Node>();
-        final HashSet<Node> nodeGraph = new HashSet<Node>();
+        // shortlist stores the leaves of the inverted dependency graph.
+        final ArrayList<Node> shortlist = new ArrayList<Node>();
         for (final Module module : rootModules) {
-            addNodeDeep(module, nodeGraph, registry);
+            addNodeDeep(module, shortlist, registry);
         }
-        return nodeGraph;
+        return shortlist;
     }
     
-    private static void addNodeDeep(final Module module, final HashSet<Node> nodeGraph,
+    private static void addNodeDeep(final Module module, final ArrayList<Node> shortlist,
             final IdentityHashMap<Module, Node> registry)
     {
         if (registry.containsKey(module)) {
@@ -145,14 +142,18 @@ public class SerialDependencyResolver implements DependencyResolver
             throw new IllegalStateException("Node already exists.");
         }
         
-        // linking nodes in the same way as modules are linked
+        final Set<Module> deps = module.getDependencies();
+        if (deps.isEmpty()) {
+            shortlist.add(node);
+            return;
+        }
+        // inverted dependencies are assigned
         for (final Module dep : module.getDependencies()) {
-            addNodeDeep(dep, nodeGraph, registry);
+            addNodeDeep(dep, shortlist, registry);
             final Node depNode = registry.get(dep);
             assert depNode != null;
             depNode.dependencyOf.add(node);
         }
-        nodeGraph.add(node);
     }
     
     private static void ensureNoLoops(final Collection<Module> modules) throws CyclicDependenciesDetectedException
