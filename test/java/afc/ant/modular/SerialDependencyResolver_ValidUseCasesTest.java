@@ -712,8 +712,6 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         module3.addDependency(module4);
         module4.addDependency(module3);
         
-        module4.addDependency(module3);
-        
         try {
             resolver.init(Arrays.asList(module3, module4));
             fail();

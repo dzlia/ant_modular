@@ -256,51 +256,6 @@ public class ModuleTest extends TestCase
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
     }
     
-    public void testAddDependency_NullDependency()
-    {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        
-        m.setDependencies(Collections.singletonList(m2));
-        assertSame("foo", m.getPath());
-        assertEquals(Collections.singleton(m2), m.getDependencies());
-        
-        try {
-            m.addDependency(null);
-            fail();
-        }
-        catch (NullPointerException ex) {
-            assertEquals("dependency", ex.getMessage());
-        }
-        assertSame("foo", m.getPath());
-        assertEquals(Collections.singleton(m2), m.getDependencies());
-    }
-    
-    public void testAddDependency_AddItselfAsDependency()
-    {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
-        
-        m.setDependencies(Collections.singletonList(m2));
-        assertSame("foo", m.getPath());
-        assertEquals(Collections.singleton(m2), m.getDependencies());
-        
-        try {
-            m.addDependency(m);
-            fail();
-        }
-        catch (IllegalArgumentException ex) {
-            assertEquals("Cannot add itself as a dependency.", ex.getMessage());
-        }
-        assertSame("foo", m.getPath());
-        assertEquals(Collections.singleton(m2), m.getDependencies());
-            
-        m.addDependency(m3);
-        assertSame("foo", m.getPath());
-        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
-    }
-    
     /**
      * <p>Test description: though discouraged using different instances of Module with the same path is allowed.
      * Such instances must be treat as different modules.</p>

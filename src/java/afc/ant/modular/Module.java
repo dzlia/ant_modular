@@ -53,12 +53,11 @@ public class Module
     
     void addDependency(final Module dependency)
     {
-        if (dependency == null) {
-            throw new NullPointerException("dependency");
-        }
-        if (dependency == this) {
-            throw new IllegalArgumentException("Cannot add itself as a dependency.");
-        }
+        /* Add dependency is not public/protected. The package developer is responsible
+           for passing valid dependencies. */
+        assert dependency != null;
+        assert dependency != this;
+        assert !dependencies.contains(dependency);
         dependencies.add(dependency);
     }
     
