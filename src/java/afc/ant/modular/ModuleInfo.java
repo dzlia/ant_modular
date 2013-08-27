@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ModuleInfo
+public final class ModuleInfo
 {
     private final String path;
     private final HashSet<String> dependencies = new HashSet<String>();
