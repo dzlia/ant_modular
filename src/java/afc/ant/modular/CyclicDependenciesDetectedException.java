@@ -24,16 +24,52 @@ package afc.ant.modular;
 
 import java.util.List;
 
+/**
+ * <p>Indicates that a loop is detected in dependencies between the {@link Module modules}
+ * involved. In other words, there is a module in the given modules that depends upon
+ * itself. Circular dependencies do not allow a {@link DependencyResolver} to determine
+ * an order in which modules could be processes so that each module is processed
+ * after all its dependee modules are processed.</p>
+ *
+ * @author @author D&#378;mitry La&#365;&#269;uk
+ * 
+ * @see DependencyResolver
+ */
 public class CyclicDependenciesDetectedException extends Exception
 {
     private final List<Module> loop;
     
+    /**
+     * <p>Creates an instance of {@code CyclicDependenciesDetectedException} and
+     * initialises it with the given module list that form a dependency loop. The modules
+     * passed are expected to be in the order they are placed in this loop.
+     * The first and the last elements of this list are not expected to be the same
+     * module. For instance, if the modules {@code A}, {@code B}, {@code C} are in
+     * a dependency loop {@code A->B->C->} then the list {@code [A, B, C]} should
+     * be passed.</p>
+     * 
+     * <p>The exception message is composed basing on the given modules.</p>
+     * 
+     * <p>Ownership over the given list is taken by the instance created. It should
+     * not be modified after the exception is created.</p>
+     * 
+     * @param loop the list of modules that form the dependency loop. It must not be
+     *      {@code null}.
+     * 
+     * @throws NullPointerException if <em>loop</em> is {@code null}.
+     */
     public CyclicDependenciesDetectedException(final List<Module> loop)
     {
         super(errorMessage(loop));
         this.loop = loop;
     }
     
+    /**
+     * <p>Returns the list of the modules that form the dependency loop this exception
+     * is associated with. The list returned is mutable. It is never {@code null}.</p>
+     * 
+     * @return the list of the modules that form the dependency loop.
+     */
     public List<Module> getLoop()
     {
         return loop;
