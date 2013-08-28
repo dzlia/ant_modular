@@ -61,8 +61,8 @@ public class SerialDependencyResolver implements DependencyResolver
         if (shortlist.isEmpty()) {
             return null;
         }
-        /* Removing node from the graph here instead of #moduleProcessed to avoid searching
-         * for the node when #moduleProcessed is invoked. All consistency and input validity
+        /* Removing the node from the graph here instead of #moduleProcessed to avoid searching
+         * for this node when #moduleProcessed is invoked. All consistency and input validity
          * checks are performed so that the caller must follow the correct workflow.
          */
         final Node node = shortlist.remove(shortlist.size()-1);
@@ -116,6 +116,12 @@ public class SerialDependencyResolver implements DependencyResolver
         private final ArrayList<Node> dependencyOf;
     }
     
+    /*
+     * Builds a DAG which nodes hold modules and arcs that represent inverted module dependencies.
+     * The list of nodes returned contains the ending vertices of the graph. The modules that
+     * are bound to these vertices do not have dependencies on other modules and are used
+     * as modules to start unwinding dependencies from.
+     */
     private static ArrayList<Node> buildNodeGraph(final Collection<Module> rootModules)
     {
         /* TODO it is known that there are no loops in the dependency graph.
