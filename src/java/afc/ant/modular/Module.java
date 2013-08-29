@@ -22,18 +22,29 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 public final class Module
 {
     private final String path;
-    private final HashSet<Module> dependencies = new HashSet<Module>();
-    private final Set<Module> dependenciesView = Collections.unmodifiableSet(dependencies);
+    
+    /* A set of dependencies upon other modules is emulated via ArrayList which is memory-efficient
+     * and has fast #add and #iterator#next operations. Uniqueness of modules is ensured by
+     * implementation of ModuleRegistry and ModuleInfo. The latter does not allow the same path
+     * to be added to the dependencies twice. Clients of Module see the module dependencies as a Set
+     * object that guarantees uniqueness of its elements.
+     */
+    private final ArrayList<Module> dependencies = new ArrayList<Module>();
+    private final ArrayListSet<Module> dependenciesView = new ArrayListSet(dependencies);
+    
     private final HashMap<String, Object> attributes = new HashMap<String, Object>();
     private final Map<String, Object> attributesView = Collections.unmodifiableMap(attributes);
     
@@ -102,6 +113,9 @@ public final class Module
      * In addition, any further modification of this module's dependencies is immediately
      * visible in the set returned.</p>
      * 
+     * <p><strong>Note</strong>: the cost of the {@code Set#contains(Object)} operation
+     * of the set returned is {@code O(n)}.</p>
+     * 
      * @return an unmodifiable set of this module's dependee modules.
      */
     public Set<Module> getDependencies()
@@ -157,5 +171,72 @@ public final class Module
     public Map<String, Object> getAttributes()
     {
         return attributesView;
+    }
+    
+    // An immutable adaptor from ArrayList to Set. Lists without duplicate elements are supported only.
+    private static class ArrayListSet<T> extends AbstractSet<T>
+    {
+        private final ArrayList<T> list;
+        
+        public ArrayListSet(final ArrayList<T> list)
+        {
+            assert list != null;
+            assert new HashSet<T>(list).size() == list.size();
+            this.list = list;
+        }
+
+        @Override
+        public Iterator<T> iterator()
+        {
+            return list.iterator();
+        }
+        
+        @Override
+        public int size()
+        {
+            return list.size();
+        }
+        
+        @Override
+        public boolean contains(final Object o)
+        {
+            return list.contains(o);
+        }
+        
+        @Override
+        public boolean add(final T o)
+        {
+            throw new UnsupportedOperationException();
+        }
+        
+        @Override
+        public boolean addAll(final Collection<? extends T> c)
+        {
+            throw new UnsupportedOperationException();
+        }
+        
+        @Override
+        public boolean remove(final Object o)
+        {
+            throw new UnsupportedOperationException();
+        }
+        
+        @Override
+        public boolean removeAll(final Collection<?> c)
+        {
+            throw new UnsupportedOperationException();
+        }
+        
+        @Override
+        public boolean retainAll(final Collection<?> c)
+        {
+            throw new UnsupportedOperationException();
+        }
+        
+        @Override
+        public void clear()
+        {
+            throw new UnsupportedOperationException();
+        }
     }
 }

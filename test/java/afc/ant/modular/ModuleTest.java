@@ -147,7 +147,7 @@ public class ModuleTest extends TestCase
             m.getDependencies().add(new Module("quux"));
             fail();
         }
-        catch (RuntimeException ex) {
+        catch (UnsupportedOperationException ex) {
             // expected
         }
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
@@ -166,7 +166,7 @@ public class ModuleTest extends TestCase
             m.getDependencies().add(null);
             fail();
         }
-        catch (RuntimeException ex) {
+        catch (UnsupportedOperationException ex) {
             // expected
         }
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
@@ -185,7 +185,102 @@ public class ModuleTest extends TestCase
             m.getDependencies().clear();
             fail();
         }
-        catch (RuntimeException ex) {
+        catch (UnsupportedOperationException ex) {
+            // expected
+        }
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+    }
+    
+    public void testTryRemoveADependencyViaGetter()
+    {
+        final Module m = new Module("foo");
+        final Module m2 = new Module("bar");
+        final Module m3 = new Module("baz");
+
+        m.setDependencies(Arrays.asList(m2, m3));
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+        
+        try {
+            m.getDependencies().remove(m2);
+            fail();
+        }
+        catch (UnsupportedOperationException ex) {
+            // expected
+        }
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+    }
+    
+    public void testTryRemoveAllViaGetter()
+    {
+        final Module m = new Module("foo");
+        final Module m2 = new Module("bar");
+        final Module m3 = new Module("baz");
+
+        m.setDependencies(Arrays.asList(m2, m3));
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+        
+        try {
+            m.getDependencies().removeAll(Arrays.asList(m2));
+            fail();
+        }
+        catch (UnsupportedOperationException ex) {
+            // expected
+        }
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+    }
+    
+    public void testTryRemoveAllViaGetter_InputCollectionSizeGreaterThanDependencyCount()
+    {
+        final Module m = new Module("foo");
+        final Module m2 = new Module("bar");
+        final Module m3 = new Module("baz");
+
+        m.setDependencies(Arrays.asList(m2, m3));
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+        
+        try {
+            m.getDependencies().removeAll(Arrays.asList(m2, m3, m2));
+            fail();
+        }
+        catch (UnsupportedOperationException ex) {
+            // expected
+        }
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+    }
+    
+    public void testTryRetainAllViaGetter()
+    {
+        final Module m = new Module("foo");
+        final Module m2 = new Module("bar");
+        final Module m3 = new Module("baz");
+
+        m.setDependencies(Arrays.asList(m2, m3));
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+        
+        try {
+            m.getDependencies().retainAll(Arrays.asList(m2, m3, m2));
+            fail();
+        }
+        catch (UnsupportedOperationException ex) {
+            // expected
+        }
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+    }
+    
+    public void testTryAddACollectionOfDependenciesViaGetter()
+    {
+        final Module m = new Module("foo");
+        final Module m2 = new Module("bar");
+        final Module m3 = new Module("baz");
+
+        m.setDependencies(Arrays.asList(m2, m3));
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+        
+        try {
+            m.getDependencies().addAll(Arrays.asList(new Module("quux")));
+            fail();
+        }
+        catch (UnsupportedOperationException ex) {
             // expected
         }
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
