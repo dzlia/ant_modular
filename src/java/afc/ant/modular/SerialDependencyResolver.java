@@ -118,7 +118,7 @@ public class SerialDependencyResolver implements DependencyResolver
     
     /*
      * Builds a DAG which nodes hold modules and arcs that represent inverted module dependencies.
-     * The list of nodes returned contains the ending vertices of the graph. The modules that
+     * The list of nodes returned contains the starting vertices of the graph. The modules that
      * are bound to these vertices do not have dependencies on other modules and are used
      * as modules to start unwinding dependencies from.
      */
@@ -141,7 +141,7 @@ public class SerialDependencyResolver implements DependencyResolver
     {
         Node node = registry.get(module);
         if (node != null) {
-            return node; // the module is already processed 
+            return node; // the module is already processed
         }
         
         node = new Node(module);
