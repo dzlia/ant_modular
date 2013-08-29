@@ -43,7 +43,7 @@ public final class Module
      * object that guarantees uniqueness of its elements.
      */
     private final ArrayList<Module> dependencies = new ArrayList<Module>();
-    private final ArrayListSet<Module> dependenciesView = new ArrayListSet(dependencies);
+    private final Set<Module> dependenciesView = Collections.unmodifiableSet(new ArrayListSet<Module>(dependencies));
     
     private final HashMap<String, Object> attributes = new HashMap<String, Object>();
     private final Map<String, Object> attributesView = Collections.unmodifiableMap(attributes);
@@ -173,7 +173,9 @@ public final class Module
         return attributesView;
     }
     
-    // An immutable adaptor from ArrayList to Set. Lists without duplicate elements are supported only.
+    /* An adaptor from ArrayList to Set. Lists without duplicate elements are supported only.
+     * It must be used with an unmodifiable wrapper.
+     */
     private static class ArrayListSet<T> extends AbstractSet<T>
     {
         private final ArrayList<T> list;
@@ -201,42 +203,6 @@ public final class Module
         public boolean contains(final Object o)
         {
             return list.contains(o);
-        }
-        
-        @Override
-        public boolean add(final T o)
-        {
-            throw new UnsupportedOperationException();
-        }
-        
-        @Override
-        public boolean addAll(final Collection<? extends T> c)
-        {
-            throw new UnsupportedOperationException();
-        }
-        
-        @Override
-        public boolean remove(final Object o)
-        {
-            throw new UnsupportedOperationException();
-        }
-        
-        @Override
-        public boolean removeAll(final Collection<?> c)
-        {
-            throw new UnsupportedOperationException();
-        }
-        
-        @Override
-        public boolean retainAll(final Collection<?> c)
-        {
-            throw new UnsupportedOperationException();
-        }
-        
-        @Override
-        public void clear()
-        {
-            throw new UnsupportedOperationException();
         }
     }
 }

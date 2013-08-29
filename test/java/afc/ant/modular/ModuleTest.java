@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -278,6 +279,30 @@ public class ModuleTest extends TestCase
         
         try {
             m.getDependencies().addAll(Arrays.asList(new Module("quux")));
+            fail();
+        }
+        catch (UnsupportedOperationException ex) {
+            // expected
+        }
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+    }
+    
+    public void testTryRemoveADependencyViaIterator()
+    {
+        final Module m = new Module("foo");
+        final Module m2 = new Module("bar");
+        final Module m3 = new Module("baz");
+
+        m.setDependencies(Arrays.asList(m2, m3));
+        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
+        
+        final Iterator<Module> i = m.getDependencies().iterator();
+        assertTrue(i.hasNext());
+        final Module moduleToRemove = i.next();
+        assertTrue(TestUtil.set(m2, m3).contains(moduleToRemove));
+        
+        try {
+            i.remove();
             fail();
         }
         catch (UnsupportedOperationException ex) {
