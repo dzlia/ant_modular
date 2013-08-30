@@ -101,7 +101,7 @@ public class SerialDependencyResolver implements DependencyResolver
     }
     
     /* TODO think if path could be used as an array-based stack and the status of the modules
-       is set as registry module. However, the currect implementation shows itself to be slightly faster.*/
+       is set as registry module. However, the current implementation shows itself to be slightly faster.*/
     private static void addModuleDeep(final Module module, final ArrayList<Module> moduleOrder,
             final IdentityHashMap<Module, ?> registry, final LinkedHashSet<Module> path)
             throws CyclicDependenciesDetectedException
