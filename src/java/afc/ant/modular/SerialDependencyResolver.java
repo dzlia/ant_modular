@@ -25,7 +25,6 @@ package afc.ant.modular;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -46,7 +45,6 @@ public class SerialDependencyResolver implements DependencyResolver
                 throw new NullPointerException("rootModules contains null element.");
             }
         }
-        ensureNoLoops(rootModules);
         moduleOrder = orderModules(rootModules);
         pos = 0;
         moduleAcquired = null;
@@ -91,55 +89,35 @@ public class SerialDependencyResolver implements DependencyResolver
     
     // Returns modules in the order so that each module's dependee modules are located before this module.
     private static ArrayList<Module> orderModules(final Collection<Module> rootModules)
+            throws CyclicDependenciesDetectedException
     {
-        /* TODO it is known that there are no loops in the dependency graph.
-           Use it knowledge to eliminate unnecessary checks OR merge orderModules() with
-           ensureNoLoops() so that loops are checked for while the module order is being built. */
-        final IdentityHashMap<Module, Module> registry = new IdentityHashMap<Module, Module>();
+        final IdentityHashMap<Module, ?> registry = new IdentityHashMap<Module, Object>();
+        final LinkedHashSet<Module> path = new LinkedHashSet<Module>();
         final ArrayList<Module> moduleOrder = new ArrayList<Module>();
         for (final Module module : rootModules) {
-            addModuleDeep(module, moduleOrder, registry);
+            addModuleDeep(module, moduleOrder, registry, path);
         }
         return moduleOrder;
     }
     
+    /* TODO think if path could be used as an array-based stack and the status of the modules
+       is set as registry module. However, the currect implementation shows itself to be slightly faster.*/
     private static void addModuleDeep(final Module module, final ArrayList<Module> moduleOrder,
-            final IdentityHashMap<Module, Module> registry)
+            final IdentityHashMap<Module, ?> registry, final LinkedHashSet<Module> path)
+            throws CyclicDependenciesDetectedException
     {
         if (registry.containsKey(module)) {
             return; // the module is already processed
         }
         
-        registry.put(module, null);
-        
-        // the dependee modules are added before this module
-        for (final Module dep : module.getDependencies()) {
-            addModuleDeep(dep, moduleOrder, registry);
-        }
-        moduleOrder.add(module);
-    }
-    
-    private static void ensureNoLoops(final Collection<Module> modules) throws CyclicDependenciesDetectedException
-    {
-        final HashSet<Module> cleanModules = new HashSet<Module>();
-        final LinkedHashSet<Module> path = new LinkedHashSet<Module>();
-        for (final Module module : modules) {
-            ensureNoLoops(module, path, cleanModules);
-        }
-    }
-    
-    private static void ensureNoLoops(final Module module, final LinkedHashSet<Module> path,
-            final HashSet<Module> cleanModules) throws CyclicDependenciesDetectedException
-    {
-        if (cleanModules.contains(module)) {
-            return;
-        }
         if (path.add(module)) {
+            // the dependee modules are added before this module
             for (final Module dep : module.getDependencies()) {
-                ensureNoLoops(dep, path, cleanModules);
+                addModuleDeep(dep, moduleOrder, registry, path);
             }
             path.remove(module);
-            cleanModules.add(module);
+            registry.put(module, null);
+            moduleOrder.add(module);
             return;
         }
         
