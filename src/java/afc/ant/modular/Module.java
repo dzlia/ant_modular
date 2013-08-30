@@ -41,8 +41,11 @@ public final class Module
      * implementation of ModuleRegistry and ModuleInfo. The latter does not allow the same path
      * to be added to the dependencies twice. Clients of Module see the module dependencies as a Set
      * object that guarantees uniqueness of its elements.
+     * 
+     * This field has the package-level access. This is used by dependency resolvers to avoid
+     * overhead associated with iterators (virtual function call, longer dereference chain, etc.).
      */
-    private final ArrayList<Module> dependencies = new ArrayList<Module>();
+    final ArrayList<Module> dependencies = new ArrayList<Module>();
     private final Set<Module> dependenciesView = Collections.unmodifiableSet(new ArrayListSet<Module>(dependencies));
     
     private final HashMap<String, Object> attributes = new HashMap<String, Object>();

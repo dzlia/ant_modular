@@ -112,7 +112,8 @@ public class SerialDependencyResolver implements DependencyResolver
         
         if (path.add(module)) {
             // the dependee modules are added before this module
-            for (final Module dep : module.getDependencies()) {
+            for (int i = 0, n = module.dependencies.size(); i < n; ++i) {
+                final Module dep = module.dependencies.get(i);
                 addModuleDeep(dep, moduleOrder, registry, path);
             }
             path.remove(module);
