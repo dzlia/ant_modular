@@ -112,7 +112,7 @@ public class SerialDependencyResolver implements DependencyResolver
         
         registry.put(module, null);
         
-        // inverted dependencies are assigned
+        // the dependee modules are added before this module
         for (final Module dep : module.getDependencies()) {
             addModuleDeep(dep, moduleOrder, registry);
         }
