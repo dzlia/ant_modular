@@ -29,12 +29,12 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 public class SerialDependencyResolver implements DependencyResolver
 {
-    private ArrayList<Node> shortlist;
+    private ArrayList<Module> moduleOrder;
     private Module moduleAcquired;
+    private int pos;
     
     public void init(final Collection<Module> rootModules) throws CyclicDependenciesDetectedException
     {
@@ -47,7 +47,8 @@ public class SerialDependencyResolver implements DependencyResolver
             }
         }
         ensureNoLoops(rootModules);
-        shortlist = buildNodeGraph(rootModules);
+        moduleOrder = orderModules(rootModules);
+        pos = 0;
         moduleAcquired = null;
     }
     
@@ -58,23 +59,10 @@ public class SerialDependencyResolver implements DependencyResolver
         if (moduleAcquired != null) {
             throw new IllegalStateException("#getFreeModule() is called when there is a module being processed.");
         }
-        if (shortlist.isEmpty()) {
+        if (pos == moduleOrder.size()) {
             return null;
         }
-        /* Removing the node from the graph here instead of #moduleProcessed to avoid searching
-         * for this node when #moduleProcessed is invoked. All consistency and input validity
-         * checks are performed so that the caller must follow the correct workflow.
-         */
-        final Node node = shortlist.remove(shortlist.size()-1);
-        
-        for (int j = 0, n = node.dependencyOf.size(); j < n; ++j) {
-            final Node depOf = node.dependencyOf.get(j);
-            if (--depOf.dependencyCount == 0) {
-                // all modules with no dependencies go to the shortlist
-                shortlist.add(depOf);
-            }
-        }
-        return moduleAcquired = node.module;
+        return moduleAcquired = moduleOrder.get(pos);
     }
     
     public void moduleProcessed(final Module module)
@@ -90,75 +78,45 @@ public class SerialDependencyResolver implements DependencyResolver
             throw new IllegalArgumentException(MessageFormat.format(
                     "The module ''{0}'' is not being processed.", module.getPath()));
         }
+        ++pos;
         moduleAcquired = null;
     }
     
     private void ensureInitialised()
     {
-        if (shortlist == null) {
+        if (moduleOrder == null) {
             throw new IllegalStateException("Resolver is not initialised.");
         }
     }
     
-    private static class Node
-    {
-        private Node(final Module module)
-        {
-            this.module = module;
-            dependencyCount = module.getDependencies().size();
-            dependencyOf = new ArrayList<Node>();
-        }
-        
-        private final Module module;
-        /* Knowing just dependency count is enough to detect the moment
-           when this node has no dependencies remaining. */
-        private int dependencyCount;
-        private final ArrayList<Node> dependencyOf;
-    }
-    
-    /*
-     * Builds a DAG which nodes hold modules and arcs that represent inverted module dependencies.
-     * The list of nodes returned contains the starting vertices of the graph. The modules that
-     * are bound to these vertices do not have dependencies on other modules and are used
-     * as modules to start unwinding dependencies from.
-     */
-    private static ArrayList<Node> buildNodeGraph(final Collection<Module> rootModules)
+    // Returns modules in the order so that each module's dependee modules are located before this module.
+    private static ArrayList<Module> orderModules(final Collection<Module> rootModules)
     {
         /* TODO it is known that there are no loops in the dependency graph.
-           Use it knowledge to eliminate unnecessary checks OR merge buildNodeGraph() with
-           ensureNoLoops() so that loops are checked for while the node graph is being built. */
-        final IdentityHashMap<Module, Node> registry = new IdentityHashMap<Module, Node>();
-        // shortlist stores the leaves of the inverted dependency graph.
-        final ArrayList<Node> shortlist = new ArrayList<Node>();
+           Use it knowledge to eliminate unnecessary checks OR merge orderModules() with
+           ensureNoLoops() so that loops are checked for while the module order is being built. */
+        final IdentityHashMap<Module, Module> registry = new IdentityHashMap<Module, Module>();
+        final ArrayList<Module> moduleOrder = new ArrayList<Module>();
         for (final Module module : rootModules) {
-            addNodeDeep(module, shortlist, registry);
+            addModuleDeep(module, moduleOrder, registry);
         }
-        return shortlist;
+        return moduleOrder;
     }
     
-    private static Node addNodeDeep(final Module module, final ArrayList<Node> shortlist,
-            final IdentityHashMap<Module, Node> registry)
+    private static void addModuleDeep(final Module module, final ArrayList<Module> moduleOrder,
+            final IdentityHashMap<Module, Module> registry)
     {
-        Node node = registry.get(module);
-        if (node != null) {
-            return node; // the module is already processed
+        if (registry.containsKey(module)) {
+            return; // the module is already processed
         }
         
-        node = new Node(module);
-        registry.put(module, node);
+        registry.put(module, null);
         
-        final Set<Module> deps = module.getDependencies();
-        if (deps.isEmpty()) {
-            shortlist.add(node);
-        } else {
-            // inverted dependencies are assigned
-            for (final Module dep : module.getDependencies()) {
-                final Node depNode = addNodeDeep(dep, shortlist, registry);
-                assert depNode != null;
-                depNode.dependencyOf.add(node);
-            }
+        // inverted dependencies are assigned
+        for (final Module dep : module.getDependencies()) {
+            addModuleDeep(dep, moduleOrder, registry);
         }
-        return node;
+        moduleOrder.add(module);
     }
     
     private static void ensureNoLoops(final Collection<Module> modules) throws CyclicDependenciesDetectedException
