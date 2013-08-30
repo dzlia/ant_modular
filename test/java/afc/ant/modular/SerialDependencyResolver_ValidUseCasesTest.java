@@ -92,8 +92,26 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         assertEquals(TestUtil.set(module1, module2), returnedModules);
     }
     
-    
     public void testThreeModules_Chain() throws Exception
+    {
+        final Module module1 = new Module("foo");
+        final Module module2 = new Module("bar");
+        final Module module3 = new Module("baz");
+        module1.addDependency(module2);
+        module3.addDependency(module1);
+        
+        resolver.init(Collections.singletonList(module3));
+        
+        assertSame(module2, resolver.getFreeModule());
+        resolver.moduleProcessed(module2);
+        assertSame(module1, resolver.getFreeModule());
+        resolver.moduleProcessed(module1);
+        assertSame(module3, resolver.getFreeModule());
+        resolver.moduleProcessed(module3);
+        assertSame(null, resolver.getFreeModule());
+    }
+    
+    public void testThreeModules_Chain_AllModulesAreRoot() throws Exception
     {
         final Module module1 = new Module("foo");
         final Module module2 = new Module("bar");
