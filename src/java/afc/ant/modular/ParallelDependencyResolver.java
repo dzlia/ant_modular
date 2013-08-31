@@ -115,6 +115,7 @@ public class ParallelDependencyResolver implements DependencyResolver
     
     private static class Node
     {
+        // TODO implement synchronised wrapper of module
         private Node(final Module module)
         {
             this.module = module;
