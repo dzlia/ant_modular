@@ -32,12 +32,12 @@ import junit.framework.TestCase;
 
 public class ParallelDependencyResolver_SerialUse_ValidUseCasesTest extends TestCase
 {
-    private SerialDependencyResolver resolver;
+    private ParallelDependencyResolver resolver;
     
     @Override
     protected void setUp()
     {
-        resolver = new SerialDependencyResolver();
+        resolver = new ParallelDependencyResolver();
     }
     
     public void testNoModules() throws Exception
@@ -500,8 +500,8 @@ public class ParallelDependencyResolver_SerialUse_ValidUseCasesTest extends Test
             resolver.moduleProcessed(module2);
             fail();
         }
-        catch (IllegalStateException ex) {
-            assertEquals("No module is being processed.", ex.getMessage());
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'bar' is not being processed.", ex.getMessage());
         }
         assertSame(null, resolver.getFreeModule());
     }
@@ -532,8 +532,8 @@ public class ParallelDependencyResolver_SerialUse_ValidUseCasesTest extends Test
             resolver.moduleProcessed(module1);
             fail();
         }
-        catch (IllegalStateException ex) {
-            assertEquals("No module is being processed.", ex.getMessage());
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'foo' is not being processed.", ex.getMessage());
         }
         assertSame(null, resolver.getFreeModule());
     }
@@ -567,8 +567,8 @@ public class ParallelDependencyResolver_SerialUse_ValidUseCasesTest extends Test
             resolver.moduleProcessed(module1);
             fail();
         }
-        catch (IllegalStateException ex) {
-            assertEquals("No module is being processed.", ex.getMessage());
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'foo' is not being processed.", ex.getMessage());
         }
         assertSame(null, resolver.getFreeModule());
     }
@@ -742,7 +742,7 @@ public class ParallelDependencyResolver_SerialUse_ValidUseCasesTest extends Test
         assertSame(null, resolver.getFreeModule());
     }
     
-    private static ArrayList<Module> flushModules(final SerialDependencyResolver resolver, final int moduleCount)
+    private static ArrayList<Module> flushModules(final ParallelDependencyResolver resolver, final int moduleCount)
     {
         final ArrayList<Module> result = new ArrayList<Module>();
         for (int i = moduleCount; i > 0; --i) {

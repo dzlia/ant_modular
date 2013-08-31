@@ -48,8 +48,12 @@ public class ParallelDependencyResolver implements DependencyResolver
             }
         }
         synchronized (this) {
-            shortlist = new LinkedBlockingQueue<Node>();
-            remainingModuleCount = buildNodeGraph(rootModules, shortlist);
+            final LinkedBlockingQueue<Node> newShortlist = new LinkedBlockingQueue<Node>();
+            /* if buildNodeGraph throws an exception then the state is not changed
+               so that this ParallelDependencyResolver instance could be used as if
+               this init() were not invoked. */
+            remainingModuleCount = buildNodeGraph(rootModules, newShortlist);
+            shortlist = newShortlist;
             modulesAcquired = new IdentityHashMap<Module, Node>();
         }
     }
@@ -159,7 +163,6 @@ public class ParallelDependencyResolver implements DependencyResolver
         
         if (path.add(module)) {
             node = new Node(module);
-            registry.put(module, node);
             
             final Set<Module> deps = module.getDependencies();
             if (deps.isEmpty()) {
@@ -173,6 +176,7 @@ public class ParallelDependencyResolver implements DependencyResolver
                 }
             }
             
+            registry.put(module, node);
             path.remove(module);
             return node;
         }
