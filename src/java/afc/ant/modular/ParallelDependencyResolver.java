@@ -140,9 +140,6 @@ public class ParallelDependencyResolver implements DependencyResolver
     private static int buildNodeGraph(final Collection<Module> rootModules, LinkedBlockingQueue<Node> shortlist)
             throws CyclicDependenciesDetectedException
     {
-        /* TODO it is known that there are no loops in the dependency graph.
-           Use it knowledge to eliminate unnecessary checks OR merge buildNodeGraph() with
-           ensureNoLoops() so that loops are checked for while the node graph is being built. */
         final IdentityHashMap<Module, Node> registry = new IdentityHashMap<Module, Node>();
         final LinkedHashSet<Module> path = new LinkedHashSet<Module>();
         for (final Module module : rootModules) {
