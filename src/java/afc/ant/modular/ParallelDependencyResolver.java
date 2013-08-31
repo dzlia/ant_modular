@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ParallelDependencyResolver implements DependencyResolver
