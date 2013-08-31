@@ -145,7 +145,7 @@ public class ParallelDependencyResolver implements DependencyResolver
         for (final Module module : rootModules) {
             addNodeDeep(module, shortlist, registry, path);
         }
-        // the number 
+        // the number of nodes in the graph
         return registry.size();
     }
     
