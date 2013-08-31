@@ -49,7 +49,7 @@ public class ParallelDependencyResolver implements DependencyResolver
         }
         synchronized (this) {
             final LinkedBlockingQueue<Node> newShortlist = new LinkedBlockingQueue<Node>();
-            /* if buildNodeGraph throws an exception then the state is not changed
+            /* If buildNodeGraph() throws an exception then the state is not changed
                so that this ParallelDependencyResolver instance could be used as if
                this init() were not invoked. */
             remainingModuleCount = buildNodeGraph(rootModules, newShortlist);
