@@ -165,12 +165,13 @@ public class ParallelDependencyResolver implements DependencyResolver
         if (path.add(module)) {
             node = new Node(module);
             
-            final Set<Module> deps = module.getDependencies();
+            final ArrayList<Module> deps = module.dependencies;
             if (deps.isEmpty()) {
                 shortlist.add(node);
             } else {
                 // inverted dependencies are assigned
-                for (final Module dep : module.getDependencies()) {
+                for (int i = 0, n = deps.size(); i < n; ++i) {
+                    final Module dep = deps.get(i);
                     final Node depNode = addNodeDeep(dep, shortlist, registry, path);
                     assert depNode != null;
                     depNode.dependencyOf.add(node);
