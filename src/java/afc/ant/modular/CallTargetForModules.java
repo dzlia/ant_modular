@@ -40,6 +40,7 @@ public class CallTargetForModules extends Task
     private String moduleProperty;
     
     private boolean targetSet;
+    private Property moduleParam;
     
     @Override
     public void init() throws BuildException
@@ -95,9 +96,14 @@ public class CallTargetForModules extends Task
     private void callTarget(final Module module)
     {
         if (moduleProperty != null) {
-            final Property param = antcall.createParam();
-            param.setName(moduleProperty);
-            param.setValue(module);
+            /* Replacing the value of the module param. This param is re-used
+               so that there are no multiple conflicting params when there are
+               multiple modules to be processed. */
+            if (moduleParam == null) {
+                moduleParam = antcall.createParam();
+                moduleParam.setName(moduleProperty);
+            }
+            moduleParam.setValue(module);
         }
         antcall.perform();
     }
