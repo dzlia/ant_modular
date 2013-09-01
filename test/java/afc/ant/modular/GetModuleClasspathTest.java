@@ -43,6 +43,13 @@ public class GetModuleClasspathTest extends TestCase
         task.setProject(project);
     }
     
+    @Override
+    protected void tearDown()
+    {
+        project = null;
+        task = null;
+    }
+    
     public void testNoModuleProperty()
     {
         task.setOutputProperty("out");

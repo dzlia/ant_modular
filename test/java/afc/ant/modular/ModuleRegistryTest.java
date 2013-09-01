@@ -22,6 +22,13 @@ public class ModuleRegistryTest extends TestCase
         registry = new ModuleRegistry(loader);
     }
     
+    @Override
+    protected void tearDown()
+    {
+        registry = null;
+        loader = null;
+    }
+    
     public void testCreateSingleModuleWithADependency_NoAttributes() throws Exception
     {
         final ModuleInfo module = new ModuleInfo("foo");

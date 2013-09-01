@@ -40,6 +40,12 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         resolver = new SerialDependencyResolver();
     }
     
+    @Override
+    protected void tearDown()
+    {
+        resolver = null;
+    }
+    
     public void testNoModules() throws Exception
     {
         resolver.init(Collections.<Module>emptyList());

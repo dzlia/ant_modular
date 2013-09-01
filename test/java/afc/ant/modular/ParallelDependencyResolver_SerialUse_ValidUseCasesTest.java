@@ -40,6 +40,12 @@ public class ParallelDependencyResolver_SerialUse_ValidUseCasesTest extends Test
         resolver = new ParallelDependencyResolver();
     }
     
+    @Override
+    protected void tearDown()
+    {
+        resolver = null;
+    }
+    
     public void testNoModules() throws Exception
     {
         resolver.init(Collections.<Module>emptyList());

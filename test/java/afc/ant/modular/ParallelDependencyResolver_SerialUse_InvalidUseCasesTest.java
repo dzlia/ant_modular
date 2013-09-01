@@ -37,6 +37,12 @@ public class ParallelDependencyResolver_SerialUse_InvalidUseCasesTest extends Te
         resolver = new ParallelDependencyResolver();
     }
     
+    @Override
+    protected void tearDown()
+    {
+        resolver = null;
+    }
+    
     public void testNullModuleList() throws Exception
     {
         try {

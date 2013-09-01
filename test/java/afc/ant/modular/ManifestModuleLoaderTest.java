@@ -27,6 +27,14 @@ public class ManifestModuleLoaderTest extends TestCase
         loader = new ManifestModuleLoader();
     }
     
+    @Override
+    protected void tearDown()
+    {
+        loader = null;
+        project = null;
+        baseDir = null;
+    }
+    
     public void testLoadModule_NoDependencies_NoAttributes() throws Exception
     {
         loader.setProject(project);

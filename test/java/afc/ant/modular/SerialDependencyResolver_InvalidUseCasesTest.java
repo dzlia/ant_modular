@@ -37,6 +37,12 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
         resolver = new SerialDependencyResolver();
     }
     
+    @Override
+    protected void tearDown()
+    {
+        resolver = null;
+    }
+    
     public void testNullModuleList() throws Exception
     {
         try {
