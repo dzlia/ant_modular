@@ -22,10 +22,14 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import java.io.File;
+import java.util.HashSet;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.types.Path.PathElement;
 
 import junit.framework.TestCase;
 
@@ -326,5 +330,40 @@ public class GetModuleClasspathTest extends TestCase
         assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
         assertEquals(TestUtil.map("x", "y"), dep1.getAttributes());
         assertEquals(TestUtil.map("b", "c"), dep2.getAttributes());
+    }
+    
+    public void testSingleClasspathAttribute_WithClasspathProperty_SingleModule()
+    {
+        final Path path = new Path(project);
+        path.createPathElement().setPath("a");
+        path.createPathElement().setPath("b");
+        path.createPathElement().setPath("c/d/e");
+        
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.map("attrib", "1", "attrib2", "3", "cp", path));
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        task.setSourceAttribute("cp");
+        
+        task.execute();
+        
+        final Object outObject = PropertyHelper.getProperty(project, "out");
+        assertTrue(outObject instanceof Path);
+        assertClasspath((Path) outObject, new File("a"), new File("b"), new File("c/d/e")); 
+        
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("attrib", "1", "attrib2", "3", "cp", path), module.getAttributes());
+    }
+    
+    private void assertClasspath(final Path classpath, final File... elements)
+    {
+        assertNotNull(classpath);
+        final String[] locations = classpath.list();
+        assertEquals(elements.length, locations.length);
+        for (int i = 0; i < locations.length; ++i) {
+            assertEquals(elements[i].getAbsolutePath(), locations[i]);
+        }
     }
 }
