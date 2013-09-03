@@ -33,14 +33,20 @@ import org.apache.tools.ant.types.PropertySet;
 
 public class CallTargetForModules extends Task
 {
-    private CallTarget antcall;
     private ArrayList<ModuleElement> moduleElements;
     private ModuleLoader moduleLoader;
     // If defined then the correspondent Module object is set to this property for each module being processed.
     private String moduleProperty;
     
+    private String target;
     private boolean targetSet;
-    private Property moduleParam;
+    private final ArrayList<ParamElement> params = new ArrayList<ParamElement>();
+    private final ArrayList<Reference> references = new ArrayList<Reference>();
+    private final PropertySet propertySet = new PropertySet();
+    
+    // Default values match antcall's defaults.
+    private boolean inheritAll = true;
+    private boolean inheritRefs = false;
     
     @Override
     public void init() throws BuildException
@@ -48,8 +54,6 @@ public class CallTargetForModules extends Task
         moduleProperty = null;
         targetSet = false;
         moduleElements = new ArrayList<ModuleElement>();
-        antcall = (CallTarget) getProject().createTask("antcall");
-        antcall.init();
     }
     
     @Override
@@ -95,16 +99,26 @@ public class CallTargetForModules extends Task
     
     private void callTarget(final Module module)
     {
+        final CallTarget antcall = (CallTarget) getProject().createTask("antcall");
+        antcall.init();
+        
         if (moduleProperty != null) {
-            /* Replacing the value of the module param. This param is re-used
-               so that there are no multiple conflicting params when there are
-               multiple modules to be processed. */
-            if (moduleParam == null) {
-                moduleParam = antcall.createParam();
-                moduleParam.setName(moduleProperty);
-            }
+            final Property moduleParam = antcall.createParam();
+            moduleParam.setName(moduleProperty);
             moduleParam.setValue(module);
         }
+        for (int i = 0, n = params.size(); i < n; ++i) {
+            final ParamElement param = params.get(i);
+            param.populate(antcall.createParam());
+        }
+        for (int i = 0, n = references.size(); i < n; ++i) {
+            antcall.addReference(references.get(i));
+        }
+        antcall.addPropertyset(propertySet);
+        antcall.setInheritAll(inheritAll);
+        antcall.setInheritRefs(inheritRefs);
+        antcall.setTarget(target);
+        
         antcall.perform();
     }
     
@@ -130,33 +144,35 @@ public class CallTargetForModules extends Task
     
     public void setTarget(final String target)
     {
-        antcall.setTarget(target);
+        this.target = target;
         targetSet = true;
     }
     
     public void setInheritAll(final boolean inheritAll)
     {
-        antcall.setInheritAll(inheritAll);
+        this.inheritAll = inheritAll;
     }
     
     public void setInheritRefs(final boolean inheritRefs)
     {
-        antcall.setInheritRefs(inheritRefs);
+        this.inheritRefs = inheritRefs;
     }
     
-    public Property createParam()
+    public ParamElement createParam()
     {
-        return antcall.createParam();
+        final ParamElement param = new ParamElement();
+        params.add(param);
+        return param;
     }
     
     public void addReference(final Reference reference)
     {
-        antcall.addReference(reference);
+        references.add(reference);
     }
     
     public void addPropertyset(final PropertySet propertySet)
     {
-        antcall.addPropertyset(propertySet);
+        this.propertySet.addPropertyset(propertySet);
     }
     
     // TODO support defining modules using regular expressions
@@ -170,6 +186,38 @@ public class CallTargetForModules extends Task
                 throw new BuildException("Module path is undefined.");
             }
             this.path = path;
+        }
+    }
+    
+    // TODO add all configuration that is supported by the Ant Property type.
+    public static class ParamElement
+    {
+        private String name;
+        private String value;
+        
+        private boolean nameSet;
+        private boolean valueSet;
+        
+        public void setName(final String name)
+        {
+            this.name = name;
+            nameSet = true;
+        }
+        
+        public void setValue(final String value)
+        {
+            this.value = value;
+            valueSet = true;
+        }
+        
+        public void populate(final Property property)
+        {
+            if (nameSet) {
+                property.setName(name);
+            }
+            if (valueSet) {
+                property.setValue(value);
+            }
         }
     }
 }
