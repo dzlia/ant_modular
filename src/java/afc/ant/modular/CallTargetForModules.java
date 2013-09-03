@@ -82,9 +82,6 @@ public class CallTargetForModules extends Task
                 modules.add(registry.resolveModule(moduleParam.path));
             }
             
-            // TODO make dependency resolver configurable
-
-            
             if (threadCount == 1) {
                 processModulesSerial(modules);
             } else {
@@ -130,7 +127,6 @@ public class CallTargetForModules extends Task
         dependencyResolver.init(modules);
         
         Module module;
-        // TODO add support for parallelism
         while ((module = dependencyResolver.getFreeModule()) != null) {
             callTarget(module);
             
