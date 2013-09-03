@@ -97,9 +97,9 @@ public class ParallelDependencyResolver implements DependencyResolver
             if (--depOf.dependencyCount == 0) {
                 // all modules with no dependencies go to the shortlist
                 shortlist.add(depOf);
+                notify();
             }
         }
-        notify();
     }
     
     private void ensureInitialised()
