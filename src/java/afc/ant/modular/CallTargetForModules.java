@@ -22,7 +22,10 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
@@ -47,6 +50,8 @@ public class CallTargetForModules extends Task
     // Default values match antcall's defaults.
     private boolean inheritAll = true;
     private boolean inheritRefs = false;
+    
+    private int threadCount = 1;
     
     @Override
     public void init() throws BuildException
@@ -78,15 +83,12 @@ public class CallTargetForModules extends Task
             }
             
             // TODO make dependency resolver configurable
-            final DependencyResolver dependencyResolver = new SerialDependencyResolver();
-            dependencyResolver.init(modules);
+
             
-            Module module;
-            // TODO add support for parallelism
-            while ((module = dependencyResolver.getFreeModule()) != null) {
-                callTarget(module);
-                
-                dependencyResolver.moduleProcessed(module);
+            if (threadCount == 1) {
+                processModulesSerial(modules);
+            } else {
+                processModulesParallel(modules);
             }
         }
         catch (ModuleNotLoadedException ex) {
@@ -122,6 +124,77 @@ public class CallTargetForModules extends Task
         antcall.perform();
     }
     
+    private void processModulesSerial(final ArrayList<Module> modules) throws CyclicDependenciesDetectedException
+    {
+        final SerialDependencyResolver dependencyResolver = new SerialDependencyResolver();
+        dependencyResolver.init(modules);
+        
+        Module module;
+        // TODO add support for parallelism
+        while ((module = dependencyResolver.getFreeModule()) != null) {
+            callTarget(module);
+            
+            dependencyResolver.moduleProcessed(module);
+        }
+    }
+    
+    private void processModulesParallel(final ArrayList<Module> modules) throws CyclicDependenciesDetectedException
+    {
+        final ParallelDependencyResolver dependencyResolver = new ParallelDependencyResolver();
+        dependencyResolver.init(modules);
+        
+        final AtomicBoolean buildFailed = new AtomicBoolean(false);
+        final AtomicReference buildFailureException = new AtomicReference();
+        
+        final Thread[] threads = new Thread[threadCount];
+        for (int i = 0; i < threadCount; ++i) {
+            final Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try {
+                        while (!buildFailed.get()) {
+                            if (Thread.interrupted()) {
+                                return;
+                            }
+                            
+                            final Module module = dependencyResolver.getFreeModule();
+                            if (module == null) {
+                                return;
+                            }
+                            callTarget(module);
+                            dependencyResolver.moduleProcessed(module);
+                        }
+                    }
+                    catch (Throwable ex) {
+                        buildFailed.set(true);
+                        buildFailureException.set(ex);
+                    }
+                }
+            };
+            threads[i] = t;
+            t.start();
+        }
+        try {
+            for (final Thread t : threads) {
+                t.join();
+            }
+        }
+        catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new BuildException("The build thread was interrupted.", ex);
+        }
+        
+        if (buildFailed.get()) {
+            final Throwable ex = (Throwable) buildFailureException.get();
+            if (ex instanceof BuildException) {
+                throw (BuildException) ex;
+            }
+            throw new BuildException(MessageFormat.format("Build failed. Cause: ''{0}''.", ex.getMessage()), ex);
+        }
+    }
+    
     public ModuleElement createModule()
     {
         final ModuleElement module = new ModuleElement();
@@ -135,6 +208,16 @@ public class CallTargetForModules extends Task
             throw new BuildException("Only a single module loader element is allowed.");
         }
         moduleLoader = loader;
+    }
+    
+    public void setThreadCount(final int threadCount)
+    {
+        if (threadCount <= 0) {
+            throw new BuildException(MessageFormat.format(
+                    "Invalid thread count: ''{0}''. It must be a positive value.",
+                    String.valueOf(threadCount)));
+        }
+        this.threadCount = threadCount;
     }
     
     public void setModuleProperty(final String propertyName)
