@@ -28,11 +28,10 @@ import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class ParallelDependencyResolver implements DependencyResolver
 {
-    private LinkedBlockingQueue<Node> shortlist;
+    private ArrayList<Node> shortlist;
     private IdentityHashMap<Module, Node> modulesAcquired;
     private int remainingModuleCount;
     
@@ -47,7 +46,7 @@ public class ParallelDependencyResolver implements DependencyResolver
             }
         }
         synchronized (this) {
-            final LinkedBlockingQueue<Node> newShortlist = new LinkedBlockingQueue<Node>();
+            final ArrayList<Node> newShortlist = new ArrayList<Node>();
             /* If buildNodeGraph() throws an exception then the state is not changed
                so that this ParallelDependencyResolver instance could be used as if
                this init() were not invoked. */
@@ -61,12 +60,15 @@ public class ParallelDependencyResolver implements DependencyResolver
     public synchronized Module getFreeModule()
     {
         ensureInitialised();
-        if (remainingModuleCount == 0) {
-            return null;
-        }
         
         try {
-            final Node node = shortlist.take();
+            while (shortlist.isEmpty()) {
+                if (remainingModuleCount == 0) {
+                    return null;
+                }
+                wait();
+            }
+            final Node node = shortlist.remove(shortlist.size()-1);
             final Module module = node.module;
             modulesAcquired.put(module, node);
             --remainingModuleCount;
@@ -85,24 +87,19 @@ public class ParallelDependencyResolver implements DependencyResolver
         if (module == null) {
             throw new NullPointerException("module");
         }
-        try {
-            final Node node = modulesAcquired.remove(module);
-            if (node == null) {
-                throw new IllegalArgumentException(MessageFormat.format(
-                        "The module ''{0}'' is not being processed.", module.getPath()));
-            }
-            for (int j = 0, n = node.dependencyOf.size(); j < n; ++j) {
-                final Node depOf = node.dependencyOf.get(j);
-                if (--depOf.dependencyCount == 0) {
-                    // all modules with no dependencies go to the shortlist
-                    shortlist.put(depOf);
-                }
+        final Node node = modulesAcquired.remove(module);
+        if (node == null) {
+            throw new IllegalArgumentException(MessageFormat.format(
+                    "The module ''{0}'' is not being processed.", module.getPath()));
+        }
+        for (int j = 0, n = node.dependencyOf.size(); j < n; ++j) {
+            final Node depOf = node.dependencyOf.get(j);
+            if (--depOf.dependencyCount == 0) {
+                // all modules with no dependencies go to the shortlist
+                shortlist.add(depOf);
             }
         }
-        catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException();
-        }
+        notify();
     }
     
     private void ensureInitialised()
@@ -137,7 +134,7 @@ public class ParallelDependencyResolver implements DependencyResolver
      * 
      * @returns the total number of modules.
      */
-    private static int buildNodeGraph(final Collection<Module> rootModules, LinkedBlockingQueue<Node> shortlist)
+    private static int buildNodeGraph(final Collection<Module> rootModules, ArrayList<Node> shortlist)
             throws CyclicDependenciesDetectedException
     {
         final IdentityHashMap<Module, Node> registry = new IdentityHashMap<Module, Node>();
@@ -149,7 +146,7 @@ public class ParallelDependencyResolver implements DependencyResolver
         return registry.size();
     }
     
-    private static Node addNodeDeep(final Module module, final LinkedBlockingQueue<Node> shortlist,
+    private static Node addNodeDeep(final Module module, final ArrayList<Node> shortlist,
             final IdentityHashMap<Module, Node> registry, final LinkedHashSet<Module> path)
             throws CyclicDependenciesDetectedException
     {
