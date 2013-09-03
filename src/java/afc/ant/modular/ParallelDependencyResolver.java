@@ -92,8 +92,8 @@ public class ParallelDependencyResolver implements DependencyResolver
             throw new IllegalArgumentException(MessageFormat.format(
                     "The module ''{0}'' is not being processed.", module.getPath()));
         }
-        for (int j = 0, n = node.dependencyOf.size(); j < n; ++j) {
-            final Node depOf = node.dependencyOf.get(j);
+        for (int i = 0, n = node.dependencyOf.size(); i < n; ++i) {
+            final Node depOf = node.dependencyOf.get(i);
             if (--depOf.dependencyCount == 0) {
                 // all modules with no dependencies go to the shortlist
                 shortlist.add(depOf);
