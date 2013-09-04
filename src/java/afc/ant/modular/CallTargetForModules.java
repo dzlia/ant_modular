@@ -22,16 +22,20 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import java.io.File;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.CallTarget;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.tools.ant.taskdefs.Ant.Reference;
+import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PropertySet;
 
 public class CallTargetForModules extends Task
@@ -268,14 +272,27 @@ public class CallTargetForModules extends Task
         }
     }
     
-    // TODO add all configuration that is supported by the Ant Property type.
-    public static class ParamElement
+    public static class ParamElement extends ProjectComponent
     {
         private String name;
         private String value;
+        private File file;
+        private URL url;
+        private String resource;
+        private Path classpath;
+        private String environment;
+        private Reference reference;
+        private String prefix;
+        // prefixValues introduced in Ant 1.8.2 is not available because Ant 1.6+ is supported.
         
         private boolean nameSet;
         private boolean valueSet;
+        private boolean fileSet;
+        private boolean urlSet;
+        private boolean resourceSet;
+        private boolean environmentSet;
+        private boolean referenceSet;
+        private boolean prefixSet;
         
         public void setName(final String name)
         {
@@ -289,6 +306,65 @@ public class CallTargetForModules extends Task
             valueSet = true;
         }
         
+        public void setFile(final File file)
+        {
+            this.file = file;
+            fileSet = true;
+        }
+        
+        public void setUrl(final URL url)
+        {
+            this.url = url;
+            urlSet = true;
+        }
+        
+        public void setResource(final String resource)
+        {
+            this.resource = resource;
+            resourceSet = true;
+        }
+        
+        public void setClasspath(final Path classpath)
+        {
+            if (this.classpath == null) {
+                this.classpath = classpath;
+            } else {
+                this.classpath.append(classpath);
+            }
+        }
+        
+        public Path createClasspath()
+        {
+            if (classpath == null) {
+                return classpath = new Path(getProject());
+            } else {
+                return classpath.createPath();
+            }
+        }
+        
+        public void setClasspathRef(final Reference reference)
+        {
+            createClasspath().setRefid(reference);
+        }
+        
+        public void setEnvironment(final String environment)
+        {
+            this.environment = environment;
+            environmentSet = true;
+        }
+        
+        public void setRefid(final Reference reference)
+        {
+            this.reference = reference;
+            referenceSet = true;
+        }
+        
+        public void setPrefix(final String prefix)
+        {
+            this.prefix = prefix;
+            prefixSet = true;
+        }
+        
         public void populate(final Property property)
         {
             if (nameSet) {
@@ -296,6 +372,27 @@ public class CallTargetForModules extends Task
             }
             if (valueSet) {
                 property.setValue(value);
+            }
+            if (fileSet) {
+                property.setFile(file);
+            }
+            if (urlSet) {
+                property.setUrl(url);
+            }
+            if (resourceSet) {
+                property.setResource(resource);
+            }
+            if (classpath != null) {
+                property.setClasspath(classpath);
+            }
+            if (environmentSet) {
+                property.setEnvironment(environment);
+            }
+            if (referenceSet) {
+                property.setRefid(reference);
+            }
+            if (prefixSet) {
+                property.setPrefix(prefix);
             }
         }
     }
