@@ -365,7 +365,7 @@ public class CallTargetForModules extends Task
             prefixSet = true;
         }
         
-        public void populate(final Property property)
+        private void populate(final Property property)
         {
             if (nameSet) {
                 property.setName(name);
