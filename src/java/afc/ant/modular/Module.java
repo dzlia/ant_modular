@@ -132,6 +132,8 @@ public final class Module
         if (attributeName == null) {
             throw new NullPointerException("attributeName");
         }
+        /* Synchronising on attributesView so this modification is atomic
+           for everyone who follows the contract of #getAttributes(). */
         synchronized (attributesView)
         {
             attributes.put(attributeName, value);
@@ -163,6 +165,8 @@ public final class Module
                 throw new NullPointerException("attributes contains an attribute with null name.");
             }
         }
+        /* Synchronising on attributesView so this modification is atomic
+           for everyone who follows the contract of #getAttributes(). */
         synchronized (attributesView) {
             this.attributes.clear();
             this.attributes.putAll(attributes);
