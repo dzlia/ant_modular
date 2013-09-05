@@ -197,7 +197,7 @@ public final class Module
      * }</pre>
      * Failure to follow this rule may lead to non-deterministic behaviour.</p>
      * 
-     * @return an synchronised and unmodifiable map of this {@code Module}'s attributes.
+     * @return a thread-safe and unmodifiable map of this {@code Module}'s attributes.
      */
     public Map<String, Object> getAttributes()
     {
