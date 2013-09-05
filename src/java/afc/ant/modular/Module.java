@@ -49,7 +49,8 @@ public final class Module
     private final Set<Module> dependenciesView = Collections.unmodifiableSet(new ArrayListSet<Module>(dependencies));
     
     private final HashMap<String, Object> attributes = new HashMap<String, Object>();
-    private final Map<String, Object> attributesView = Collections.unmodifiableMap(attributes);
+    private final Map<String, Object> attributesView = Collections.synchronizedMap(
+            Collections.unmodifiableMap(attributes));
     
     // path is assumed to end with '/'
     Module(final String path)
@@ -131,13 +132,16 @@ public final class Module
         if (attributeName == null) {
             throw new NullPointerException("attributeName");
         }
-        attributes.put(attributeName, value);
+        synchronized (attributesView)
+        {
+            attributes.put(attributeName, value);
+        }
     }
     
     /**
      * <p>Replaces the attributes of this {@code Module} with given attributes.
-     * The new attributes become visible immediately via a set returned by
-     * {@link #getAttributes()}.</p>
+     * This operation is thread-safe and atomic. The new attributes become visible
+     * immediately via a set returned by {@link #getAttributes()}.</p>
      * 
      * <p>The input map is not modified by this function and ownership over it is not
      * passed to this {@code Module}.</p>
@@ -159,8 +163,10 @@ public final class Module
                 throw new NullPointerException("attributes contains an attribute with null name.");
             }
         }
-        this.attributes.clear();
-        this.attributes.putAll(attributes);
+        synchronized (attributesView) {
+            this.attributes.clear();
+            this.attributes.putAll(attributes);
+        }
     }
     
     /**
@@ -169,7 +175,26 @@ public final class Module
      * {@code Module}'s attributes by means of the {@link #addAttribute(String, Object)}
      * and {@link #setAttributes(Map)} operations is immediately visible in the map returned.</p>
      * 
-     * @return an unmodifiable map of this {@code Module}'s attributes.
+     * <p>The map returned is thread-safe. However it is necessary to synchronise on this map
+     * to ensure that a bulk operation on the map is atomic. For instance:
+     * <pre>
+     * final Module module = getModule();
+     * final Map<String, Object> attribs = module.getAttributes();
+     * 
+     * // It is necessary to synchronise on attribs, not module!
+     * synchronized (attribs) {
+     *     final Iterator<String> i = attribs.iterator();
+     *     System.out.print("Attributes: ");
+     *     while (i.hasNext()) {
+     *         System.out.print(i.next());
+     *         if (i.hasNext()) {
+     *             System.out.print(", ");
+     *         }
+     *     }
+     * }</pre>
+     * Failure to follow this rule may lead to non-deterministic behaviour.</p>
+     * 
+     * @return an synchronised and unmodifiable map of this {@code Module}'s attributes.
      */
     public Map<String, Object> getAttributes()
     {
