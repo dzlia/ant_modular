@@ -3,6 +3,7 @@
 	<property name="src.dir" value="${basedir}/src/java"/>
 	<property name="src.resources.dir" value="${basedir}/src/resources"/>
 	<property name="classes.dir" value="${build.dir}/classes"/>
+	<property name="doc.api.dir" value="${build.dir}/doc_api"/>
 	<property name="lib.dir" value="${basedir}/lib"/>
 	<property name="jar.name" value="ant_modular.jar"/>
 	<property name="jar.file" value="${build.dir}/${jar.name}"/>
@@ -33,6 +34,19 @@
 				<fileset dir="${lib.dir}"/>
 			</classpath>
 		</javac>
+	</target>
+	
+	<target name="doc" depends="init">
+		<mkdir dir="${doc.api.dir}"/>
+		
+		<javadoc sourcepath="${src.dir}" destdir="${doc.api.dir}" charset="utf-8">
+			<classpath>
+				<fileset dir="${lib.dir}"/>
+				<fileset dir="${ant.library.dir}"/>
+			</classpath>
+			<footer>Ant Modular</footer>
+			<bottom>Copyright &#169; 2013, D&#378;mitry La&#365;&#269;uk. All rights reserved.</bottom>
+		</javadoc>
 	</target>
 	
 	<target name="jar" depends="compile">
