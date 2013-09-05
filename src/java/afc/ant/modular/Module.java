@@ -182,11 +182,11 @@ public final class Module
      * to ensure that a bulk operation on the map is atomic. For instance:
      * <pre>
      * final Module module = getModule();
-     * final Map<String, Object> attribs = module.getAttributes();
+     * final Map&lt;String, Object&gt; attribs = module.getAttributes();
      * 
      * // It is necessary to synchronise on attribs, not module!
      * synchronized (attribs) {
-     *     final Iterator<String> i = attribs.iterator();
+     *     final Iterator&lt;String&gt; i = attribs.keySet().iterator();
      *     System.out.print("Attributes: ");
      *     while (i.hasNext()) {
      *         System.out.print(i.next());
