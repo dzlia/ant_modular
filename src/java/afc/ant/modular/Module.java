@@ -134,8 +134,7 @@ public final class Module
         }
         /* Synchronising on attributesView so this modification is atomic
            for everyone who follows the contract of #getAttributes(). */
-        synchronized (attributesView)
-        {
+        synchronized (attributesView) {
             attributes.put(attributeName, value);
         }
     }
