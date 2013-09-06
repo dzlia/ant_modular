@@ -100,7 +100,7 @@ public final class Module
      * 
      * <p>This function is thread-safe.</p>
      * 
-     * @return the module path.
+     * @return the module path. It is necessarily non-{@code null}.
      */
     public String getPath()
     {
