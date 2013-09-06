@@ -24,7 +24,6 @@ package afc.ant.modular;
 
 import java.util.AbstractSet;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +31,35 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * <p>An entity that represents a single module in a multi-module environment. Each
+ * module is identified by its {@link #getPath() path} relative to the root directory
+ * of this environment. In addition, each module has metadata associated with it.
+ * This metadata consists of {@link #getDependencies() dependencies} and
+ * {@link #getAttributes() attributes}.</p>
+ * 
+ * <p>The module dependencies is a set of modules which this module dependens upon.
+ * Typically the dependee modules should be processed before this module can be
+ * processed.</p>
+ * 
+ * <p>The module attributes are named pieces of data of free format. Attribute names
+ * are case-sensitive. The {@code null} name is not allowed. An attribute value can be
+ * any object or {@code null}.</p>
+ * 
+ * <p>Each {@code Module} is built from its prototype &ndash; a {@link ModuleInfo} object.
+ * The dependency paths defined in the latter are converted into {@code Module} instances
+ * and assigned to the module instance and the attributes are copied with no transformation.
+ * {@code Module} has neither public nor protected constructors.
+ * {@link ModuleRegistry#resolveModule(String)} is to be used to get an instance of
+ * {@code Module} for a given path.</p>
+ * 
+ * <p>{@code Module} is technically not thread-safe. However, it can be used without
+ * synchronisation from any thread once it is exposed to the client of the Ant Modular
+ * library. Note that synchronising upon <em>attributes</em> is needed in some cases
+ * (refer to {@link #getDependencies()} for more details).</p>
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
 public final class Module
 {
     private final String path;
@@ -52,7 +80,12 @@ public final class Module
     private final Map<String, Object> attributesView = Collections.synchronizedMap(
             Collections.unmodifiableMap(attributes));
     
-    // path is assumed to end with '/'
+    /**
+     * <p>Creates an Module with a given path. The {@code Module} instance
+     * created has neither dependencies nor attributes.</p>
+     * 
+     * @param path the module path. It is assumed to end with '/'.
+     */
     Module(final String path)
     {
         if (path == null) {
@@ -61,54 +94,42 @@ public final class Module
         this.path = path;
     }
     
+    /**
+     * <p>Returns the module path. It is a path relative to the root directory of
+     * the environment that is associated with this {@code Module}.</p>
+     * 
+     * <p>This function is thread-safe.</p>
+     * 
+     * @return the module path.
+     */
     public String getPath()
     {
         return path;
     }
     
+    /**
+     * <p>Assigns a given {@code Module} as a dependency. It is assumed that the {@code Module}
+     * passed is not identical to this {@code Module} and is not contained already in
+     * this module's dependencies. In addition it is expected to be non-{@code null}.</p>
+     * 
+     * <p>To preserve thread-safety, this operation cannot be used after
+     * {@link ModuleRegistry#resolveModule(String)} has initialised this {@code Module}.</p>
+     * 
+     * @param dependency the dependee module to be assigned.
+     */
     void addDependency(final Module dependency)
     {
         /* Add dependency is not public/protected. The package developer is responsible
            for passing valid dependencies. */
         assert dependency != null;
         assert dependency != this;
+        /* No synchronisation is needed because dependencies are assigned before any thread
+         * is started by CallTargetForModules in which the client sees this Module instance
+         * (there is 'happens-before' relation) and because the client cannot modify
+         * these dependencies.
+         */
         assert !dependencies.contains(dependency);
         dependencies.add(dependency);
-    }
-    
-    /**
-     * <p>Replaces the dependencies of this {@code Module} with given {@code Module} objects.
-     * The new dependencies become visible immediately via a set returned by
-     * {@link #getDependencies()}.</p>
-     * 
-     * <p>The input collection is not modified by this function and ownership over it is not
-     * passed to this {@code Module}.</p>
-     * 
-     * @param dependencies {@code Module} objects that this {@code Module} is to depend upon.
-     *      This collection and all its elements are to be non-{@code null}. This collection must not
-     *      contain this {@code Module}.
-     * 
-     * @throws NullPointerException if <i>dependencies</i> or any its element is {@code null}.
-     *      This {@code Module} instance is not modified in this case.
-     * @throws IllegalArgumentException if <i>dependencies</i> contains this {@code Module}.
-     *      This {@code Module} instance is not modified in this case.
-     */
-    void setDependencies(final Collection<Module> dependencies)
-    {
-        if (dependencies == null) {
-            throw new NullPointerException("dependencies");
-        }
-        // Iteration is used instead of Collection#contains because not all collections support null elements.
-        for (final Module dependency : dependencies) {
-            if (dependency == null) {
-                throw new NullPointerException("dependencies contains null dependency.");
-            }
-            if (dependency == this) {
-                throw new IllegalArgumentException("Cannot add itself as a dependency.");
-            }
-        }
-        this.dependencies.clear();
-        this.dependencies.addAll(dependencies);
     }
     
     /**
@@ -117,16 +138,29 @@ public final class Module
      * In addition, any further modification of this module's dependencies is immediately
      * visible in the set returned.</p>
      * 
-     * <p><strong>Note</strong>: the cost of the {@code Set#contains(Object)} operation
-     * of the set returned is {@code O(n)}.</p>
+     * <p>The set returned is thread-safe. No synchronisation is needed for any operation
+     * that is allowed by this set.</p>
      * 
-     * @return an unmodifiable set of this module's dependee modules.
+     * @return a thread-safe and unmodifiable set of this module's dependee modules.
      */
     public Set<Module> getDependencies()
     {
         return dependenciesView;
     }
     
+    /**
+     * <p>Sets a given attribute to this {@code Module}. If the attribute with the given name
+     * already exists then its value is replaced with the new value. This operation is
+     * thread-safe and atomic. The new attribute becomes visible immediately via a set returned
+     * by {@link #getAttributes()}.</p>
+     * 
+     * @param attributeName the name of the attribute. It must not be {@code null}.
+     *      Attribute names are case-sensitive.
+     * @param value the attribute value. It can be {@code null}.
+     * 
+     * @throws NullPointerException if <em>attributeName</em> is {@code null}.
+     *      This {@code Module} instance is not modified in this case.
+     */
     public void addAttribute(final String attributeName, final Object value)
     {
         if (attributeName == null) {
@@ -150,7 +184,7 @@ public final class Module
      * @param attributes the new attributes to be assigned to this {@code Module}.
      *      This map must be non-{@code null}.
      * 
-     * @throws NullPointerException if <i>attributes</i> is {@code null}.
+     * @throws NullPointerException if <em>attributes</em> is {@code null}.
      *      This {@code Module} instance is not modified in this case.
      */
     public void setAttributes(final Map<String, Object> attributes)

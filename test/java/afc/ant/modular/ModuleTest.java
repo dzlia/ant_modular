@@ -49,10 +49,11 @@ public class ModuleTest extends TestCase
         final ArrayList<Module> deps = new ArrayList<Module>();
         deps.add(m2);
         deps.add(m3);
-        m2.setDependencies(Collections.singleton(m3));
+        m2.addDependency(m3);
         
         final HashSet<Module> expectedDeps = TestUtil.set(m2, m3);
-        m.setDependencies(deps);
+        m.addDependency(m2);
+        m.addDependency(m3);
         assertSame("foo", m.getPath());
         assertEquals(expectedDeps, m.getDependencies());
         assertEquals(Arrays.asList(m2, m3), deps);
@@ -63,20 +64,6 @@ public class ModuleTest extends TestCase
         // ensure deps of m2 and m3 are not modified
         assertEquals(Collections.singleton(m3), m2.getDependencies());
         assertEquals(Collections.emptySet(), m3.getDependencies());
-    }
-    
-    public void testReSetValidDependencies()
-    {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
-        final Module m4 = new Module("quux");
-
-        m.setDependencies(Arrays.asList(m2));
-        assertEquals(Collections.singleton(m2), m.getDependencies());
-        
-        m.setDependencies(Arrays.asList(m3, m4));
-        assertEquals(TestUtil.set(m3, m4), m.getDependencies());
     }
     
     public void testSetValidDependencies_InputCollectionDoesNotSupportNullElements()
@@ -119,10 +106,11 @@ public class ModuleTest extends TestCase
         };
         deps.add(m2);
         deps.add(m3);
-        m2.setDependencies(Collections.singleton(m3));
+        m2.addDependency(m3);
         
         final HashSet<Module> expectedDeps = TestUtil.set(m2, m3);
-        m.setDependencies(deps);
+        m.addDependency(m2);
+        m.addDependency(m3);
         assertSame("foo", m.getPath());
         assertEquals(expectedDeps, m.getDependencies());
         assertEquals(Arrays.asList(m2, m3), deps);
@@ -141,7 +129,8 @@ public class ModuleTest extends TestCase
         final Module m2 = new Module("bar");
         final Module m3 = new Module("baz");
         
-        m.setDependencies(Arrays.asList(m2, m3));
+        m.addDependency(m2);
+        m.addDependency(m3);
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -160,7 +149,8 @@ public class ModuleTest extends TestCase
         final Module m2 = new Module("bar");
         final Module m3 = new Module("baz");
         
-        m.setDependencies(Arrays.asList(m2, m3));
+        m.addDependency(m2);
+        m.addDependency(m3);
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -178,8 +168,9 @@ public class ModuleTest extends TestCase
         final Module m = new Module("foo");
         final Module m2 = new Module("bar");
         final Module m3 = new Module("baz");
-
-        m.setDependencies(Arrays.asList(m2, m3));
+        
+        m.addDependency(m2);
+        m.addDependency(m3);
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -197,8 +188,9 @@ public class ModuleTest extends TestCase
         final Module m = new Module("foo");
         final Module m2 = new Module("bar");
         final Module m3 = new Module("baz");
-
-        m.setDependencies(Arrays.asList(m2, m3));
+        
+        m.addDependency(m2);
+        m.addDependency(m3);
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -216,8 +208,9 @@ public class ModuleTest extends TestCase
         final Module m = new Module("foo");
         final Module m2 = new Module("bar");
         final Module m3 = new Module("baz");
-
-        m.setDependencies(Arrays.asList(m2, m3));
+        
+        m.addDependency(m2);
+        m.addDependency(m3);
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -235,8 +228,9 @@ public class ModuleTest extends TestCase
         final Module m = new Module("foo");
         final Module m2 = new Module("bar");
         final Module m3 = new Module("baz");
-
-        m.setDependencies(Arrays.asList(m2, m3));
+        
+        m.addDependency(m2);
+        m.addDependency(m3);
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -254,8 +248,9 @@ public class ModuleTest extends TestCase
         final Module m = new Module("foo");
         final Module m2 = new Module("bar");
         final Module m3 = new Module("baz");
-
-        m.setDependencies(Arrays.asList(m2, m3));
+        
+        m.addDependency(m2);
+        m.addDependency(m3);
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -273,8 +268,9 @@ public class ModuleTest extends TestCase
         final Module m = new Module("foo");
         final Module m2 = new Module("bar");
         final Module m3 = new Module("baz");
-
-        m.setDependencies(Arrays.asList(m2, m3));
+        
+        m.addDependency(m2);
+        m.addDependency(m3);
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -292,8 +288,9 @@ public class ModuleTest extends TestCase
         final Module m = new Module("foo");
         final Module m2 = new Module("bar");
         final Module m3 = new Module("baz");
-
-        m.setDependencies(Arrays.asList(m2, m3));
+        
+        m.addDependency(m2);
+        m.addDependency(m3);
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         final Iterator<Module> i = m.getDependencies().iterator();
@@ -307,46 +304,6 @@ public class ModuleTest extends TestCase
         }
         catch (UnsupportedOperationException ex) {
             // expected
-        }
-        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
-    }
-    
-    public void testSetNullDependencies()
-    {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
-        
-        m.setDependencies(Arrays.asList(m2, m3));
-        assertSame("foo", m.getPath());
-        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
-        
-        try {
-            m.setDependencies(null);
-            fail();
-        }
-        catch (NullPointerException ex) {
-            assertEquals("dependencies", ex.getMessage());
-        }
-        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
-    }
-    
-    public void testSetDependenciesWithNullElement()
-    {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
-        
-        m.setDependencies(Arrays.asList(m2, m3));
-        assertSame("foo", m.getPath());
-        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
-        
-        try {
-            m.setDependencies(Arrays.asList(new Module("quux"), null));
-            fail();
-        }
-        catch (NullPointerException ex) {
-            assertEquals("dependencies contains null dependency.", ex.getMessage());
         }
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
     }
@@ -367,7 +324,7 @@ public class ModuleTest extends TestCase
         final Module m2 = new Module("bar");
         final Module m3 = new Module("baz");
         
-        m.setDependencies(Arrays.asList(m2));
+        m.addDependency(m2);
         assertSame("foo", m.getPath());
         assertEquals(Collections.singleton(m2), m.getDependencies());
         
@@ -386,7 +343,7 @@ public class ModuleTest extends TestCase
         final Module m2 = new Module("bar");
         final Module m3 = new Module("foo");
         
-        m.setDependencies(Collections.singletonList(m2));
+        m.addDependency(m2);
         assertSame("foo", m.getPath());
         assertEquals(Collections.singleton(m2), m.getDependencies());
         
@@ -414,24 +371,6 @@ public class ModuleTest extends TestCase
         
         m1.addDependency(m2);
         assertTrue(m1.equals(m1));
-    }
-    
-    public void testSetItselfByMeansOfSetDependencies()
-    {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        
-        m.addDependency(m2);
-        
-        try {
-            m.setDependencies(Arrays.asList(new Module("baz"), m));
-            fail();
-        }
-        catch (IllegalArgumentException ex) {
-            assertEquals("Cannot add itself as a dependency.", ex.getMessage());
-        }
-        
-        assertEquals(Collections.singleton(m2), m.getDependencies());
     }
     
     public void testSetAttributes()
@@ -578,11 +517,11 @@ public class ModuleTest extends TestCase
         m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
         
         try {
-            m.setDependencies(null);
+            m.setAttributes(null);
             fail();
         }
         catch (NullPointerException ex) {
-            assertEquals("dependencies", ex.getMessage());
+            assertEquals("attributes", ex.getMessage());
         }
         m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
         
