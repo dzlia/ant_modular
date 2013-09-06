@@ -30,8 +30,8 @@ import java.util.List;
  * itself. Circular dependencies do not allow a {@link DependencyResolver} to determine
  * an order in which modules could be processes so that each module is processed
  * after all its dependee modules are processed.</p>
- *
- * @author @author D&#378;mitry La&#365;&#269;uk
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
  * 
  * @see DependencyResolver
  */
