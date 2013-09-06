@@ -91,41 +91,46 @@ public class SerialDependencyResolver implements DependencyResolver
     private static ArrayList<Module> orderModules(final Collection<Module> rootModules)
             throws CyclicDependenciesDetectedException
     {
-        final IdentityHashMap<Module, ?> registry = new IdentityHashMap<Module, Object>();
-        final LinkedHashSet<Module> path = new LinkedHashSet<Module>();
-        final ArrayList<Module> moduleOrder = new ArrayList<Module>();
+        final Context ctx = new Context();
         for (final Module module : rootModules) {
-            addModuleDeep(module, moduleOrder, registry, path);
+            addModuleDeep(module, ctx);
         }
-        return moduleOrder;
+        return ctx.moduleOrder;
+    }
+    
+    // Data that is used by addModuleDeep. These objects are the same at each step of the recusion.
+    private static class Context
+    {
+        public final IdentityHashMap<Module, ?> registry = new IdentityHashMap<Module, Object>();
+        public final LinkedHashSet<Module> path = new LinkedHashSet<Module>();
+        public final ArrayList<Module> moduleOrder = new ArrayList<Module>();
     }
     
     /* TODO think if path could be used as an array-based stack and the status of the modules
        is set as registry module. However, the current implementation shows itself to be slightly faster.*/
-    private static void addModuleDeep(final Module module, final ArrayList<Module> moduleOrder,
-            final IdentityHashMap<Module, ?> registry, final LinkedHashSet<Module> path)
+    private static void addModuleDeep(final Module module, final Context ctx)
             throws CyclicDependenciesDetectedException
     {
-        if (registry.containsKey(module)) {
+        if (ctx.registry.containsKey(module)) {
             return; // the module is already processed
         }
         
-        if (path.add(module)) {
+        if (ctx.path.add(module)) {
             // the dependee modules are added before this module
             for (int i = 0, n = module.dependencies.size(); i < n; ++i) {
                 final Module dep = module.dependencies.get(i);
-                addModuleDeep(dep, moduleOrder, registry, path);
+                addModuleDeep(dep, ctx);
             }
-            path.remove(module);
-            registry.put(module, null);
-            moduleOrder.add(module);
+            ctx.path.remove(module);
+            ctx.registry.put(module, null);
+            ctx.moduleOrder.add(module);
             return;
         }
         
         /* A loop is detected. It does not necessarily end with the starting node,
            some leading nodes could be truncated. */
-        int loopSize = path.size();
-        final Iterator<Module> it = path.iterator();
+        int loopSize = ctx.path.size();
+        final Iterator<Module> it = ctx.path.iterator();
         while (it.next() != module) {
             // skipping all leading nodes that are outside the loop
             --loopSize;
