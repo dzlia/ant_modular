@@ -77,6 +77,10 @@ public final class Module
     private final Set<Module> dependenciesView = Collections.unmodifiableSet(new ArrayListSet<Module>(dependencies));
     
     private final HashMap<String, Object> attributes = new HashMap<String, Object>();
+    
+    /* Synchronised outside, unmodifiable inside. Otherwise these is no way for the client
+     * to synchronise for bulk operations on the same monitor that is used for single operations.
+     */
     private final Map<String, Object> attributesView = Collections.synchronizedMap(
             Collections.unmodifiableMap(attributes));
     
