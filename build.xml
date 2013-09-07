@@ -106,10 +106,12 @@
 	</target>
 	
 	<target name="testCoverage" depends="compile,compileTest" xmlns:jacoco="org.jacoco.ant">
+		<delete file="${test.coverage.data.file}" failonerror="true"/>
 		<mkdir dir="${test.report.dir}"/>
 		<mkdir dir="${test.coverage.report.dir}"/>
 		<taskdef uri="org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpath="${lib.dir}/jacocoant.jar"/>
-		<jacoco:coverage destfile="${test.coverage.data.file}" excludes="*Test">
+		<jacoco:coverage destfile="${test.coverage.data.file}"
+				includes="afc.ant.modular.*" excludes="*Test:*Test.*:*Test$$*">
 			<junit fork="true" forkmode="once" dir="${basedir}" failureProperty="test.failed" printsummary="true">
 				<classpath>
 					<pathelement location="${classes.dir}"/>
