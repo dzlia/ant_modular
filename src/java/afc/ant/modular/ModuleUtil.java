@@ -33,7 +33,7 @@ import org.apache.tools.ant.BuildException;
  * <p>Various utilities that are used primarily to read module meta information
  * by Ant tasks that are used in targets invoked for a specific module.</p>
  *
- * @author @author D&#378;mitry La&#365;&#269;uk
+ * @author D&#378;mitry La&#365;&#269;uk
  */
 public class ModuleUtil
 {
