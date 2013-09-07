@@ -37,6 +37,14 @@ public final class ModuleInfo
     private final HashMap<String, Object> attributes = new HashMap<String, Object>();
     private final Map<String, Object> attributesView = Collections.unmodifiableMap(attributes);
     
+    /**
+     * <p>Creates a {@code ModuleInfo} with a given path. The normalised path is assigned.
+     * The {@code ModuleInfo} instance created has neither dependencies nor attributes.</p>
+     * 
+     * @param path the module path. It must not be {@code null}.
+     * 
+     * @throws NullPointerException if <em>path</em> is {@code null}.
+     */
     public ModuleInfo(final String path)
     {
         if (path == null) {
@@ -45,11 +53,30 @@ public final class ModuleInfo
         this.path = normalisePath(path);
     }
     
+    /**
+     * <p>Returns the path of this {@code ModuleInfo}. It is a path relative to the root directory
+     * of the environment that is associated with this {@code ModuleInfo}.</p>
+     * 
+     * @return the module path. It is necessarily non-{@code null}.
+     */
     public String getPath()
     {
         return path;
     }
     
+    /**
+     * <p>Assigns a given module path as a dependency. The path is normalised before it is
+     * assigned. The given module path in its normalised form must not be equal to the path
+     * of this {@code ModuleInfo}. In addition, it must not be {@code null}. The new dependency
+     * becomes visible immediately via a set returned by {@link #getDependencies()}.</p>
+     * 
+     * @param dependency the module path to be assigned as a dependency.
+     *      It must not be {@code null}.
+     * 
+     * @throws NullPointerException if <em>dependency</em> is {@code null}.
+     * @throws IllegalArgumentException if <em>dependency</em> in its normalised form is equal
+     *      to this {@code ModuleInfo}'s path.
+     */
     public void addDependency(final String dependency)
     {
         if (dependency == null) {
@@ -65,18 +92,18 @@ public final class ModuleInfo
     /**
      * <p>Replaces the dependencies of this {@code ModuleInfo} with given module paths.
      * The dependencies assigned are normalised, if needed. The new dependencies become
-     * visible immediately via a set returned by <tt>{@link #getDependencies()}</tt>.</p>
+     * visible immediately via a set returned by {@link #getDependencies()}.</p>
      * 
      * <p>The input collection is not modified by this function and ownership over it is not
      * passed to this {@code ModuleInfo}.</p>
      * 
      * @param dependencies module paths that this {@code ModuleInfo} is to depend upon.
      *      This collection and all its elements are to be non-{@code null}. This collection must not
-     *      contain this {@code ModuleInfo}'s path.
+     *      contain this {@code ModuleInfo}'s path (the normalised paths are compared).
      * 
-     * @throws NullPointerException if <i>dependencies</i> or any its element is {@code null}.
+     * @throws NullPointerException if <em>dependencies</em> or any its element is {@code null}.
      *      This {@code ModuleInfo} instance is not modified in this case.
-     * @throws IllegalArgumentException if <i>dependencies</i> contains this {@code ModuleInfo}'s path
+     * @throws IllegalArgumentException if <em>dependencies</em> contains this {@code ModuleInfo}'s path
      *      (normalised or non-normalised). This {@code ModuleInfo} instance is not modified in this case.
      */
     public void setDependencies(final Collection<String> dependencies)
@@ -101,11 +128,11 @@ public final class ModuleInfo
     }
     
     /**
-     * <p>Returns a set of module paths which this module depends upon. The paths returned
-     * returned are necessarily non-{@code null}. The set returned is unmodifiable.
+     * <p>Returns a set of module paths which this module depends upon. The set returned and
+     * the paths it contains are necessarily non-{@code null}. The set returned is unmodifiable.
      * In addition, any further modification of this {@code ModuleInfo}'s dependencies by means of
-     * the <tt>{@link #addDependency(String)}</tt> and <tt>{@link #setDependencies(Collection)}</tt>
-     * operations is immediately visible in the set returned.</p>
+     * the {@link #addDependency(String)} and {@link #setDependencies(Collection)} operations
+     * is immediately visible in the set returned.</p>
      * 
      * @return an unmodifiable set of this module's dependency modules.
      */
@@ -114,6 +141,18 @@ public final class ModuleInfo
         return dependenciesView;
     }
     
+    /**
+     * <p>Sets a given attribute to this {@code ModuleInfo}. If the attribute with the given name
+     * already exists then its value is replaced with the new value. The new attribute becomes
+     * visible immediately via a set returned by {@link #getAttributes()}.</p>
+     * 
+     * @param attributeName the name of the attribute. It must not be {@code null}.
+     *      Attribute names are case-sensitive.
+     * @param value the attribute value. It can be {@code null}.
+     * 
+     * @throws NullPointerException if <em>attributeName</em> is {@code null}.
+     *      This {@code ModuleInfo} instance is not modified in this case.
+     */
     public void addAttribute(final String attributeName, final Object value)
     {
         if (attributeName == null) {
