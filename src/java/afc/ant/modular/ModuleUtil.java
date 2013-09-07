@@ -181,7 +181,7 @@ public class ModuleUtil
         final String className = module.getClass().getName();
         if (!className.equals(Module.class.getName())) {
             throw new IllegalArgumentException(MessageFormat.format(
-                    "Unsupported module type. Expected: ''{0}'', was: ''{1}''",
+                    "Unsupported module type. Expected: ''{0}'', was: ''{1}''.",
                     Module.class.getName(), className));
         }
     }
