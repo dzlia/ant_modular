@@ -1,5 +1,11 @@
 package afc.ant.modular;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+
 import junit.framework.TestCase;
 
 public class ModuleUtilTest extends TestCase
@@ -19,9 +25,69 @@ public class ModuleUtilTest extends TestCase
         assertFalse(ModuleUtil.isModule(new ModuleInfo("foo")));
     }
     
-    // TODO add test isModule_Module_DifferentClassLoader()
     public void testIsModule_Module()
     {
         assertTrue(ModuleUtil.isModule(new Module("foo")));
+    }
+    
+    public void testIsModule_Module_DifferentClassLoader() throws Exception
+    {
+        final Object module = createModuleWithDifferentClassLoader("foo/");
+        
+        assertTrue(ModuleUtil.isModule(module));
+    }
+    
+    private static Object createModuleWithDifferentClassLoader(final String path) throws Exception
+    {
+        final Class c = ModuleClassLoader.instance.loadClass(Module.class.getName());
+        
+        assertNotSame(c, Module.class);
+        
+        final Constructor constructor = c.getDeclaredConstructor(String.class);
+        constructor.setAccessible(true);
+        
+        return constructor.newInstance(path);
+    }
+    
+    private static class ModuleClassLoader extends ClassLoader
+    {
+        public static final ModuleClassLoader instance;
+        
+        static {
+            try {
+                instance = new ModuleClassLoader();
+            }
+            catch (IOException ex) {
+                throw new ExceptionInInitializerError(ex);
+            }
+        }
+        
+        private ModuleClassLoader() throws IOException
+        {
+            defineClass(Module.class.getName());
+            // This code is consistent: the binary name of the class ArrayListSet is used.
+            defineClass(Module.class.getName() + "$ArrayListSet");
+        }
+        
+        private void defineClass(final String className) throws IOException
+        {
+            final InputStream in = Module.class.getClassLoader().getResourceAsStream(
+                    className.replace('.', '/') + ".class");
+            
+            try {
+                final BufferedInputStream bufferedIn = new BufferedInputStream(in);
+                final ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                
+                int b;
+                while ((b = bufferedIn.read()) >= 0) {
+                    buf.write(b);
+                }
+                
+                defineClass(className, buf.toByteArray(), 0, buf.size());
+            }
+            finally {
+                in.close();
+            }
+        }
     }
 }
