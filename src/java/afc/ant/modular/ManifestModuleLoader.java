@@ -168,7 +168,7 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
             return URLDecoder.decode(str, "utf-8");
         }
         catch (UnsupportedEncodingException ex) {
-            throw new BuildException(MessageFormat.format("Unable to decode a URL: ''{0}''", str), ex);
+            throw new BuildException(MessageFormat.format("Unable to decode a URL: ''{0}''.", str), ex);
         }
     }
 }
