@@ -80,8 +80,8 @@ public class ManifestModuleLoaderTest extends TestCase
         assertNotNull(moduleInfo);
         assertEquals("WithDeps_WithAttributes/", moduleInfo.getPath());
         assertEquals(TestUtil.set("foo/", "bar/baz/"), moduleInfo.getDependencies());
-        assertEquals(TestUtil.map("Attrib1", "", "Attrib2", "a b  cc/%C5%81/e", "Attrib3", "hello, world!", "aTTRIB4", "12345"),
-                moduleInfo.getAttributes());
+        assertEquals(TestUtil.map("Attrib1", "", "Attrib2", "a b  c+c/%C5%81/e",
+                "Attrib3", "hello, world!", "aTTRIB4", "12345"), moduleInfo.getAttributes());
     }
     
     public void testLoadModule_WithDependencies_WithAttributes_SingleClasspathAttribute() throws Exception
@@ -102,7 +102,7 @@ public class ManifestModuleLoaderTest extends TestCase
         assertEquals("12345", moduleInfo.getAttributes().get("aTTRIB4"));
         
         assertPath(moduleInfo.getAttributes().get("ATTRIB2"),
-                new File(moduleDir, "a"), new File(moduleDir, "b"), new File(moduleDir, "cc/\u0141/e"));
+                new File(moduleDir, "a"), new File(moduleDir, "b"), new File(moduleDir, "c c/\u0141/e"));
     }
     
     public void testLoadModule_WithDependencies_WithAttributes_MultipleClasspathAttribute() throws Exception
@@ -123,7 +123,7 @@ public class ManifestModuleLoaderTest extends TestCase
         assertEquals("hello, world!", moduleInfo.getAttributes().get("Attrib3"));
         
         assertPath(moduleInfo.getAttributes().get("Attrib2"),
-                new File(moduleDir, "a"), new File(moduleDir, "b"), new File(moduleDir, "cc/\u0141/e"));
+                new File(moduleDir, "a"), new File(moduleDir, "b"), new File(moduleDir, "c c/\u0141/e"));
         
         assertPath(moduleInfo.getAttributes().get("Attrib4"), new File(moduleDir, "12345"));
     }
@@ -147,7 +147,7 @@ public class ManifestModuleLoaderTest extends TestCase
         assertEquals("12345", moduleInfo.getAttributes().get("aTTRIB4"));
         
         assertPath(moduleInfo.getAttributes().get("Attrib2"),
-                new File(moduleDir, "a"), new File(moduleDir, "b"), new File(moduleDir, "cc/\u0141/e"));
+                new File(moduleDir, "a"), new File(moduleDir, "b"), new File(moduleDir, "c c/\u0141/e"));
     }
     
     public void testLoadModule_ClasspathAttributeHasNoName() throws Exception

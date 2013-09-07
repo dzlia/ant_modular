@@ -2,6 +2,6 @@
 Name: Build
 Depends: foo bar/baz/
 Attrib1: 
-Attrib2: a b  cc/%C5%81/e
+Attrib2: a b  c+c/%C5%81/e
 Attrib3: hello, world!
 aTTRIB4: 12345

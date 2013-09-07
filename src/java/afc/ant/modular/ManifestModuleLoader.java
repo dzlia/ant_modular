@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Map;
@@ -37,7 +38,6 @@ import java.util.regex.Pattern;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ProjectComponent;
-import org.apache.tools.ant.launch.Locator;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Path.PathElement;
 
@@ -72,7 +72,7 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         }
         final Matcher m = listElementPattern.matcher(deps);
         while (m.find()) {
-            final String path = decodeUri(m.group());
+            final String path = decodeUrl(m.group());
             moduleInfo.addDependency(path);
         }
     }
@@ -91,7 +91,7 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
             final Matcher m = listElementPattern.matcher(value);
             while (m.find()) {
                 final PathElement element = classpath.createPathElement();
-                element.setPath(moduleInfo.getPath() + decodeUri(m.group()));
+                element.setPath(moduleInfo.getPath() + decodeUrl(m.group()));
             }
             moduleInfo.addAttribute(attrib.name, classpath);
         }
@@ -162,10 +162,10 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         return val;
     }
     
-    private static String decodeUri(final String str)
+    private static String decodeUrl(final String str)
     {
         try {
-            return Locator.decodeUri(str);
+            return URLDecoder.decode(str, "utf-8");
         }
         catch (UnsupportedEncodingException ex) {
             throw new BuildException("Unable to decode URI.", ex);
