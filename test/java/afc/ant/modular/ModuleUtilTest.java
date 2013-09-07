@@ -202,11 +202,11 @@ public class ModuleUtilTest extends TestCase
     
     private static Object createModuleWithDifferentClassLoader(final String path, final ClassLoader cl) throws Exception
     {
-        final Class c = cl.loadClass(Module.class.getName());
+        final Class<?> c = cl.loadClass(Module.class.getName());
         
         assertNotSame(c, Module.class);
         
-        final Constructor constructor = c.getDeclaredConstructor(String.class);
+        final Constructor<?> constructor = c.getDeclaredConstructor(String.class);
         constructor.setAccessible(true);
         
         return constructor.newInstance(path);
