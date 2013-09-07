@@ -12,10 +12,13 @@
 	
 	<property name="debug.enabled" value="true"/>
 	<property name="java.src.version" value="1.5"/>
+	<property name="java.src.encoding" value="utf-8"/>
 	
 	<property name="test.src.dir" value="${basedir}/test/java"/>
 	<property name="test.classes.dir" value="${build.dir}/test_classes"/>
 	<property name="test.report.dir" value="${build.dir}/test_report"/>
+	<property name="test.coverage.report.dir" value="${build.dir}/test_report_coverage"/>
+	<property name="test.coverage.data.file" value="${build.dir}/coverage_data"/>
 	
 	<target name="clean">
 		<delete dir="${build.dir}" failonerror="true"/>
@@ -39,7 +42,7 @@
 	<target name="doc" depends="init">
 		<mkdir dir="${doc.api.dir}"/>
 		
-		<javadoc sourcepath="${src.dir}" destdir="${doc.api.dir}" charset="utf-8">
+		<javadoc sourcepath="${src.dir}" destdir="${doc.api.dir}" charset="${java.src.encoding}">
 			<classpath>
 				<fileset dir="${lib.dir}"/>
 				<fileset dir="${ant.library.dir}"/>
@@ -68,7 +71,7 @@
 		<mkdir dir="${test.classes.dir}"/>
 		
 		<javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" debug="true" source="${java.src.version}"
-				encoding="UTF-8" includeantruntime="true">
+				encoding="${java.src.encoding}" includeantruntime="true">
 			<classpath>
 				<pathelement location="${classes.dir}"/>
 				<fileset dir="${lib.dir}"/>
@@ -100,5 +103,49 @@
 			</fileset>
 			<report todir="${test.report.dir}" format="frames"/>
 		</junitreport>
+	</target>
+	
+	<target name="testCoverage" depends="compile,compileTest" xmlns:jacoco="org.jacoco.ant">
+		<mkdir dir="${test.report.dir}"/>
+		<mkdir dir="${test.coverage.report.dir}"/>
+		<taskdef uri="org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpath="${lib.dir}/jacocoant.jar"/>
+		<jacoco:coverage destfile="${test.coverage.data.file}" excludes="*Test">
+			<junit fork="true" forkmode="once" dir="${basedir}" failureProperty="test.failed" printsummary="true">
+				<classpath>
+					<pathelement location="${classes.dir}"/>
+					<pathelement location="${test.classes.dir}"/>
+					<fileset dir="${lib.dir}"/>
+				</classpath>
+				
+				<jvmarg value="-ea"/>
+				
+				<formatter type="xml"/>
+				<batchtest todir="${test.report.dir}">
+					<fileset dir="${test.classes.dir}">
+						<include name="**/*Test.class"/>
+					</fileset>
+				</batchtest>
+			</junit>
+		</jacoco:coverage>
+		<junitreport todir="${test.report.dir}">
+			<fileset dir="${test.report.dir}">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report todir="${test.report.dir}" format="frames"/>
+		</junitreport>
+		<jacoco:report>
+			<executiondata>
+				<file file="${test.coverage.data.file}"/>
+			</executiondata>
+			<structure name="Ant Modular">
+				<classfiles>
+					<fileset dir="${classes.dir}"/>
+				</classfiles>
+				<sourcefiles encoding="${java.src.encoding}">
+					<fileset dir="${src.dir}"/>
+				</sourcefiles>
+			</structure>
+			<html destdir="${test.coverage.report.dir}"/>
+		</jacoco:report>
 	</target>
 </project>
