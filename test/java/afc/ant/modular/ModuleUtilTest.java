@@ -16,7 +16,7 @@ public class ModuleUtilTest extends TestCase
     
     public void testIsModule_ModuleInfo()
     {
-        assertFalse(ModuleUtil.isModule(new Object()));
+        assertFalse(ModuleUtil.isModule(new ModuleInfo("foo")));
     }
     
     // TODO add test isModule_Module_DifferentClassLoader()
