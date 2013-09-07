@@ -137,7 +137,7 @@ public class GetModuleClasspath extends Task
         return o;
     }
     
-    private static class SourceAttribute
+    public static class SourceAttribute
     {
         private String name;
         

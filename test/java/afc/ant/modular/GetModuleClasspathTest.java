@@ -112,6 +112,55 @@ public class GetModuleClasspathTest extends TestCase
         assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
+    public void testClasspathAttributeWithUndefinedName_SingleAttribute()
+    {
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.map("attrib", "1", "attrib2", "3"));
+        PropertyHelper.setProperty(project, "in", module);
+        task.setSourceAttribute(null);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        
+        try {
+            task.execute();
+            fail();
+        }
+        catch (BuildException ex)
+        {
+            assertEquals("A source attribute with undefined name is specified.", ex.getMessage());
+        }
+        
+        assertEquals(null, PropertyHelper.getProperty(project, "out"));
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
+    }
+    
+    public void testClasspathAttributeWithUndefinedName_MultipleAttributes()
+    {
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.map("attrib", "1", "attrib2", "3"));
+        PropertyHelper.setProperty(project, "in", module);
+        task.createSourceAttribute().setName("foo");
+        task.createSourceAttribute().setName(null);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        
+        try {
+            task.execute();
+            fail();
+        }
+        catch (BuildException ex)
+        {
+            assertEquals("A source attribute with undefined name is specified.", ex.getMessage());
+        }
+        
+        assertEquals(null, PropertyHelper.getProperty(project, "out"));
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
+    }
+    
     public void testNoModuleUnderThePropery()
     {
         task.setModuleProperty("in");
