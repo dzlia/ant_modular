@@ -85,7 +85,7 @@ public final class Module
             Collections.unmodifiableMap(attributes));
     
     /**
-     * <p>Creates an Module with a given path. The {@code Module} instance
+     * <p>Creates a {@code Module} with a given path. The {@code Module} instance
      * created has neither dependencies nor attributes.</p>
      * 
      * @param path the module path. It is assumed to end with '/'.
