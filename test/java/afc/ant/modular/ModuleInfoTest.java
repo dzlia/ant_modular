@@ -498,11 +498,11 @@ public class ModuleInfoTest extends TestCase
         m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
         
         try {
-            m.setDependencies(null);
+            m.setAttributes(null);
             fail();
         }
         catch (NullPointerException ex) {
-            assertEquals("dependencies", ex.getMessage());
+            assertEquals("attributes", ex.getMessage());
         }
         m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
         
