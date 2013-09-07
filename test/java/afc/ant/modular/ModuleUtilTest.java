@@ -39,7 +39,7 @@ public class ModuleUtilTest extends TestCase
     
     private static Object createModuleWithDifferentClassLoader(final String path) throws Exception
     {
-        final Class c = ModuleClassLoader.instance.loadClass(Module.class.getName());
+        final Class c = new ModuleClassLoader().loadClass(Module.class.getName());
         
         assertNotSame(c, Module.class);
         
@@ -51,19 +51,12 @@ public class ModuleUtilTest extends TestCase
     
     private static class ModuleClassLoader extends ClassLoader
     {
-        public static final ModuleClassLoader instance;
-        
-        static {
-            try {
-                instance = new ModuleClassLoader();
-            }
-            catch (IOException ex) {
-                throw new ExceptionInInitializerError(ex);
-            }
-        }
-        
-        private ModuleClassLoader() throws IOException
+        public ModuleClassLoader() throws IOException
         {
+            /* Defining Module and its nested classes explicitly so that
+             * this class loader does not ask the parent class loader to load them,
+             * and a brand new classes are associated with this class loader.
+             */ 
             defineClass(Module.class.getName());
             // This code is consistent: the binary name of the class ArrayListSet is used.
             defineClass(Module.class.getName() + "$ArrayListSet");
