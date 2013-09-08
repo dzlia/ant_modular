@@ -748,6 +748,28 @@ public class ParallelDependencyResolver_SerialUse_ValidUseCasesTest extends Test
         assertSame(null, resolver.getFreeModule());
     }
     
+    public void testLoop_RootModuleIsNotIncluded()
+    {
+        final Module module1 = new Module("foo");
+        final Module module2 = new Module("bar");
+        final Module module3 = new Module("baz");
+        final Module module4 = new Module("quux");
+        module1.addDependency(module2);
+        module2.addDependency(module3);
+        module3.addDependency(module4);
+        module4.addDependency(module3);
+        
+        try {
+            resolver.init(Arrays.asList(module1));
+            fail();
+        }
+        catch (CyclicDependenciesDetectedException ex) {
+            assertTrue(ex.getMessage(), Pattern.matches("Cyclic dependencies detected: (?:" +
+                    Pattern.quote("[->baz->quux->]") + '|' +
+                    Pattern.quote("[->quux->baz->]") + ")\\.", ex.getMessage()));
+        }
+    }
+    
     private static ArrayList<Module> flushModules(final ParallelDependencyResolver resolver, final int moduleCount)
     {
         final ArrayList<Module> result = new ArrayList<Module>();
