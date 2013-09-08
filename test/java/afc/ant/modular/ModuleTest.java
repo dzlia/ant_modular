@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 import junit.framework.TestCase;
@@ -586,5 +587,37 @@ public class ModuleTest extends TestCase
         assertEquals(Collections.singletonMap("bar", val), m.getAttributes());
         
         assertEquals(Collections.singleton(m2), m.getDependencies());
+    }
+    
+    public void testGetDependencies_BasicOperations()
+    {
+        final Module m1 = new Module("foo/");
+        final Module m2 = new Module("bar/");
+        final Module m3 = new Module("baz/");
+        final Module m4 = new Module("quux/");
+        m1.addDependency(m2);
+        m1.addDependency(m3);
+        
+        final Set<Module> deps = m1.getDependencies();
+        
+        assertNotNull(deps);
+        assertFalse(deps.isEmpty());
+        assertEquals(2, deps.size());
+        assertFalse(deps.contains(m1));
+        assertTrue(deps.contains(m2));
+        assertTrue(deps.contains(m3));
+        assertFalse(deps.contains(m4));
+        assertEquals(TestUtil.set(m2, m3), deps);
+        
+        final Set<Module> deps2 = m2.getDependencies();
+        
+        assertNotNull(deps2);
+        assertTrue(deps2.isEmpty());
+        assertEquals(0, deps2.size());
+        assertFalse(deps2.contains(m1));
+        assertFalse(deps2.contains(m2));
+        assertFalse(deps2.contains(m3));
+        assertFalse(deps2.contains(m4));
+        assertEquals(Collections.emptySet(), deps2);
     }
 }
