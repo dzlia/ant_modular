@@ -23,6 +23,7 @@
 package afc.ant.modular;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +34,6 @@ import org.apache.tools.ant.types.Path;
 
 import junit.framework.TestCase;
 
-// TODO test multiple classpath attributes
 public class GetModuleClasspathTest extends TestCase
 {
     private GetModuleClasspath task;
@@ -593,6 +593,283 @@ public class GetModuleClasspathTest extends TestCase
         assertEquals(TestUtil.map("cp", path4), dep3.getAttributes());
     }
     
+    public void testClasspathAttributeAndElement_SingleModule()
+    {
+        final Path path1 = new Path(project);
+        path1.createPathElement().setPath("b");
+        path1.createPathElement().setPath("a");
+        path1.createPathElement().setPath("c/d/e");
+        
+        final Path path2 = new Path(project);
+        path2.createPathElement().setPath("88/ee");
+        
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2));
+        
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        task.setSourceAttribute("cp");
+        task.createSourceAttribute().setName("cp3");
+        
+        task.execute();
+        
+        final Object outObject = PropertyHelper.getProperty(project, "out");
+        assertTrue(outObject instanceof Path);
+        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+                new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet()); 
+        
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
+    }
+    
+    public void testClasspathAttributeAndElement_SingleModule_RepeatedSourceAttribute()
+    {
+        final Path path1 = new Path(project);
+        path1.createPathElement().setPath("b");
+        path1.createPathElement().setPath("a");
+        path1.createPathElement().setPath("c/d/e");
+        
+        final Path path2 = new Path(project);
+        path2.createPathElement().setPath("88/ee");
+        
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2));
+        
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        task.setSourceAttribute("cp");
+        task.createSourceAttribute().setName("cp3");
+        task.createSourceAttribute().setName("cp"); // repeated
+        
+        task.execute();
+        
+        final Object outObject = PropertyHelper.getProperty(project, "out");
+        assertTrue(outObject instanceof Path);
+        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+                new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet()); 
+        
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
+    }
+    
+    public void testClasspathElements_SingleModule()
+    {
+        final Path path1 = new Path(project);
+        path1.createPathElement().setPath("b");
+        path1.createPathElement().setPath("a");
+        path1.createPathElement().setPath("c/d/e");
+        
+        final Path path2 = new Path(project);
+        path2.createPathElement().setPath("88/ee");
+        
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2));
+        
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        task.createSourceAttribute().setName("cp");
+        task.createSourceAttribute().setName("cp3");
+        
+        task.execute();
+        
+        final Object outObject = PropertyHelper.getProperty(project, "out");
+        assertTrue(outObject instanceof Path);
+        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+                new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet()); 
+        
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
+    }
+    
+    public void testClasspathElements_SingleModule_EmptyClasspathAttribute()
+    {
+        final Path path1 = new Path(project);
+        
+        final Path path2 = new Path(project);
+        path2.createPathElement().setPath("88/ee");
+        
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2));
+        
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        task.createSourceAttribute().setName("cp");
+        task.createSourceAttribute().setName("cp3");
+        
+        task.execute();
+        
+        final Object outObject = PropertyHelper.getProperty(project, "out");
+        assertTrue(outObject instanceof Path);
+        assertClasspath((Path) outObject, Collections.singleton(new File("88/ee")), Collections.<File>emptySet()); 
+        
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
+    }
+    
+    public void testClasspathElements_SingleModule_EmptyClasspath()
+    {
+        final Path path1 = new Path(project);
+        final Path path2 = new Path(project);
+        
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2));
+        
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        task.createSourceAttribute().setName("cp");
+        task.createSourceAttribute().setName("cp3");
+        
+        task.execute();
+        
+        final Object outObject = PropertyHelper.getProperty(project, "out");
+        assertTrue(outObject instanceof Path);
+        assertClasspath((Path) outObject, Collections.<File>emptySet(), Collections.<File>emptySet()); 
+        
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
+    }
+    
+    public void testClasspathElements_ModuleWithDeps_DependenciesIncluded()
+    {
+        final Path path1 = new Path(project);
+        path1.createPathElement().setPath("b");
+        path1.createPathElement().setPath("a");
+        path1.createPathElement().setPath("c/d/e");
+        
+        final Path path2 = new Path(project);
+        path2.createPathElement().setPath("88/ee");
+        
+        final Path path3 = new Path(project);
+        path3.createPathElement().setPath("111");
+        
+        final Path path4 = new Path(project);
+        path4.createPathElement().setPath("222");
+        
+        final Module module = new Module("foo/");
+        module.setAttributes(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2));
+        final Module dep1 = new Module("bar/");
+        dep1.setAttributes(TestUtil.map("cp", path3));
+        final Module dep2 = new Module("baz/");
+        dep2.setAttributes(TestUtil.map("cp3", path4));
+        module.addDependency(dep1);
+        dep1.addDependency(dep2);
+        
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        task.createSourceAttribute().setName("cp");
+        task.createSourceAttribute().setName("cp3");
+        task.setIncludeDependencies(true);
+        
+        task.execute();
+        
+        final Object outObject = PropertyHelper.getProperty(project, "out");
+        assertTrue(outObject instanceof Path);
+        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+                new File("c/d/e"), new File("88/ee")), TestUtil.set(new File("111"), new File("222")));
+        
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
+    }
+    
+    public void testClasspathElements_ModuleWithDeps_DependenciesNotIncluded()
+    {
+        final Path path1 = new Path(project);
+        path1.createPathElement().setPath("b");
+        path1.createPathElement().setPath("a");
+        path1.createPathElement().setPath("c/d/e");
+        
+        final Path path2 = new Path(project);
+        path2.createPathElement().setPath("88/ee");
+        
+        final Path path3 = new Path(project);
+        path3.createPathElement().setPath("111");
+        
+        final Path path4 = new Path(project);
+        path4.createPathElement().setPath("222");
+        
+        final Module module = new Module("foo/");
+        module.setAttributes(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2));
+        final Module dep1 = new Module("bar/");
+        dep1.setAttributes(TestUtil.map("cp", path3));
+        final Module dep2 = new Module("baz/");
+        dep2.setAttributes(TestUtil.map("cp3", path4));
+        module.addDependency(dep1);
+        dep1.addDependency(dep2);
+        
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        task.createSourceAttribute().setName("cp");
+        task.createSourceAttribute().setName("cp3");
+        task.setIncludeDependencies(false);
+        
+        task.execute();
+        
+        final Object outObject = PropertyHelper.getProperty(project, "out");
+        assertTrue(outObject instanceof Path);
+        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+                new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet());
+        
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
+    }
+    
+    public void testClasspathElements_ModuleWithDeps_DependenciesIncludedByDefault()
+    {
+        final Path path1 = new Path(project);
+        path1.createPathElement().setPath("b");
+        path1.createPathElement().setPath("a");
+        path1.createPathElement().setPath("c/d/e");
+        
+        final Path path2 = new Path(project);
+        path2.createPathElement().setPath("88/ee");
+        
+        final Path path3 = new Path(project);
+        path3.createPathElement().setPath("111");
+        
+        final Path path4 = new Path(project);
+        path4.createPathElement().setPath("222");
+        
+        final Module module = new Module("foo/");
+        module.setAttributes(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2));
+        final Module dep1 = new Module("bar/");
+        dep1.setAttributes(TestUtil.map("cp", path3));
+        final Module dep2 = new Module("baz/");
+        dep2.setAttributes(TestUtil.map("cp3", path4));
+        module.addDependency(dep1);
+        dep1.addDependency(dep2);
+        
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        task.createSourceAttribute().setName("cp");
+        task.createSourceAttribute().setName("cp3");
+        
+        task.execute();
+        
+        final Object outObject = PropertyHelper.getProperty(project, "out");
+        assertTrue(outObject instanceof Path);
+        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+                new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet());
+        
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
+    }
+    
     private void assertClasspath(final Path classpath, final File... elements)
     {
         assertNotNull(classpath);
@@ -614,6 +891,29 @@ public class GetModuleClasspathTest extends TestCase
         }
         final HashSet<String> actualOtherElements = new HashSet<String>();
         for (int i = primaryElements.length; i < locations.length; ++i) {
+            actualOtherElements.add(locations[i]);
+        }
+        assertEquals(otherElements.size(), actualOtherElements.size());
+        for (final File e : otherElements) {
+            assertTrue(actualOtherElements.contains(e.getAbsolutePath()));
+        }
+    }
+    
+    // Primary elements are the paths defined in the main module. Other elements are the other paths.
+    private void assertClasspath(final Path classpath, final Set<File> primaryElements, final Set<File> otherElements)
+    {
+        assertNotNull(classpath);
+        final String[] locations = classpath.list();
+        assertEquals(primaryElements.size() + otherElements.size(), locations.length);
+        final HashSet<String> actualPrimaryElements = new HashSet<String>();
+        for (int i = 0, n = primaryElements.size(); i < n; ++i) {
+            actualPrimaryElements.add(locations[i]);
+        }
+        for (final File f : primaryElements) {
+            assertTrue(actualPrimaryElements.contains(f.getAbsolutePath()));
+        }
+        final HashSet<String> actualOtherElements = new HashSet<String>();
+        for (int i = primaryElements.size(); i < locations.length; ++i) {
             actualOtherElements.add(locations[i]);
         }
         assertEquals(otherElements.size(), actualOtherElements.size());
