@@ -24,6 +24,7 @@ package afc.ant.modular;
 
 import java.util.ArrayList;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -57,7 +58,7 @@ public class ParallelDependencyResolver_ParalleUseTest extends TestCase
      * <p>The module depend upon others in such a way that at the moment there is only
      * a single module that could be processed.</p>
      */
-    public void testManyModulesAndThreads_DeterministicResult() throws Exception
+    public void testManyModulesAndThreads_DenseModuleGraph() throws Exception
     {
         final int n = 100;
         final ArrayList<Module> modules = new ArrayList<Module>(n);
@@ -74,6 +75,44 @@ public class ParallelDependencyResolver_ParalleUseTest extends TestCase
         
         assertNotNull(order);
         assertEquals(modules, new ArrayList<Module>(order));
+    }
+    
+    /**
+     * <p>The module depend upon others in such a way that at the moment there could be
+     * many modules that could be processed in parallel.</p>
+     */
+    public void testManyModulesAndThreads_SparseModuleGraph() throws Exception
+    {
+        final int n = 100;
+        final ArrayList<Module> modules = new ArrayList<Module>(n);
+        
+        // The seed value makes the module graph the same for different runs of the test in the same JVM.
+        final Random rand = new Random(25);
+        for (int i = 0; i < n; ++i) {
+            final Module m = new Module("does_not_matter");
+            // j is assigned with some pseudo-random value so that different modules are used as dependencies.
+            for (int s = modules.size(), j = Math.min(s, rand.nextInt(10)); j < s; j += 5) {
+                m.dependencies.add(modules.get(j));
+            }
+            modules.add(m);
+        }
+        
+        resolver.init(modules);
+        
+        final Queue<Module> order = executeConcurrently(resolver, 10);
+        
+        assertNotNull(order);
+        final ArrayList<Module> list = new ArrayList<Module>(order);
+        assertEquals(n, list.size());
+        
+        for (int i = 0; i < n; ++i) {
+            final Module module = list.get(i);
+            for (final Module dep : module.dependencies) {
+                final int depPos = list.indexOf(dep);
+                assertTrue(depPos >= 0);
+                assertTrue(i > depPos);
+            }
+        }
     }
     
     private static Queue<Module> executeConcurrently(final ParallelDependencyResolver resolver, final int threadCount)
