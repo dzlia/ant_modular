@@ -144,7 +144,7 @@ public class CallTargetForModules extends Task
         dependencyResolver.init(modules);
         
         final AtomicBoolean buildFailed = new AtomicBoolean(false);
-        final AtomicReference buildFailureException = new AtomicReference();
+        final AtomicReference<Throwable> buildFailureException = new AtomicReference<Throwable>();
         
         final Thread[] threads = new Thread[threadCount];
         for (int i = 0; i < threadCount; ++i) {
