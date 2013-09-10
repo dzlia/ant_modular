@@ -23,20 +23,17 @@
 package afc.ant.modular;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 /**
- * <p>Tests cases when {@link ParallelDependencyResolver} is used by a single thread but
- * multiple modules are acquired simultaneously.</p>
+ * <p>Tests cases when {@link ParallelDependencyResolver} is used by multiple threads.</p>
  *
  * @author @author D&#378;mitry La&#365;&#269;uk
  */
@@ -113,7 +110,14 @@ public class ParallelDependencyResolver_ParalleUseTest extends TestCase
         }
         
         for (int i = 0; i < threadCount; ++i) {
+            // TODO The test could hand up here. Resolve this.
             threads[i].join();
+        }
+        
+        if (failure.get()) { // failing the test if not all threads has executed successfully.
+            final AssertionFailedError ex = new AssertionFailedError();
+            ex.initCause(failureCause.get());
+            throw ex;
         }
         
         return order;
