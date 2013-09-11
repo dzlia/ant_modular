@@ -111,7 +111,7 @@
 		<mkdir dir="${test.coverage.report.dir}"/>
 		<taskdef uri="org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpath="${lib.dir}/jacocoant.jar"/>
 		<jacoco:coverage destfile="${test.coverage.data.file}"
-				includes="afc.ant.modular.*" excludes="*Test:*Test.*:*Test$$*">
+				includes="afc.ant.modular.*" excludes="*Test:*Test.*:*Test$$*:*.Test*:*.Mock*">
 			<junit fork="true" forkmode="once" dir="${basedir}" failureProperty="test.failed" printsummary="true">
 				<classpath>
 					<pathelement location="${classes.dir}"/>
