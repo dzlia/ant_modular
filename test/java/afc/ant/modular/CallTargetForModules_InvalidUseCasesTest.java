@@ -127,4 +127,83 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
             assertEquals("At least one <module> element is required.", ex.getMessage());
         }
     }
+    
+    public void testTwoRootModules_CyclicDependency()
+    {
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        moduleInfo1.addDependency("bar/");
+        moduleInfo2.addDependency("foo/");
+        moduleLoader.modules.put("foo/", moduleInfo1);
+        moduleLoader.modules.put("bar/", moduleInfo2);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.createModule().setPath("bar");
+        task.addConfigured(moduleLoader);
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertTrue(ex.getCause() instanceof CyclicDependenciesDetectedException);
+            assertEquals(ex.getMessage(), ex.getCause().getMessage());
+        }
+    }
+    
+    public void testRootModuleWithDependency_CyclicDependency()
+    {
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        moduleInfo1.addDependency("bar/");
+        moduleInfo2.addDependency("foo/");
+        moduleLoader.modules.put("foo/", moduleInfo1);
+        moduleLoader.modules.put("bar/", moduleInfo2);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertTrue(ex.getCause() instanceof CyclicDependenciesDetectedException);
+            assertEquals(ex.getMessage(), ex.getCause().getMessage());
+        }
+    }
+    
+    public void testMissingModule()
+    {
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        moduleInfo1.addDependency("bar/");
+        moduleInfo2.addDependency("baz/"); // this dependency will not be resolved
+        moduleLoader.modules.put("foo/", moduleInfo1);
+        moduleLoader.modules.put("bar/", moduleInfo2);
+        
+        final ModuleNotLoadedException exception = new ModuleNotLoadedException("test_msg");
+        moduleLoader.modules.put("baz/", exception);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertSame(exception, ex.getCause());
+            assertEquals("test_msg", ex.getMessage());
+        }
+    }
 }
