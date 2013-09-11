@@ -43,22 +43,6 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         }
     }
     
-    public void testMissingModuleProperty()
-    {
-        task.init();
-        task.setTarget("testTarget");
-        task.createModule().setPath("foo");
-        task.addConfigured(moduleLoader);
-        
-        try {
-            task.perform();
-            fail();
-        }
-        catch (BuildException ex) {
-            assertEquals("The attribute 'moduleProperty' is undefined.", ex.getMessage());
-        }
-    }
-    
     public void testMissingModuleLoader()
     {
         task.init();

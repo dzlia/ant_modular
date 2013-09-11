@@ -62,9 +62,6 @@ public class CallTargetForModules extends Task
         if (target == null) {
             throw new BuildException("The attribute 'target' is undefined.");
         }
-        if (moduleProperty == null) {
-            throw new BuildException("The attribute 'moduleProperty' is undefined.");
-        }
         if (moduleLoader == null) {
             throw new BuildException("No module loader is defined.");
         }
