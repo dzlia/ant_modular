@@ -111,4 +111,20 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
             assertEquals("There is a <module> element with the attribute 'path' undefined.", ex.getMessage());
         }
     }
+    
+    public void testNoModuleElements()
+    {
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.addConfigured(moduleLoader);
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("At least one <module> element is required.", ex.getMessage());
+        }
+    }
 }
