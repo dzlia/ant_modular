@@ -75,4 +75,40 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
             assertEquals("Only a single module loader element is allowed.", ex.getMessage());
         }
     }
+    
+    public void testModuleElementWithNoPath_SingleModule()
+    {
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule();
+        task.addConfigured(moduleLoader);
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("There is a <module> element with the attribute 'path' undefined.", ex.getMessage());
+        }
+    }
+    
+    public void testModuleElementWithNoPath_MultipleModules()
+    {
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.createModule().setPath("bar");
+        task.createModule();
+        task.addConfigured(moduleLoader);
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("There is a <module> element with the attribute 'path' undefined.", ex.getMessage());
+        }
+    }
 }

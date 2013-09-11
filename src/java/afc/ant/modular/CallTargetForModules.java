@@ -65,15 +65,20 @@ public class CallTargetForModules extends Task
         if (moduleLoader == null) {
             throw new BuildException("No module loader is defined.");
         }
+        for (int i = 0, n = moduleElements.size(); i < n; ++i) {
+            final ModuleElement moduleParam = moduleElements.get(i);
+            if (moduleParam.path == null) {
+                throw new BuildException("There is a <module> element with the attribute 'path' undefined.");
+            }
+        }
         
         final ModuleRegistry registry = new ModuleRegistry(moduleLoader);
         
         try {
             final ArrayList<Module> modules = new ArrayList<Module>(moduleElements.size());
-            for (final ModuleElement moduleParam : moduleElements) {
-                if (moduleParam.path == null) {
-                    throw new BuildException("Module path is undefined.");
-                }
+            for (int i = 0, n = moduleElements.size(); i < n; ++i) {
+                final ModuleElement moduleParam = moduleElements.get(i);
+                
                 modules.add(registry.resolveModule(moduleParam.path));
             }
             
