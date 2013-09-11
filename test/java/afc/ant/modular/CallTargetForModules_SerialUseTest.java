@@ -1,6 +1,8 @@
 package afc.ant.modular;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -44,17 +46,37 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, true, false, "moduleProp", moduleInfo);
+        assertCallTargetState(task1, true, true, false, "moduleProp", moduleInfo, TestUtil.map());
+    }
+    
+    public void testSerialRun_SingleModule_ModulePropertyUndefined()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, true, false, TestUtil.map());
     }
     
     private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
-            final boolean inheritAll, final boolean inheritRefs, final String moduleProperty, final ModuleInfo proto)
+            final boolean inheritAll, final boolean inheritRefs, final String moduleProperty, final ModuleInfo proto,
+            final Map<String, Object> properties)
     {
         assertEquals(executed, task.executed);
         assertEquals(inheritAll, task.inheritAll);
         assertEquals(inheritRefs, task.inheritRefs);
         
-        final Object moduleObj = task.ownProject.getProperties().get("moduleProp");
+        final Object moduleObj = task.ownProject.getProperties().get(moduleProperty);
         assertTrue(moduleObj instanceof Module);
         final Module module = (Module) moduleObj;
         assertEquals(proto.getPath(), module.getPath());
@@ -64,5 +86,20 @@ public class CallTargetForModules_SerialUseTest extends TestCase
             assertTrue(depPaths.add(dep.getPath()));
         }
         assertEquals(proto.getDependencies(), depPaths);
+        
+        // merging module property into the properties passed. The module object is not freely available
+        final HashMap<String, Object> propsWithModule = new HashMap<String, Object>(properties);
+        propsWithModule.put(moduleProperty, module);
+        assertEquals(propsWithModule, task.ownProject.getProperties());
+    }
+    
+    private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
+            final boolean inheritAll, final boolean inheritRefs, final Map<String, Object> properties)
+    {
+        assertEquals(executed, task.executed);
+        assertEquals(inheritAll, task.inheritAll);
+        assertEquals(inheritRefs, task.inheritRefs);
+        
+        assertEquals(properties, task.ownProject.getProperties());
     }
 }

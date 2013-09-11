@@ -1,10 +1,13 @@
 package afc.ant.modular;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.taskdefs.CallTarget;
 import org.apache.tools.ant.taskdefs.Property;
+import org.apache.tools.ant.types.PropertySet;
 
 import junit.framework.Assert;
 
@@ -19,6 +22,7 @@ public class MockCallTargetTask extends CallTarget
     public boolean inheritRefs;
     
     private final ArrayList<Property> params = new ArrayList<Property>();
+    private final ArrayList<PropertySet> propertySets = new ArrayList<PropertySet>();
     
     public MockCallTargetTask(final Project project)
     {
@@ -32,10 +36,15 @@ public class MockCallTargetTask extends CallTarget
         Assert.assertFalse(executed);
         executed = true;
         
-        // lightweight execute; filling own project properties with those overridden via params
+        // lightweight execute; filling own project properties with those overridden via params and property sets
         for (final Property param : params) {
             param.setProject(ownProject);
             param.execute();
+        }
+        for (final PropertySet propSet : propertySets) {
+            for (final Map.Entry<Object, Object> prop : propSet.getProperties().entrySet()) {
+                PropertyHelper.setNewProperty(ownProject, (String) prop.getKey(), prop.getValue());
+            }
         }
         
         if (exception instanceof RuntimeException) {
@@ -66,5 +75,12 @@ public class MockCallTargetTask extends CallTarget
         final Property param = super.createParam();
         params.add(param);
         return param;
+    }
+    
+    @Override
+    public void addPropertyset(final PropertySet propertySet)
+    {
+        propertySets.add(propertySet);
+        super.addPropertyset(propertySet);
     }
 }
