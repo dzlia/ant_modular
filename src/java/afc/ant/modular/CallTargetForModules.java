@@ -40,13 +40,12 @@ import org.apache.tools.ant.types.PropertySet;
 
 public class CallTargetForModules extends Task
 {
-    private ArrayList<ModuleElement> moduleElements;
+    private ArrayList<ModuleElement> moduleElements = new ArrayList<ModuleElement>();
     private ModuleLoader moduleLoader;
     // If defined then the correspondent Module object is set to this property for each module being processed.
     private String moduleProperty;
     
     private String target;
-    private boolean targetSet;
     private final ArrayList<ParamElement> params = new ArrayList<ParamElement>();
     private final ArrayList<Reference> references = new ArrayList<Reference>();
     private final PropertySet propertySet = new PropertySet();
@@ -58,21 +57,16 @@ public class CallTargetForModules extends Task
     private int threadCount = 1;
     
     @Override
-    public void init() throws BuildException
-    {
-        moduleProperty = null;
-        targetSet = false;
-        moduleElements = new ArrayList<ModuleElement>();
-    }
-    
-    @Override
     public void execute() throws BuildException
     {
-        if (!targetSet) {
-            throw new BuildException("Target is not set.");
+        if (target == null) {
+            throw new BuildException("The attribute 'target' is undefined.");
+        }
+        if (moduleProperty == null) {
+            throw new BuildException("The attribute 'moduleProperty' is undefined.");
         }
         if (moduleLoader == null) {
-            throw new BuildException("The module loader element is required.");
+            throw new BuildException("No module loader is defined.");
         }
         
         final ModuleRegistry registry = new ModuleRegistry(moduleLoader);
@@ -228,7 +222,6 @@ public class CallTargetForModules extends Task
     public void setTarget(final String target)
     {
         this.target = target;
-        targetSet = true;
     }
     
     public void setInheritAll(final boolean inheritAll)
