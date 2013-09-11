@@ -266,9 +266,6 @@ public class CallTargetForModules extends Task
         
         public void setPath(final String path)
         {
-            if (path == null) {
-                throw new BuildException("Module path is undefined.");
-            }
             this.path = path;
         }
     }
