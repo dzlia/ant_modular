@@ -46,7 +46,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, true, false, "moduleProp", moduleInfo, TestUtil.map());
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo, TestUtil.map());
     }
     
     public void testSerialRun_SingleModule_ModulePropertyUndefined()
@@ -65,14 +65,15 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, true, false, TestUtil.map());
+        assertCallTargetState(task1, true, "testTarget", true, false, TestUtil.map());
     }
     
     private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
-            final boolean inheritAll, final boolean inheritRefs, final String moduleProperty, final ModuleInfo proto,
-            final Map<String, Object> properties)
+            final String target, final boolean inheritAll, final boolean inheritRefs, final String moduleProperty,
+            final ModuleInfo proto, final Map<String, Object> properties)
     {
         assertEquals(executed, task.executed);
+        assertEquals(target, task.target);
         assertEquals(inheritAll, task.inheritAll);
         assertEquals(inheritRefs, task.inheritRefs);
         
@@ -94,9 +95,11 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     }
     
     private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
-            final boolean inheritAll, final boolean inheritRefs, final Map<String, Object> properties)
+            final String target, final boolean inheritAll, final boolean inheritRefs,
+            final Map<String, Object> properties)
     {
         assertEquals(executed, task.executed);
+        assertEquals(target, task.target);
         assertEquals(inheritAll, task.inheritAll);
         assertEquals(inheritRefs, task.inheritRefs);
         

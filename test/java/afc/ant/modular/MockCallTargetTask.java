@@ -20,6 +20,7 @@ public class MockCallTargetTask extends CallTarget
     
     public boolean inheritAll;
     public boolean inheritRefs;
+    public String target;
     
     private final ArrayList<Property> params = new ArrayList<Property>();
     private final ArrayList<PropertySet> propertySets = new ArrayList<PropertySet>();
@@ -53,6 +54,13 @@ public class MockCallTargetTask extends CallTarget
         if (exception instanceof Error) {
             throw (Error) exception;
         }
+    }
+    
+    @Override
+    public void setTarget(final String target)
+    {
+        this.target = target;
+        super.setTarget(target);
     }
     
     @Override
