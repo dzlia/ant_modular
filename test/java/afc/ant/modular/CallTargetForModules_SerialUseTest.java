@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.apache.tools.ant.types.PropertySet;
+
 import afc.ant.modular.CallTargetForModules.ParamElement;
 
 import junit.framework.TestCase;
@@ -191,6 +193,119 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
                 TestUtil.map("hello", "world", "John", "Smith"));
+    }
+    
+    public void testSerialRun_SingleModule_WithPropertySets_AndInheritedPropertiesByDefault()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final PropertySet propSet1 = new PropertySet();
+        propSet1.setProject(project);
+        propSet1.appendName("123");
+        propSet1.appendName("hello");
+        propSet1.appendName("no_such_property");
+        final PropertySet propSet2 = new PropertySet();
+        propSet2.setProject(project);
+        propSet2.appendName("qwerty");
+        task.addPropertyset(propSet1);
+        task.addPropertyset(propSet2);
+        
+        project.setProperty("123", "456");
+        project.setProperty("12345", "45678");
+        project.setProperty("hello", "universe");
+        project.setProperty("qwerty", "board");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("123", "456", "12345", "45678", "hello", "universe", "qwerty", "board"));
+    }
+    
+    public void testSerialRun_SingleModule_WithPropertySets_AndInheritedPropertiesForced()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        task.setInheritAll(true);
+        
+        final PropertySet propSet1 = new PropertySet();
+        propSet1.setProject(project);
+        propSet1.appendName("123");
+        propSet1.appendName("hello");
+        propSet1.appendName("no_such_property");
+        final PropertySet propSet2 = new PropertySet();
+        propSet2.setProject(project);
+        propSet2.appendName("qwerty");
+        task.addPropertyset(propSet1);
+        task.addPropertyset(propSet2);
+        
+        project.setProperty("123", "456");
+        project.setProperty("12345", "45678");
+        project.setProperty("hello", "universe");
+        project.setProperty("qwerty", "board");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("123", "456", "12345", "45678", "hello", "universe", "qwerty", "board"));
+    }
+    
+    public void testSerialRun_SingleModule_WithPropertySets_PropertiesNotInherited()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        task.setInheritAll(false);
+        
+        final PropertySet propSet1 = new PropertySet();
+        propSet1.setProject(project);
+        propSet1.appendName("123");
+        propSet1.appendName("hello");
+        propSet1.appendName("no_such_property");
+        final PropertySet propSet2 = new PropertySet();
+        propSet2.setProject(project);
+        propSet2.appendName("qwerty");
+        task.addPropertyset(propSet1);
+        task.addPropertyset(propSet2);
+        
+        project.setProperty("123", "456");
+        project.setProperty("12345", "45678");
+        project.setProperty("hello", "universe");
+        project.setProperty("qwerty", "board");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+                TestUtil.map("123", "456", "hello", "universe", "qwerty", "board"));
     }
     
     private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
