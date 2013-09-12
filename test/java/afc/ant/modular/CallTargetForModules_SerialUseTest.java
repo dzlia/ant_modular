@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import afc.ant.modular.CallTargetForModules.ParamElement;
+
 import junit.framework.TestCase;
 
 public class CallTargetForModules_SerialUseTest extends TestCase
@@ -66,6 +68,129 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, TestUtil.map());
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParams()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        param2.setName("John");
+        param2.setValue("Smith");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParams_AndInheritedPropertiesByDefault()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        param2.setName("John");
+        param2.setValue("Smith");
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param with the same name
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParams_AndInheritedPropertiesForced()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        task.setInheritAll(true);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        param2.setName("John");
+        param2.setValue("Smith");
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param with the same name
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParams_PropertiesNotInherited()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        task.setInheritAll(false);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        param2.setName("John");
+        param2.setValue("Smith");
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param with the same name
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith"));
     }
     
     private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,

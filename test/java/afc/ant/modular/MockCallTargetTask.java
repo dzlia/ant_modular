@@ -2,6 +2,7 @@ package afc.ant.modular;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
@@ -16,7 +17,7 @@ public class MockCallTargetTask extends CallTarget
     public Throwable exception;
     public boolean executed;
     
-    public final MockProject ownProject;
+    public MockProject ownProject;
     
     public boolean inheritAll;
     public boolean inheritRefs;
@@ -28,7 +29,6 @@ public class MockCallTargetTask extends CallTarget
     public MockCallTargetTask(final Project project)
     {
         setProject(project);
-        ownProject = new MockProject();
     }
     
     @Override
@@ -36,6 +36,16 @@ public class MockCallTargetTask extends CallTarget
     {
         Assert.assertFalse(executed);
         executed = true;
+        
+        ownProject = new MockProject();
+        
+        if (inheritAll)
+        {
+            final PropertyHelper helper = PropertyHelper.getPropertyHelper(ownProject);
+            for (final Map.Entry prop : (Set<Map.Entry>) getProject().getProperties().entrySet()) {
+                helper.setProperty((String) prop.getKey(), prop.getValue(), false);
+            }
+        }
         
         // lightweight execute; filling own project properties with those overridden via params and property sets
         for (final Property param : params) {
