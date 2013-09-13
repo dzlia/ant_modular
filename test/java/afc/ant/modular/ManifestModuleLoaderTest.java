@@ -2,12 +2,10 @@ package afc.ant.modular;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Iterator;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.Path;
-import org.apache.tools.ant.types.resources.FileResource;
 
 import junit.framework.TestCase;
 
@@ -285,11 +283,10 @@ public class ManifestModuleLoaderTest extends TestCase
         assertNotNull(pathObject);
         assertTrue(pathObject instanceof Path);
         final Path path = (Path) pathObject;
-        assertEquals(expectedElements.length, path.size());
-        final Iterator i = path.iterator();
-        for (final File element : expectedElements) {
-            assertEquals(element.getAbsolutePath(), ((FileResource) i.next()).getFile().getAbsolutePath());
+        final String[] actualElements = path.list();
+        assertEquals(expectedElements.length, actualElements.length);
+        for (int i = 0; i < expectedElements.length; ++i) {
+            assertEquals(expectedElements[i].getAbsolutePath(), actualElements[i]);
         }
-        assertFalse(i.hasNext()); // sanity check
     }
 }
