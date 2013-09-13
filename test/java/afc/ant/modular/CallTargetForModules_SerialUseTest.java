@@ -1,6 +1,7 @@
 package afc.ant.modular;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -268,6 +269,91 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         final ParamElement param1 = task.createParam();
         param1.setFile(new File("test/data/CallTargetForModules/params_for_test.properties"));
+        param1.setPrefix("afc");
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "universe", "afc.John", "Smith", "123", "456", "afc.qwerty", "board"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParamsFromUrl_AndInheritedPropertiesByDefault() throws Exception
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setUrl(new File("test/data/CallTargetForModules/params_for_test.properties").toURI().toURL());
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "universe", "John", "Smith", "123", "456", "qwerty", "board"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParamsFromUrl_PropertiesNotInherited()
+            throws Exception
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        task.setInheritAll(false);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setUrl(new File("test/data/CallTargetForModules/params_for_test.properties").toURI().toURL());
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+                TestUtil.map("John", "Smith", "qwerty", "board"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParamsFromUrlWithPrefix_AndInheritedPropertiesByDefault()
+            throws Exception
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setUrl(new File("test/data/CallTargetForModules/params_for_test.properties").toURI().toURL());
         param1.setPrefix("afc");
         
         project.setProperty("123", "456");
