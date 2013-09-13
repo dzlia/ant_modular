@@ -38,7 +38,7 @@ import java.util.Set;
  * This metadata consists of {@link #getDependencies() dependencies} and
  * {@link #getAttributes() attributes}.</p>
  * 
- * <p>The module dependencies is a set of modules which this module dependens upon.
+ * <p>The module dependencies is a set of modules which this module depends upon.
  * Typically the dependee modules should be processed before this module can be
  * processed.</p>
  * 
