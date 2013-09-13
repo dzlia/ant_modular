@@ -192,13 +192,16 @@ public class ModuleUtil
             return module.getClass().getMethod(functionName).invoke(module);
         }
         catch (IllegalAccessException ex) {
-            throw new BuildException(MessageFormat.format("Unable to invoke module#{0}().", functionName), ex);
+            throw new BuildException(MessageFormat.format(
+                    "No permission to invoke module#{0}().", functionName));
         }
         catch (NoSuchMethodException ex) {
-            throw new BuildException(MessageFormat.format("Unable to invoke module#{0}().", functionName), ex);
+            throw new BuildException(MessageFormat.format(
+                    "The module instance does not have the function ''{0}()''.", functionName));
         }
         catch (InvocationTargetException ex) {
-            throw new BuildException(MessageFormat.format("Unable to invoke module#{0}().", functionName), ex);
+            throw new BuildException(MessageFormat.format(
+                    "module#{0}() has thrown an exception.", functionName), ex.getCause());
         }
     }
 }
