@@ -281,6 +281,7 @@ public class CallTargetForModules extends Task
         private String environment;
         private Reference reference;
         private String prefix;
+        // relative and basedir introduced in Ant 1.8.0 are not available because Ant 1.6+ is supported.
         // prefixValues introduced in Ant 1.8.2 is not available because Ant 1.6+ is supported.
         
         private boolean nameSet;
