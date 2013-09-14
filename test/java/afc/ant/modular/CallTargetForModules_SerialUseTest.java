@@ -479,6 +479,133 @@ public class CallTargetForModules_SerialUseTest extends TestCase
                 TestUtil.map("hello", "universe", "afc.John", "Smith", "123", "456", "afc.qwerty", "board"));
     }
     
+    public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_FirstCreateThenSet()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setResource("/CallTargetForModules/params_for_test.properties");
+        final Path path1 = param1.createClasspath();
+        path1.setLocation(new File("test/"));
+        final Path path2 = new Path(project);
+        path2.setLocation(new File("test/data/"));
+        param1.setClasspath(path2);
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "universe", "John", "Smith", "123", "456", "qwerty", "board"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_FirstSetThenCreate()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setResource("/CallTargetForModules/params_for_test.properties");
+        final Path path1 = new Path(project);
+        path1.setLocation(new File("test/data/"));
+        param1.setClasspath(path1);
+        final Path path2 = param1.createClasspath();
+        path2.setLocation(new File("test/"));
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "universe", "John", "Smith", "123", "456", "qwerty", "board"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_MultipleCreate()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setResource("/CallTargetForModules/params_for_test.properties");
+        final Path path1 = param1.createClasspath();
+        path1.setLocation(new File("test/data/"));
+        final Path path2 = param1.createClasspath();
+        path2.setLocation(new File("test/"));
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "universe", "John", "Smith", "123", "456", "qwerty", "board"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_MultipleCreate_WithPrefix()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setResource("/CallTargetForModules/params_for_test.properties");
+        final Path path1 = param1.createClasspath();
+        path1.setLocation(new File("test/data/"));
+        final Path path2 = param1.createClasspath();
+        path2.setLocation(new File("test/"));
+        param1.setPrefix("afc");
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "universe", "afc.John", "Smith", "123", "456", "afc.qwerty", "board"));
+    }
+    
     public void testSerialRun_SingleModule_WithPropertySets_AndInheritedPropertiesByDefault()
     {
         final ModuleInfo moduleInfo = new ModuleInfo("foo/");
