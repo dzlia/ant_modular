@@ -238,12 +238,12 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         param1.setFile(new File("test/data/CallTargetForModules/params_for_test.properties"));
         
         project.setProperty("123", "456");
-        project.setProperty("hello", "universe");
+        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
         
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "universe", "John", "Smith", "123", "456", "qwerty", "board"));
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromFile_PropertiesNotInherited()
@@ -271,7 +271,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
-                TestUtil.map("John", "Smith", "qwerty", "board"));
+                TestUtil.map("John", "Smith", "qwerty", "board", "hello", "world"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromFileWithPrefix_AndInheritedPropertiesByDefault()
@@ -299,7 +299,8 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "universe", "afc.John", "Smith", "123", "456", "afc.qwerty", "board"));
+                TestUtil.map("afc.hello", "world", "afc.John", "Smith", "123", "456", "afc.qwerty", "board",
+                        "hello", "universe"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromUrl_AndInheritedPropertiesByDefault() throws Exception
@@ -321,12 +322,12 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         param1.setUrl(new File("test/data/CallTargetForModules/params_for_test.properties").toURI().toURL());
         
         project.setProperty("123", "456");
-        project.setProperty("hello", "universe");
+        project.setProperty("hello", "world"); // must be overridden by the param property with the same name
         
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "universe", "John", "Smith", "123", "456", "qwerty", "board"));
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromUrl_PropertiesNotInherited()
@@ -355,7 +356,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
-                TestUtil.map("John", "Smith", "qwerty", "board"));
+                TestUtil.map("John", "Smith", "qwerty", "board", "hello", "world"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromUrlWithPrefix_AndInheritedPropertiesByDefault()
@@ -384,7 +385,8 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "universe", "afc.John", "Smith", "123", "456", "afc.qwerty", "board"));
+                TestUtil.map("afc.hello", "world", "afc.John", "Smith", "123", "456", "afc.qwerty", "board",
+                        "hello", "universe"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspath_AndInheritedPropertiesByDefault()
@@ -409,12 +411,12 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         param1.setClasspath(path);
         
         project.setProperty("123", "456");
-        project.setProperty("hello", "universe");
+        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
         
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "universe", "John", "Smith", "123", "456", "qwerty", "board"));
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspath_PropertiesNotInherited()
@@ -445,7 +447,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
-                TestUtil.map("John", "Smith", "qwerty", "board"));
+                TestUtil.map("John", "Smith", "qwerty", "board", "hello", "world"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspathAndPrefix_AndInheritedPropertiesByDefault()
@@ -476,7 +478,8 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "universe", "afc.John", "Smith", "123", "456", "afc.qwerty", "board"));
+                TestUtil.map("afc.hello", "world", "afc.John", "Smith", "123", "456", "afc.qwerty", "board",
+                        "hello", "universe"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_FirstCreateThenSet()
@@ -503,12 +506,12 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         param1.setClasspath(path2);
         
         project.setProperty("123", "456");
-        project.setProperty("hello", "universe");
+        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
         
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "universe", "John", "Smith", "123", "456", "qwerty", "board"));
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_FirstSetThenCreate()
@@ -535,12 +538,12 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         path2.setLocation(new File("test/"));
         
         project.setProperty("123", "456");
-        project.setProperty("hello", "universe");
+        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
         
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "universe", "John", "Smith", "123", "456", "qwerty", "board"));
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_MultipleCreate()
@@ -566,12 +569,12 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         path2.setLocation(new File("test/"));
         
         project.setProperty("123", "456");
-        project.setProperty("hello", "universe");
+        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
         
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "universe", "John", "Smith", "123", "456", "qwerty", "board"));
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_MultipleCreate_WithPrefix()
@@ -603,7 +606,8 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "universe", "afc.John", "Smith", "123", "456", "afc.qwerty", "board"));
+                TestUtil.map("afc.hello", "world", "afc.John", "Smith", "123", "456", "afc.qwerty", "board",
+                        "hello", "universe"));
     }
     
     public void testSerialRun_SingleModule_WithPropertySets_AndInheritedPropertiesByDefault()

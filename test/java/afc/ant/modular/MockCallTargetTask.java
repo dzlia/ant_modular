@@ -51,6 +51,7 @@ public class MockCallTargetTask extends CallTarget
     public MockCallTargetTask(final Project project)
     {
         setProject(project);
+        ownProject = new MockProject();
     }
     
     @Override
@@ -59,24 +60,27 @@ public class MockCallTargetTask extends CallTarget
         Assert.assertFalse(executed);
         executed = true;
         
-        ownProject = new MockProject();
-        
-        if (inheritAll)
-        {
-            final PropertyHelper helper = PropertyHelper.getPropertyHelper(ownProject);
-            for (final Map.Entry prop : (Set<Map.Entry>) getProject().getProperties().entrySet()) {
-                helper.setProperty((String) prop.getKey(), prop.getValue(), false);
-            }
-        }
-        
         // lightweight execute; filling own project properties with those overridden via params and property sets
         for (final Property param : params) {
             param.setProject(ownProject);
             param.execute();
         }
+        
         for (final PropertySet propSet : propertySets) {
             for (final Map.Entry<Object, Object> prop : propSet.getProperties().entrySet()) {
                 PropertyHelper.setNewProperty(ownProject, (String) prop.getKey(), prop.getValue());
+            }
+        }
+        
+        if (inheritAll)
+        {
+            final PropertyHelper helper = PropertyHelper.getPropertyHelper(ownProject);
+            for (final Map.Entry prop : (Set<Map.Entry>) getProject().getProperties().entrySet()) {
+                final String propertyKey = (String) prop.getKey();
+                if (propertyKey.equals("basedir")) {
+                    continue;
+                }
+                helper.setNewProperty("", (String) prop.getKey(), prop.getValue());
             }
         }
         
@@ -113,6 +117,7 @@ public class MockCallTargetTask extends CallTarget
     public Property createParam()
     {
         final Property param = super.createParam();
+        param.setProject(ownProject);
         params.add(param);
         return param;
     }
