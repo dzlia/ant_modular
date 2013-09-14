@@ -93,10 +93,11 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
             throws ModuleNotLoadedException
     {
         for (final ClasspathAttribute attrib : classpathAttributes) {
-            if (attrib.name == null) {
+            final String attributeName = attrib.name;
+            if (attributeName == null) {
                 throw new BuildException("A 'classpathAttribute' element with undefined name is encountered.");
             }
-            final String value = (String) attributes.remove(new Name(attrib.name));
+            final String value = (String) attributes.remove(new Name(attributeName));
             if (value == null) {
                 continue;
             }
@@ -113,13 +114,13 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
                     throw new ModuleNotLoadedException(MessageFormat.format(
                             "Unable to load the module ''{2}''. The classpath attribute ''{1}'' " +
                             "contains an invalid URL element: ''{0}''.",
-                            m.group(), attrib.name, moduleInfo.getPath()), ex);
+                            m.group(), attributeName, moduleInfo.getPath()), ex);
                 }
                 
                 final PathElement element = classpath.createPathElement();
                 element.setPath(moduleInfo.getPath() + classpathElement);
             }
-            moduleInfo.addAttribute(attrib.name, classpath);
+            moduleInfo.addAttribute(attributeName, classpath);
         }
     }
     
