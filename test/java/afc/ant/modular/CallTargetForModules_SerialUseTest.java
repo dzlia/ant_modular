@@ -23,10 +23,14 @@
 package afc.ant.modular;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.tools.ant.MagicNames;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Ant.Reference;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PropertySet;
@@ -95,6 +99,235 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, TestUtil.map());
+    }
+    
+    public void testSerialRun_SingleModule_WithReferences_InheritAll_InheritRefs()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final Object val1 = new Object();
+        final Object val2 = new Object();
+        final Object val3 = new Object();
+        project.addReference("ref1", val1);
+        project.addReference("ref2", val2);
+        project.addReference("ref3", val3);
+        
+        final Reference ref1 = new Reference();
+        ref1.setProject(project);
+        ref1.setRefId("ref1");
+        task.addReference(ref1);
+        final Reference ref2 = new Reference();
+        ref2.setProject(project);
+        ref2.setRefId("ref2");
+        task.addReference(ref2);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        param2.setName("John");
+        param2.setValue("Smith");
+        
+        task.setInheritAll(true);
+        task.setInheritRefs(true);
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, true, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith"),
+                TestUtil.map("ref1", val1, "ref2", val2, "ref3", val3));
+    }
+    
+    public void testSerialRun_SingleModule_WithReferences_InheritAll_DoNotInheritRefs()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final Object val1 = new Object();
+        final Object val2 = new Object();
+        final Object val3 = new Object();
+        project.addReference("ref1", val1);
+        project.addReference("ref2", val2);
+        project.addReference("ref3", val3);
+        
+        final Reference ref1 = new Reference();
+        ref1.setProject(project);
+        ref1.setRefId("ref1");
+        task.addReference(ref1);
+        final Reference ref2 = new Reference();
+        ref2.setProject(project);
+        ref2.setRefId("ref2");
+        task.addReference(ref2);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        param2.setName("John");
+        param2.setValue("Smith");
+        
+        task.setInheritAll(true);
+        task.setInheritRefs(false);
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith"),
+                TestUtil.map("ref1", val1, "ref2", val2, "ref3", val3));
+    }
+    
+    public void testSerialRun_SingleModule_WithReferences_DoNotInheritAll_InheritRefs()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final Object val1 = new Object();
+        final Object val2 = new Object();
+        final Object val3 = new Object();
+        project.addReference("ref1", val1);
+        project.addReference("ref2", val2);
+        project.addReference("ref3", val3);
+        
+        final Reference ref1 = new Reference();
+        ref1.setProject(project);
+        ref1.setRefId("ref1");
+        task.addReference(ref1);
+        final Reference ref2 = new Reference();
+        ref2.setProject(project);
+        ref2.setRefId("ref2");
+        task.addReference(ref2);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        param2.setName("John");
+        param2.setValue("Smith");
+        
+        task.setInheritAll(false);
+        task.setInheritRefs(true);
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", false, true, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith"),
+                TestUtil.map("ref1", val1, "ref2", val2, "ref3", val3));
+    }
+    
+    public void testSerialRun_SingleModule_WithReferences_DoNotInheritAll_DoNotInheritRefs()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final Object val1 = new Object();
+        final Object val2 = new Object();
+        final Object val3 = new Object();
+        project.addReference("ref1", val1);
+        project.addReference("ref2", val2);
+        project.addReference("ref3", val3);
+        
+        final Reference ref1 = new Reference();
+        ref1.setProject(project);
+        ref1.setRefId("ref1");
+        task.addReference(ref1);
+        final Reference ref2 = new Reference();
+        ref2.setProject(project);
+        ref2.setRefId("ref2");
+        task.addReference(ref2);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        param2.setName("John");
+        param2.setValue("Smith");
+        
+        task.setInheritAll(false);
+        task.setInheritRefs(false);
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith"), TestUtil.map("ref1", val1, "ref2", val2));
+    }
+    
+    public void testSerialRun_SingleModule_NoReferencesPassed_DoNotInheritAll_DoNotInheritRefs()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final Object val1 = new Object();
+        final Object val2 = new Object();
+        final Object val3 = new Object();
+        project.addReference("ref1", val1);
+        project.addReference("ref2", val2);
+        project.addReference("ref3", val3);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        param2.setName("John");
+        param2.setValue("Smith");
+        
+        task.setInheritAll(false);
+        task.setInheritRefs(false);
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith"), Collections.<String, Object>emptyMap());
     }
     
     public void testSerialRun_SingleModule_WithUserParams()
@@ -675,7 +908,8 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"),
+                Collections.<String, Object>singletonMap("cpRef", cpRefPath));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspathRef_FirstSetThenSetRef_RefContainsResource()
@@ -713,7 +947,8 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"),
+                Collections.<String, Object>singletonMap("cpRef", cpRefPath));
     }
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspathRef_FirstSetThenSetRef_RefDoesNotContainResource()
@@ -751,7 +986,8 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         task.perform();
         
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"),
+                Collections.<String, Object>singletonMap("cpRef", cpRefPath));
     }
     
     public void testSerialRun_SingleModule_WithPropertySets_AndInheritedPropertiesByDefault()
@@ -867,9 +1103,91 @@ public class CallTargetForModules_SerialUseTest extends TestCase
                 TestUtil.map("123", "456", "hello", "universe", "qwerty", "board"));
     }
     
+    public void testSerialRun_SingleModule_WithUserParams_IncludingParamReference()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        project.addReference("cpRef", "ref_value");
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        final Reference ref = new Reference();
+        ref.setProject(project);
+        ref.setRefId("cpRef");
+        param2.setName("someRef");
+        param2.setRefid(ref);
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param with the same name
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "someRef", "ref_value", "123", "456"),
+                Collections.<String, Object>singletonMap("cpRef", "ref_value"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParams_IncludingParamEnvironment()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        project.addReference("cpRef", "ref_value");
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        task.createParam().setEnvironment("env");
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param with the same name
+        
+        task.perform();
+        
+        // adding all system environment variables prefixed with 'env.'
+        final HashMap<String, Object> properties = new HashMap<String, Object>();
+        for (final Map.Entry<String, String> e : System.getenv().entrySet()) {
+            properties.put("env." + e.getKey(), e.getValue());
+        }
+        properties.putAll(TestUtil.map("hello", "world", "123", "456"));
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo, properties,
+                Collections.<String, Object>singletonMap("cpRef", "ref_value"));
+    }
+    
     private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
             final String target, final boolean inheritAll, final boolean inheritRefs, final String moduleProperty,
             final ModuleInfo proto, final Map<String, Object> properties)
+    {
+        assertCallTargetState(task, executed, target, inheritAll, inheritRefs, moduleProperty, proto,
+                properties, Collections.<String, Object>emptyMap());
+    }
+    
+    private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
+            final String target, final boolean inheritAll, final boolean inheritRefs, final String moduleProperty,
+            final ModuleInfo proto, final Map<String, Object> properties, final Map<String, Object> references)
     {
         assertEquals(executed, task.executed);
         assertEquals(target, task.target);
@@ -891,13 +1209,23 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         final HashMap<String, Object> propsWithModule = new HashMap<String, Object>(properties);
         propsWithModule.put(moduleProperty, module);
         final Map<?, ?> actualProperties = task.ownProject.getProperties();
-        actualProperties.remove("basedir");
+        actualProperties.remove(MagicNames.PROJECT_BASEDIR);
         assertEquals(propsWithModule, actualProperties);
+        
+        assertReferences(task.ownProject, references);
     }
     
     private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
             final String target, final boolean inheritAll, final boolean inheritRefs,
             final Map<String, Object> properties)
+    {
+        assertCallTargetState(task, executed, target, inheritAll, inheritRefs,
+                properties, Collections.<String, Object>emptyMap());
+    }
+    
+    private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
+            final String target, final boolean inheritAll, final boolean inheritRefs,
+            final Map<String, Object> properties, final Map<String, Object> references)
     {
         assertEquals(executed, task.executed);
         assertEquals(target, task.target);
@@ -905,7 +1233,20 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         assertEquals(inheritRefs, task.inheritRefs);
         
         final Map<?, ?> actualProperties = task.ownProject.getProperties();
-        actualProperties.remove("basedir");
+        actualProperties.remove(MagicNames.PROJECT_BASEDIR);
         assertEquals(properties, actualProperties);
+        
+        assertReferences(task.ownProject, references);
+    }
+    
+    private static void assertReferences(final Project project, final Map<String, Object> expectedReferences) 
+    {
+        final Map<?, ?> actualReferences = project.getReferences();
+        for (final Iterator<?> i = actualReferences.keySet().iterator(); i.hasNext();) {
+            if (((String) i.next()).startsWith("ant.")) {
+                i.remove();
+            }
+        }
+        assertEquals(expectedReferences, actualReferences);
     }
 }

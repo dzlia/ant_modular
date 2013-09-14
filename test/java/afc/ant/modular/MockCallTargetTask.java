@@ -26,10 +26,13 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tools.ant.ComponentHelper;
+import org.apache.tools.ant.MagicNames;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.taskdefs.CallTarget;
 import org.apache.tools.ant.taskdefs.Property;
+import org.apache.tools.ant.taskdefs.Ant.Reference;
 import org.apache.tools.ant.types.PropertySet;
 
 import junit.framework.Assert;
@@ -45,6 +48,7 @@ public class MockCallTargetTask extends CallTarget
     public boolean inheritRefs;
     public String target;
     
+    private final ArrayList<Reference> references = new ArrayList<Reference>();
     private final ArrayList<Property> params = new ArrayList<Property>();
     private final ArrayList<PropertySet> propertySets = new ArrayList<PropertySet>();
     
@@ -77,12 +81,28 @@ public class MockCallTargetTask extends CallTarget
         if (inheritAll)
         {
             for (final Map.Entry prop : (Set<Map.Entry>) getProject().getProperties().entrySet()) {
-                final String propertyKey = (String) prop.getKey();
-                if (propertyKey.equals("basedir")) {
+                final String propertyName = (String) prop.getKey();
+                if (propertyName.equals(MagicNames.PROJECT_BASEDIR)) {
                     continue;
                 }
                 helper.setNewProperty("", (String) prop.getKey(), prop.getValue());
             }
+        }
+        
+        // lightwight adding references to the own project.
+        if (inheritAll || inheritRefs) {
+            for (final Map.Entry ref : (Set<Map.Entry>) getProject().getReferences().entrySet()) {
+                final String refName = (String) ref.getKey();
+                if (refName.equals(MagicNames.REFID_PROPERTY_HELPER) ||
+                        refName.equals(ComponentHelper.COMPONENT_HELPER_REFERENCE)) {
+                    continue;
+                }
+                ownProject.addReference(refName, ref.getValue());
+            }
+        }
+        for (final Reference ref : references) {
+            Assert.assertNotNull(ref.getProject());
+            ownProject.addReference(ref.getRefId(), ref.getReferencedObject(null));
         }
         
         if (exception instanceof RuntimeException) {
@@ -112,6 +132,13 @@ public class MockCallTargetTask extends CallTarget
     {
         this.inheritRefs = inheritRefs;
         super.setInheritRefs(inheritRefs);
+    }
+    
+    @Override
+    public void addReference(final Reference reference)
+    {
+        references.add(reference);
+        super.addReference(reference);
     }
     
     @Override
