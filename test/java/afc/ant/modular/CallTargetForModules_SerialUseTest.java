@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.apache.tools.ant.taskdefs.Ant.Reference;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PropertySet;
 
@@ -608,6 +609,117 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.map("afc.hello", "world", "afc.John", "Smith", "123", "456", "afc.qwerty", "board",
                         "hello", "universe"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspathRef_RefContainsResource()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final Path cpRefPath = new Path(project);
+        cpRefPath.setLocation(new File("test/data/"));
+        project.addReference("cpRef", cpRefPath);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setResource("/CallTargetForModules/params_for_test.properties");
+        final Reference classpathRef = new Reference();
+        classpathRef.setProject(project);
+        classpathRef.setRefId("cpRef");
+        param1.setClasspathRef(classpathRef);
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspathRef_FirstSetThenSetRef_RefContainsResource()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final Path cpRefPath = new Path(project);
+        cpRefPath.setLocation(new File("test/data/"));
+        project.addReference("cpRef", cpRefPath);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setResource("/CallTargetForModules/params_for_test.properties");
+        final Path path1 = new Path(project);
+        path1.setLocation(new File("test/"));
+        param1.setClasspath(path1);
+        final Reference classpathRef = new Reference();
+        classpathRef.setProject(project);
+        classpathRef.setRefId("cpRef");
+        param1.setClasspathRef(classpathRef);
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspathRef_FirstSetThenSetRef_RefDoesNotContainResource()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final Path cpRefPath = new Path(project);
+        cpRefPath.setLocation(new File("test/"));
+        project.addReference("cpRef", cpRefPath);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setResource("/CallTargetForModules/params_for_test.properties");
+        final Path path1 = new Path(project);
+        path1.setLocation(new File("test/data/"));
+        param1.setClasspath(path1);
+        final Reference classpathRef = new Reference();
+        classpathRef.setProject(project);
+        classpathRef.setRefId("cpRef");
+        param1.setClasspathRef(classpathRef);
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
     public void testSerialRun_SingleModule_WithPropertySets_AndInheritedPropertiesByDefault()

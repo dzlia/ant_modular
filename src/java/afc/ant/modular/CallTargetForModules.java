@@ -245,6 +245,7 @@ public class CallTargetForModules extends Task
     public ParamElement createParam()
     {
         final ParamElement param = new ParamElement();
+        param.setProject(getProject());
         params.add(param);
         return param;
     }
@@ -274,6 +275,7 @@ public class CallTargetForModules extends Task
     {
         private String name;
         private String value;
+        private File location;
         private File file;
         private URL url;
         private String resource;
@@ -286,6 +288,7 @@ public class CallTargetForModules extends Task
         
         private boolean nameSet;
         private boolean valueSet;
+        private boolean locationSet;
         private boolean fileSet;
         private boolean urlSet;
         private boolean resourceSet;
@@ -303,6 +306,12 @@ public class CallTargetForModules extends Task
         {
             this.value = value;
             valueSet = true;
+        }
+        
+        public void setLocation(final File location)
+        {
+            this.location = location;
+            locationSet = true;
         }
         
         public void setFile(final File file)
@@ -371,6 +380,9 @@ public class CallTargetForModules extends Task
             }
             if (valueSet) {
                 property.setValue(value);
+            }
+            if (locationSet) {
+                property.setLocation(location);
             }
             if (fileSet) {
                 property.setFile(file);
