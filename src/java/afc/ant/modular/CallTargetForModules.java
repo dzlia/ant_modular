@@ -399,7 +399,7 @@ public class CallTargetForModules extends Task
                 property.setClasspath(classpathAttribute);
             }
             if (classpath != null) {
-                property.setClasspath(classpath);
+                property.createClasspath().add(classpath);
             }
             if (classpathRefSet) {
                 property.setClasspathRef(classpathRef);
