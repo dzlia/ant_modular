@@ -858,7 +858,9 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         // merging module property into the properties passed. The module object is not freely available
         final HashMap<String, Object> propsWithModule = new HashMap<String, Object>(properties);
         propsWithModule.put(moduleProperty, module);
-        assertEquals(propsWithModule, task.ownProject.getProperties());
+        final Map<?, ?> actualProperties = task.ownProject.getProperties();
+        actualProperties.remove("basedir");
+        assertEquals(propsWithModule, actualProperties);
     }
     
     private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
@@ -870,6 +872,8 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         assertEquals(inheritAll, task.inheritAll);
         assertEquals(inheritRefs, task.inheritRefs);
         
-        assertEquals(properties, task.ownProject.getProperties());
+        final Map<?, ?> actualProperties = task.ownProject.getProperties();
+        actualProperties.remove("basedir");
+        assertEquals(properties, actualProperties);
     }
 }

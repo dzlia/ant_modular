@@ -279,7 +279,9 @@ public class CallTargetForModules extends Task
         private File file;
         private URL url;
         private String resource;
+        private Path classpathAttribute;
         private Path classpath;
+        private Reference classpathRef;
         private String environment;
         private Reference reference;
         private String prefix;
@@ -292,6 +294,8 @@ public class CallTargetForModules extends Task
         private boolean fileSet;
         private boolean urlSet;
         private boolean resourceSet;
+        private boolean classpathAttributeSet;
+        private boolean classpathRefSet;
         private boolean environmentSet;
         private boolean referenceSet;
         private boolean prefixSet;
@@ -334,11 +338,8 @@ public class CallTargetForModules extends Task
         
         public void setClasspath(final Path classpath)
         {
-            if (this.classpath == null) {
-                this.classpath = classpath;
-            } else {
-                this.classpath.append(classpath);
-            }
+            classpathAttribute = classpath;
+            classpathAttributeSet = true;
         }
         
         public Path createClasspath()
@@ -352,7 +353,8 @@ public class CallTargetForModules extends Task
         
         public void setClasspathRef(final Reference reference)
         {
-            createClasspath().setRefid(reference);
+            classpathRef = reference;
+            classpathRefSet = true;
         }
         
         public void setEnvironment(final String environment)
@@ -393,8 +395,14 @@ public class CallTargetForModules extends Task
             if (resourceSet) {
                 property.setResource(resource);
             }
+            if (classpathAttributeSet) {
+                property.setClasspath(classpathAttribute);
+            }
             if (classpath != null) {
                 property.setClasspath(classpath);
+            }
+            if (classpathRefSet) {
+                property.setClasspathRef(classpathRef);
             }
             if (environmentSet) {
                 property.setEnvironment(environment);
