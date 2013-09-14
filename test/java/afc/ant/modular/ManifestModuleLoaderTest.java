@@ -300,6 +300,36 @@ public class ManifestModuleLoaderTest extends TestCase
         }
     }
     
+    public void testCannotLoadModule_InvalidClasspathAttribute() throws Exception
+    {
+        loader.setProject(project);
+        loader.createClasspathAttribute().setName("Attrib1");
+        
+        try {
+            loader.loadModule("WithInvalidClasspathAttribute");
+            fail();
+        }
+        catch (ModuleNotLoadedException ex) {
+            assertEquals("Unable to load the module 'WithInvalidClasspathAttribute/'. " +
+                    "The classpath attribute 'Attrib1' contains an invalid URL element: 'c+c/%'.", ex.getMessage());
+        }
+    }
+    
+    public void testCannotLoadModule_InvalidDependeeModulePath() throws Exception
+    {
+        loader.setProject(project);
+        loader.createClasspathAttribute().setName("Attrib1");
+        
+        try {
+            loader.loadModule("WithInvalidDependeeModulePath");
+            fail();
+        }
+        catch (ModuleNotLoadedException ex) {
+            assertEquals("Unable to load the module 'WithInvalidDependeeModulePath/'. " +
+                    "This dependee module path is an invalid URL: 'foo%'.", ex.getMessage());
+        }
+    }
+    
     private static void assertPath(final Object pathObject, final File... expectedElements)
     {
         assertNotNull(pathObject);

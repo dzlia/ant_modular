@@ -65,6 +65,7 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
     }
     
     private static void addDependencies(final Attributes attributes, final ModuleInfo moduleInfo)
+            throws ModuleNotLoadedException
     {
         final String deps = (String) attributes.remove(ATTRIB_DEPENDENCIES);
         if (deps == null) {
@@ -72,12 +73,24 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         }
         final Matcher m = listElementPattern.matcher(deps);
         while (m.find()) {
-            final String path = decodeUrl(m.group());
-            moduleInfo.addDependency(path);
+            final String url = m.group();
+            
+            final String dependeeModulePath;
+            try {
+                dependeeModulePath = decodeUrl(url);
+            }
+            catch (RuntimeException ex) {
+                throw new ModuleNotLoadedException(MessageFormat.format(
+                    "Unable to load the module ''{1}''. This dependee module path is an invalid URL: ''{0}''.",
+                        m.group(), moduleInfo.getPath()), ex);
+            }
+            
+            moduleInfo.addDependency(dependeeModulePath);
         }
     }
     
     private void addClasspathAttributes(final Attributes attributes, final ModuleInfo moduleInfo)
+            throws ModuleNotLoadedException
     {
         for (final ClasspathAttribute attrib : classpathAttributes) {
             if (attrib.name == null) {
@@ -90,8 +103,21 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
             final Path classpath = new Path(getProject());
             final Matcher m = listElementPattern.matcher(value);
             while (m.find()) {
+                final String url = m.group();
+                
+                final String classpathElement;
+                try {
+                    classpathElement = decodeUrl(url);
+                }
+                catch (RuntimeException ex) {
+                    throw new ModuleNotLoadedException(MessageFormat.format(
+                            "Unable to load the module ''{2}''. The classpath attribute ''{1}'' " +
+                            "contains an invalid URL element: ''{0}''.",
+                            m.group(), attrib.name, moduleInfo.getPath()), ex);
+                }
+                
                 final PathElement element = classpath.createPathElement();
-                element.setPath(moduleInfo.getPath() + decodeUrl(m.group()));
+                element.setPath(moduleInfo.getPath() + classpathElement);
             }
             moduleInfo.addAttribute(attrib.name, classpath);
         }
@@ -162,13 +188,14 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         return val;
     }
     
-    private static String decodeUrl(final String str)
+    // RuntimeException indicates that an error is encountered while decoding this URL.
+    private static String decodeUrl(final String encodedUrl) throws ModuleNotLoadedException, RuntimeException
     {
         try {
-            return URLDecoder.decode(str, "utf-8");
+            return URLDecoder.decode(encodedUrl, "utf-8");
         }
         catch (UnsupportedEncodingException ex) {
-            throw new BuildException(MessageFormat.format("Unable to decode a URL: ''{0}''.", str), ex);
+            throw new ModuleNotLoadedException("The encoding 'UTF-8' is not supported by this JVM.", ex);
         }
     }
 }
