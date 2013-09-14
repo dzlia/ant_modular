@@ -220,6 +220,38 @@ public class CallTargetForModules_SerialUseTest extends TestCase
                 TestUtil.map("hello", "world", "John", "Smith"));
     }
     
+    public void testSerialRun_SingleModule_WithUserParamLocation()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        task.setInheritAll(false);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        param2.setName("John");
+        param2.setLocation(new File("a/b/c"));
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param with the same name
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+                TestUtil.map("hello", "world", "John", new File("a/b/c").getAbsolutePath()));
+    }
+    
     public void testSerialRun_SingleModule_WithUserParamsFromFile_AndInheritedPropertiesByDefault()
     {
         final ModuleInfo moduleInfo = new ModuleInfo("foo/");
