@@ -66,15 +66,16 @@ public class MockCallTargetTask extends CallTarget
             param.execute();
         }
         
+        final PropertyHelper helper = PropertyHelper.getPropertyHelper(ownProject);
+        
         for (final PropertySet propSet : propertySets) {
             for (final Map.Entry<Object, Object> prop : propSet.getProperties().entrySet()) {
-                PropertyHelper.setNewProperty(ownProject, (String) prop.getKey(), prop.getValue());
+                helper.setProperty((String) prop.getKey(), prop.getValue(), false);
             }
         }
         
         if (inheritAll)
         {
-            final PropertyHelper helper = PropertyHelper.getPropertyHelper(ownProject);
             for (final Map.Entry prop : (Set<Map.Entry>) getProject().getProperties().entrySet()) {
                 final String propertyKey = (String) prop.getKey();
                 if (propertyKey.equals("basedir")) {
