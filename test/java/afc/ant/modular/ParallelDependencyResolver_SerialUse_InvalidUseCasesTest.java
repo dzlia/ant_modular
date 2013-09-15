@@ -308,4 +308,15 @@ public class ParallelDependencyResolver_SerialUse_InvalidUseCasesTest extends Te
             assertEquals("module", ex.getMessage());
         }
     }
+    
+    public void testAbortNonInitialisedResolver() throws Exception
+    {
+        try {
+            resolver.abort();
+            fail();
+        }
+        catch (IllegalStateException ex) {
+            assertEquals("Resolver is not initialised.", ex.getMessage());
+        }
+    }
 }
