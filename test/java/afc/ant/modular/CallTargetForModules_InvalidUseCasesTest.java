@@ -228,4 +228,46 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
             assertEquals("test_msg", ex.getMessage());
         }
     }
+    
+    public void testThreadCountIsInvalid_ZeroValue()
+    {
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
+        moduleInfo1.addDependency("bar/");
+        moduleLoader.modules.put("foo/", moduleInfo1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        try {
+            task.setThreadCount(0);
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("Invalid thread count: '0'. It must be a positive value.", ex.getMessage());
+        }
+    }
+    
+    public void testThreadCountIsInvalid_NegativeValue()
+    {
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
+        moduleInfo1.addDependency("bar/");
+        moduleLoader.modules.put("foo/", moduleInfo1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        try {
+            task.setThreadCount(-1);
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("Invalid thread count: '-1'. It must be a positive value.", ex.getMessage());
+        }
+    }
 }
