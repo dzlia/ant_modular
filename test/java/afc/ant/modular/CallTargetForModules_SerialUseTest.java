@@ -80,7 +80,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map());
     }
     
@@ -100,7 +100,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, TestUtil.<String, Object>map());
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, TestUtil.<String, Object>map());
     }
     
     public void testSerialRun_SingleModule_WithReferences_InheritAll_InheritRefs()
@@ -146,7 +146,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, true, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, true, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"),
                 TestUtil.<String, Object>map("ref1", val1, "ref2", val2, "ref3", val3));
     }
@@ -194,7 +194,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"),
                 TestUtil.<String, Object>map("ref1", val1, "ref2", val2, "ref3", val3));
     }
@@ -242,7 +242,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", false, true, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, true, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"),
                 TestUtil.<String, Object>map("ref1", val1, "ref2", val2, "ref3", val3));
     }
@@ -290,7 +290,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"),
                 TestUtil.<String, Object>map("ref1", val1, "ref2", val2));
     }
@@ -329,7 +329,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"),
                 Collections.<String, Object>emptyMap());
     }
@@ -358,7 +358,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"));
     }
     
@@ -389,7 +389,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456"));
     }
     
@@ -421,7 +421,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456"));
     }
     
@@ -453,7 +453,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"));
     }
     
@@ -485,7 +485,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", new File("a/b/c").getAbsolutePath()));
     }
     
@@ -512,7 +512,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -540,7 +540,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("John", "Smith", "qwerty", "board", "hello", "world"));
     }
     
@@ -568,7 +568,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("afc.hello", "world", "afc.John", "Smith", "123", "456",
                         "afc.qwerty", "board", "hello", "universe"));
     }
@@ -596,7 +596,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -625,7 +625,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("John", "Smith", "qwerty", "board", "hello", "world"));
     }
     
@@ -654,7 +654,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("afc.hello", "world", "afc.John", "Smith", "123", "456",
                         "afc.qwerty", "board", "hello", "universe"));
     }
@@ -685,7 +685,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -716,7 +716,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("John", "Smith", "qwerty", "board", "hello", "world"));
     }
     
@@ -747,7 +747,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("afc.hello", "world", "afc.John", "Smith", "123", "456",
                         "afc.qwerty", "board", "hello", "universe"));
     }
@@ -780,7 +780,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -812,7 +812,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -843,7 +843,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -875,7 +875,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("afc.hello", "world", "afc.John", "Smith", "123", "456",
                         "afc.qwerty", "board", "hello", "universe"));
     }
@@ -911,7 +911,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"),
                 Collections.<String, Object>singletonMap("cpRef", cpRefPath));
     }
@@ -950,7 +950,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"),
                 Collections.<String, Object>singletonMap("cpRef", cpRefPath));
     }
@@ -989,7 +989,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"),
                 Collections.<String, Object>singletonMap("cpRef", cpRefPath));
     }
@@ -1027,7 +1027,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("123", "456", "12345", "45678", "hello", "universe", "qwerty", "board"));
     }
     
@@ -1065,7 +1065,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("123", "456", "12345", "45678", "hello", "universe", "qwerty", "board"));
     }
     
@@ -1103,7 +1103,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("123", "456", "hello", "universe", "qwerty", "board"));
     }
     
@@ -1139,7 +1139,43 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.<String, Object>map("hello", "world", "someRef", "ref_value", "123", "456"),
+                Collections.<String, Object>singletonMap("cpRef", "ref_value"));
+    }
+    
+    public void testSerialRun_SingleModule_WithUserParams_IncludingParamReference_ModulePropertyUndefined()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        project.addReference("cpRef", "ref_value");
+        
+        final ParamElement param1 = task.createParam();
+        param1.setName("hello");
+        param1.setValue("world");
+        final ParamElement param2 = task.createParam();
+        final Reference ref = new Reference();
+        ref.setProject(project);
+        ref.setRefId("cpRef");
+        param2.setName("someRef");
+        param2.setRefid(ref);
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param with the same name
+        
+        task.perform();
+        
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false,
                 TestUtil.<String, Object>map("hello", "world", "someRef", "ref_value", "123", "456"),
                 Collections.<String, Object>singletonMap("cpRef", "ref_value"));
     }
@@ -1177,7 +1213,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
             properties.put("env." + e.getKey(), e.getValue());
         }
         properties.putAll(TestUtil.<String, Object>map("hello", "world", "123", "456"));
-        assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo, properties,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo, properties,
                 Collections.<String, Object>singletonMap("cpRef", "ref_value"));
     }
     
@@ -1225,13 +1261,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep3,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep3,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task2, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleProp", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task3, true, "someTarget", true, false, "moduleProp", dep1,
+        TestUtil.assertCallTargetState(task3, true, "someTarget", true, false, "moduleProp", dep1,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task4, true, "someTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task4, true, "someTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
     }
     
@@ -1278,13 +1314,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "testTarget", true, false,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task2, true, "testTarget", true, false,
+        TestUtil.assertCallTargetState(task2, true, "testTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task3, true, "testTarget", true, false,
+        TestUtil.assertCallTargetState(task3, true, "testTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task4, true, "testTarget", true, false,
+        TestUtil.assertCallTargetState(task4, true, "testTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
     }
     
@@ -1333,13 +1369,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "someTarget", true, false, "mProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "mProp", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task2, true, "someTarget", true, false, "mProp", moduleInfo2,
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "mProp", moduleInfo2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task3, true, "someTarget", true, false, "mProp", dep1,
+        TestUtil.assertCallTargetState(task3, true, "someTarget", true, false, "mProp", dep1,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task4, true, "someTarget", true, false, "mProp", moduleInfo,
+        TestUtil.assertCallTargetState(task4, true, "someTarget", true, false, "mProp", moduleInfo,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
     }
     
@@ -1387,13 +1423,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "someTarget", true, false,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task2, true, "someTarget", true, false,
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task3, true, "someTarget", true, false,
+        TestUtil.assertCallTargetState(task3, true, "someTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task4, true, "someTarget", true, false,
+        TestUtil.assertCallTargetState(task4, true, "someTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
     }
     
@@ -1454,10 +1490,10 @@ public class CallTargetForModules_SerialUseTest extends TestCase
                 dep1.getPath(), dep1,
                 dep2.getPath(), dep2);
         final ArrayList<String> modulePaths = new ArrayList<String>();
-        modulePaths.add(getModulePath(task1.ownProject, "mProp"));
-        modulePaths.add(getModulePath(task2.ownProject, "mProp"));
-        modulePaths.add(getModulePath(task3.ownProject, "mProp"));
-        modulePaths.add(getModulePath(task4.ownProject, "mProp"));
+        modulePaths.add(TestUtil.getModulePath(task1.ownProject, "mProp"));
+        modulePaths.add(TestUtil.getModulePath(task2.ownProject, "mProp"));
+        modulePaths.add(TestUtil.getModulePath(task3.ownProject, "mProp"));
+        modulePaths.add(TestUtil.getModulePath(task4.ownProject, "mProp"));
         
         assertTrue(modulePaths.contains("foo/"));
         assertTrue(modulePaths.contains("bar/"));
@@ -1466,13 +1502,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         assertTrue(modulePaths.indexOf("foo/") > modulePaths.indexOf("bar/"));
         assertTrue(modulePaths.indexOf("baz/") > modulePaths.indexOf("quux/"));
         
-        assertCallTargetState(task1, true, "someTarget", true, false, "mProp", moduleInfos.get(modulePaths.get(0)),
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "mProp",
+                moduleInfos.get(modulePaths.get(0)),
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task1", "prop1"));
-        assertCallTargetState(task2, true, "someTarget", true, false, "mProp", moduleInfos.get(modulePaths.get(1)),
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "mProp",
+                moduleInfos.get(modulePaths.get(1)),
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task2", "prop2"));
-        assertCallTargetState(task3, true, "someTarget", true, false, "mProp", moduleInfos.get(modulePaths.get(2)),
+        TestUtil.assertCallTargetState(task3, true, "someTarget", true, false, "mProp",
+                moduleInfos.get(modulePaths.get(2)),
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task3", "prop3"));
-        assertCallTargetState(task4, true, "someTarget", true, false, "mProp", moduleInfos.get(modulePaths.get(3)),
+        TestUtil.assertCallTargetState(task4, true, "someTarget", true, false, "mProp",
+                moduleInfos.get(modulePaths.get(3)),
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task4", "prop4"));
     }
     
@@ -1529,13 +1569,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         /* Since no module is passed to the targets there is not way to determine
            what targets were called for what modules. */
-        assertCallTargetState(task1, true, "someTarget", true, false,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task1", "prop1"));
-        assertCallTargetState(task2, true, "someTarget", true, false,
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task2", "prop2"));
-        assertCallTargetState(task3, true, "someTarget", true, false,
+        TestUtil.assertCallTargetState(task3, true, "someTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task3", "prop3"));
-        assertCallTargetState(task4, true, "someTarget", true, false,
+        TestUtil.assertCallTargetState(task4, true, "someTarget", true, false,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task4", "prop4"));
     }
     
@@ -1585,94 +1625,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        assertCallTargetState(task1, true, "someTarget", true, false, "mProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "mProp", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task2, true, "someTarget", true, false, "mProp", moduleInfo2,
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "mProp", moduleInfo2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task3, true, "someTarget", true, false, "mProp", dep1,
+        TestUtil.assertCallTargetState(task3, true, "someTarget", true, false, "mProp", dep1,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        assertCallTargetState(task4, true, "someTarget", true, false, "mProp", moduleInfo,
+        TestUtil.assertCallTargetState(task4, true, "someTarget", true, false, "mProp", moduleInfo,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-    }
-    
-    private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
-            final String target, final boolean inheritAll, final boolean inheritRefs, final String moduleProperty,
-            final ModuleInfo proto, final Map<String, Object> properties)
-    {
-        assertCallTargetState(task, executed, target, inheritAll, inheritRefs, moduleProperty, proto,
-                properties, Collections.<String, Object>emptyMap());
-    }
-    
-    private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
-            final String target, final boolean inheritAll, final boolean inheritRefs, final String moduleProperty,
-            final ModuleInfo proto, final Map<String, Object> properties, final Map<String, Object> references)
-    {
-        assertEquals(executed, task.executed);
-        assertEquals(target, task.target);
-        assertEquals(inheritAll, task.inheritAll);
-        assertEquals(inheritRefs, task.inheritRefs);
-        
-        final Object moduleObj = task.ownProject.getProperties().get(moduleProperty);
-        assertTrue(moduleObj instanceof Module);
-        final Module module = (Module) moduleObj;
-        assertEquals(proto.getPath(), module.getPath());
-        assertEquals(proto.getAttributes(), module.getAttributes());
-        final HashSet<String> depPaths = new HashSet<String>();
-        for (final Module dep : module.getDependencies()) {
-            assertTrue(depPaths.add(dep.getPath()));
-        }
-        assertEquals(proto.getDependencies(), depPaths);
-        
-        // merging module property into the properties passed. The module object is not freely available
-        final HashMap<String, Object> propsWithModule = new HashMap<String, Object>(properties);
-        propsWithModule.put(moduleProperty, module);
-        final Map<?, ?> actualProperties = task.ownProject.getProperties();
-        actualProperties.remove(MagicNames.PROJECT_BASEDIR);
-        assertEquals(propsWithModule, actualProperties);
-        
-        assertReferences(task.ownProject, references);
-    }
-    
-    private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
-            final String target, final boolean inheritAll, final boolean inheritRefs,
-            final Map<String, Object> properties)
-    {
-        assertCallTargetState(task, executed, target, inheritAll, inheritRefs,
-                properties, Collections.<String, Object>emptyMap());
-    }
-    
-    private static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
-            final String target, final boolean inheritAll, final boolean inheritRefs,
-            final Map<String, Object> properties, final Map<String, Object> references)
-    {
-        assertEquals(executed, task.executed);
-        assertEquals(target, task.target);
-        assertEquals(inheritAll, task.inheritAll);
-        assertEquals(inheritRefs, task.inheritRefs);
-        
-        final Map<?, ?> actualProperties = task.ownProject.getProperties();
-        actualProperties.remove(MagicNames.PROJECT_BASEDIR);
-        assertEquals(properties, actualProperties);
-        
-        assertReferences(task.ownProject, references);
-    }
-    
-    private static void assertReferences(final Project project, final Map<String, Object> expectedReferences) 
-    {
-        final Map<?, ?> actualReferences = project.getReferences();
-        for (final Iterator<?> i = actualReferences.keySet().iterator(); i.hasNext();) {
-            if (((String) i.next()).startsWith("ant.")) {
-                i.remove();
-            }
-        }
-        assertEquals(expectedReferences, actualReferences);
-    }
-    
-    private static String getModulePath(final Project project, final String moduleProperty)
-    {
-        assertNotNull(project);
-        final Object module = project.getProperties().get(moduleProperty);
-        assertTrue(module instanceof Module);
-        return ((Module) module).getPath();
     }
 }

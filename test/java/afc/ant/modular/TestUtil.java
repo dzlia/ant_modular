@@ -23,8 +23,14 @@
 package afc.ant.modular;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.apache.tools.ant.MagicNames;
+import org.apache.tools.ant.Project;
 
 import junit.framework.Assert;
 
@@ -43,5 +49,86 @@ public class TestUtil
             map.put((K) parts[i], (V) parts[i+1]);
         }
         return map;
+    }
+    
+    public static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
+            final String target, final boolean inheritAll, final boolean inheritRefs, final String moduleProperty,
+            final ModuleInfo proto, final Map<String, Object> properties)
+    {
+        assertCallTargetState(task, executed, target, inheritAll, inheritRefs, moduleProperty, proto,
+                properties, Collections.<String, Object>emptyMap());
+    }
+    
+    public static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
+            final String target, final boolean inheritAll, final boolean inheritRefs, final String moduleProperty,
+            final ModuleInfo proto, final Map<String, Object> properties, final Map<String, Object> references)
+    {
+        Assert.assertEquals(executed, task.executed);
+        Assert.assertEquals(target, task.target);
+        Assert.assertEquals(inheritAll, task.inheritAll);
+        Assert.assertEquals(inheritRefs, task.inheritRefs);
+        
+        final Object moduleObj = task.ownProject.getProperties().get(moduleProperty);
+        Assert.assertTrue(moduleObj instanceof Module);
+        final Module module = (Module) moduleObj;
+        Assert.assertEquals(proto.getPath(), module.getPath());
+        Assert.assertEquals(proto.getAttributes(), module.getAttributes());
+        final HashSet<String> depPaths = new HashSet<String>();
+        for (final Module dep : module.getDependencies()) {
+            Assert.assertTrue(depPaths.add(dep.getPath()));
+        }
+        Assert.assertEquals(proto.getDependencies(), depPaths);
+        
+        // merging module property into the properties passed. The module object is not freely available
+        final HashMap<String, Object> propsWithModule = new HashMap<String, Object>(properties);
+        propsWithModule.put(moduleProperty, module);
+        final Map<?, ?> actualProperties = task.ownProject.getProperties();
+        actualProperties.remove(MagicNames.PROJECT_BASEDIR);
+        Assert.assertEquals(propsWithModule, actualProperties);
+        
+        assertReferences(task.ownProject, references);
+    }
+    
+    public static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
+            final String target, final boolean inheritAll, final boolean inheritRefs,
+            final Map<String, Object> properties)
+    {
+        assertCallTargetState(task, executed, target, inheritAll, inheritRefs,
+                properties, Collections.<String, Object>emptyMap());
+    }
+    
+    public static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
+            final String target, final boolean inheritAll, final boolean inheritRefs,
+            final Map<String, Object> properties, final Map<String, Object> references)
+    {
+        Assert.assertEquals(executed, task.executed);
+        Assert.assertEquals(target, task.target);
+        Assert.assertEquals(inheritAll, task.inheritAll);
+        Assert.assertEquals(inheritRefs, task.inheritRefs);
+        
+        final Map<?, ?> actualProperties = task.ownProject.getProperties();
+        actualProperties.remove(MagicNames.PROJECT_BASEDIR);
+        Assert.assertEquals(properties, actualProperties);
+        
+        assertReferences(task.ownProject, references);
+    }
+    
+    private static void assertReferences(final Project project, final Map<String, Object> expectedReferences) 
+    {
+        final Map<?, ?> actualReferences = project.getReferences();
+        for (final Iterator<?> i = actualReferences.keySet().iterator(); i.hasNext();) {
+            if (((String) i.next()).startsWith("ant.")) {
+                i.remove();
+            }
+        }
+        Assert.assertEquals(expectedReferences, actualReferences);
+    }
+    
+    public static String getModulePath(final Project project, final String moduleProperty)
+    {
+        Assert.assertNotNull(project);
+        final Object module = project.getProperties().get(moduleProperty);
+        Assert.assertTrue(module instanceof Module);
+        return ((Module) module).getPath();
     }
 }
