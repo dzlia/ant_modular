@@ -131,7 +131,7 @@ public class SerialDependencyResolver implements DependencyResolver
          * some leading path elements could be truncated.
          * 
          * it.remove() has non-optional performance: just skipping to the module's
-         * position and then copy the remanings modules to a list works faster.
+         * position and then copy the remaining modules to a list works faster.
          * However, this implementation is simpler and for an error case
          * the minor difference in performance does not matter.
          */
