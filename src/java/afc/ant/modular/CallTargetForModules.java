@@ -217,7 +217,7 @@ public class CallTargetForModules extends Task
                     catch (Throwable ex) {
                         buildFailed.set(true);
                         buildFailureException.set(ex);
-                        /* ensure that other threads will stop module processing right after
+                        /* Ensure that other threads will stop module processing right after
                            their current module is processed. */
                         dependencyResolver.abort();
                     }
