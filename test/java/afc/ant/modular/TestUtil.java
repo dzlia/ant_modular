@@ -35,12 +35,12 @@ public class TestUtil
         return new HashSet<T>(Arrays.asList(elements));
     }
     
-    public static HashMap<String, Object> map(final Object... parts)
+    public static <K, V> HashMap<K, V> map(final Object... parts)
     {
         Assert.assertTrue(parts.length % 2 == 0);
-        final HashMap<String, Object> map = new HashMap<String, Object>();
+        final HashMap<K, V> map = new HashMap<K, V>();
         for (int i = 0; i < parts.length; i+=2) {
-            map.put((String) parts[i], parts[i+1]);
+            map.put((K) parts[i], (V) parts[i+1]);
         }
         return map;
     }

@@ -86,8 +86,8 @@ public class ModuleRegistryTest extends TestCase
         final Module m1 = registry.resolveModule("foo");
         final Module m2 = registry.resolveModule("bar");
         
-        assertModule(m1, "foo/", TestUtil.map("1", "2", "3", "4"), m2);
-        assertModule(m2, "bar/", TestUtil.map("5", val));
+        assertModule(m1, "foo/", TestUtil.<String, Object>map("1", "2", "3", "4"), m2);
+        assertModule(m2, "bar/", TestUtil.<String, Object>map("5", val));
         
         assertSame(m1, registry.resolveModule("foo/"));
         
@@ -115,7 +115,7 @@ public class ModuleRegistryTest extends TestCase
         assertSame(m2, m4);
         
         assertModule(m1, "foo/");
-        assertModule(m2, "bar/", TestUtil.map("qqq", "www"));
+        assertModule(m2, "bar/", TestUtil.<String, Object>map("qqq", "www"));
         
         assertEquals(2, loader.paths.size());
         assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(loader.paths));

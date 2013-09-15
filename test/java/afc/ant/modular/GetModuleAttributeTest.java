@@ -70,7 +70,7 @@ public class GetModuleAttributeTest extends TestCase
     public void testNoOutputProperty()
     {
         final Module module = new Module("foo");
-        module.setAttributes(TestUtil.map("attrib", "1", "attrib2", "3"));
+        module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -86,13 +86,13 @@ public class GetModuleAttributeTest extends TestCase
         }
         
         assertSame(module, PropertyHelper.getProperty(project, "in"));
-        assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
+        assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
     public void testNoNameProperty()
     {
         final Module module = new Module("foo");
-        module.setAttributes(TestUtil.map("attrib", "1", "attrib2", "3"));
+        module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -109,7 +109,7 @@ public class GetModuleAttributeTest extends TestCase
         
         assertEquals(null, PropertyHelper.getProperty(project, "out"));
         assertSame(module, PropertyHelper.getProperty(project, "in"));
-        assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
+        assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
     public void testNoModuleUnderThePropery()
@@ -158,7 +158,7 @@ public class GetModuleAttributeTest extends TestCase
     {
         final Object attributeValue = new Object();
         final Module module = new Module("foo");
-        module.setAttributes(TestUtil.map("attrib", attributeValue, "attrib2", "3"));
+        module.setAttributes(TestUtil.<String, Object>map("attrib", attributeValue, "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -169,13 +169,13 @@ public class GetModuleAttributeTest extends TestCase
         
         assertSame(attributeValue, PropertyHelper.getProperty(project, "out"));
         assertSame(module, PropertyHelper.getProperty(project, "in"));
-        assertEquals(TestUtil.map("attrib", attributeValue, "attrib2", "3"), module.getAttributes());
+        assertEquals(TestUtil.<String, Object>map("attrib", attributeValue, "attrib2", "3"), module.getAttributes());
     }
     
     public void testSuccessfulExecution_AttributeDoesNotExist()
     {
         final Module module = new Module("foo");
-        module.setAttributes(TestUtil.map("attrib1", "1", "attrib2", "3"));
+        module.setAttributes(TestUtil.<String, Object>map("attrib1", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -186,7 +186,7 @@ public class GetModuleAttributeTest extends TestCase
         
         assertSame(null, PropertyHelper.getProperty(project, "out"));
         assertSame(module, PropertyHelper.getProperty(project, "in"));
-        assertEquals(TestUtil.map("attrib1", "1", "attrib2", "3"), module.getAttributes());
+        assertEquals(TestUtil.<String, Object>map("attrib1", "1", "attrib2", "3"), module.getAttributes());
     }
     
     public void testSuccessfulExecution_NoAttributes()
@@ -210,7 +210,7 @@ public class GetModuleAttributeTest extends TestCase
         project.setProperty("out", "bar");
         
         final Module module = new Module("foo");
-        module.setAttributes(TestUtil.map("attrib", "1", "attrib2", "3"));
+        module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -221,7 +221,7 @@ public class GetModuleAttributeTest extends TestCase
         
         assertEquals("bar", PropertyHelper.getProperty(project, "out"));
         assertSame(module, PropertyHelper.getProperty(project, "in"));
-        assertEquals(TestUtil.map("attrib", "1", "attrib2", "3"), module.getAttributes());
+        assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
     public void testOutputPropertyAlreadyDefined_AttributeDoesNotExist()
@@ -229,7 +229,7 @@ public class GetModuleAttributeTest extends TestCase
         project.setProperty("out", "bar");
         
         final Module module = new Module("foo");
-        module.setAttributes(TestUtil.map("attrib1", "1", "attrib2", "3"));
+        module.setAttributes(TestUtil.<String, Object>map("attrib1", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -240,6 +240,6 @@ public class GetModuleAttributeTest extends TestCase
         
         assertSame("bar", PropertyHelper.getProperty(project, "out"));
         assertSame(module, PropertyHelper.getProperty(project, "in"));
-        assertEquals(TestUtil.map("attrib1", "1", "attrib2", "3"), module.getAttributes());
+        assertEquals(TestUtil.<String, Object>map("attrib1", "1", "attrib2", "3"), module.getAttributes());
     }
 }
