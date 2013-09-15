@@ -155,4 +155,64 @@ public class ParallelDependencyResolver_SerialUse_PseudoParallelUseCasesTest ext
         assertTrue(order.indexOf(module1) < order.indexOf(module2));
         assertTrue(order.indexOf(module3) < order.indexOf(module2));
     }
+    
+    public void testThreeModules_AbortInTheMiddle() throws Exception
+    {
+        final Module module1 = new Module("foo");
+        final Module module2 = new Module("bar");
+        final Module module3 = new Module("baz");
+        module1.addDependency(module2);
+        module2.addDependency(module3);
+        
+        resolver.init(Arrays.asList(module1));
+        
+        final Module m1 = resolver.getFreeModule();
+        
+        resolver.abort();
+        
+        final Module m2 = resolver.getFreeModule();
+        
+        resolver.moduleProcessed(m1);
+        
+        final Module m3 = resolver.getFreeModule();
+        
+        assertSame(module3, m1);
+        assertNull(m2);
+        assertNull(m3);
+    }
+    
+    public void testThreeModules_MultipleAbortInTheMiddle() throws Exception
+    {
+        final Module module1 = new Module("foo");
+        final Module module2 = new Module("bar");
+        final Module module3 = new Module("baz");
+        module2.addDependency(module1);
+        module2.addDependency(module3);
+        
+        resolver.init(Arrays.asList(module2));
+
+        final Module m1 = resolver.getFreeModule();
+        final Module m2 = resolver.getFreeModule();
+        
+        resolver.abort();
+        resolver.abort();
+        
+        final Module m3 = resolver.getFreeModule();
+        
+        assertNull(m3);
+        
+        resolver.moduleProcessed(m1);
+        
+        final Module m4 = resolver.getFreeModule();
+        
+        assertNull(m4);
+        
+        resolver.moduleProcessed(m2);
+        
+        final Module m5 = resolver.getFreeModule();
+        
+        assertNull(m5);
+        
+        assertEquals(TestUtil.set(module1, module3), TestUtil.set(m1, m2));
+    }
 }

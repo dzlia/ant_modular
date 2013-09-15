@@ -63,7 +63,8 @@ public class ParallelDependencyResolver implements DependencyResolver
         
         try {
             while (shortlist.isEmpty()) {
-                if (remainingModuleCount == 0) {
+                if (remainingModuleCount <= 0) {
+                    // Either all modules are processed or #abort() has been called.
                     return null;
                 }
                 wait();
@@ -87,6 +88,10 @@ public class ParallelDependencyResolver implements DependencyResolver
         if (module == null) {
             throw new NullPointerException("module");
         }
+        if (remainingModuleCount < 0) {
+            // #abort() has been called.
+            return;
+        }
         final Node node = modulesAcquired.remove(module);
         if (node == null) {
             throw new IllegalArgumentException(MessageFormat.format(
@@ -101,6 +106,14 @@ public class ParallelDependencyResolver implements DependencyResolver
         }
         /* Notifying all threads after the module is removed and its dependencies are processed
            so that each thread waiting can either get a free module or finish execution. */
+        notifyAll();
+    }
+    
+    public synchronized void abort()
+    {
+        ensureInitialised();
+        shortlist.clear();
+        remainingModuleCount = -1; // Indicates that #abort() has been called.
         notifyAll();
     }
     

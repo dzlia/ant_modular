@@ -189,8 +189,10 @@ public class CallTargetForModules extends Task
                 public void run()
                 {
                     try {
-                        while (!buildFailed.get()) {
-                            if (Thread.interrupted()) {
+                        // This thread is non-interruptible because its workflow does not need this.
+                        for (;;) {
+                            if (buildFailed.get()) {
+                                // No need to get another module is the build has failed already.
                                 return;
                             }
                             
@@ -198,13 +200,26 @@ public class CallTargetForModules extends Task
                             if (module == null) {
                                 return;
                             }
+                            
+                            /* Do not call dependencyResolver#moduleProcessed in case of exception!
+                             * This could make the modules that depend upon this module
+                             * (whose processing has failed!) free for acquisition, despite of
+                             * their dependee module did not succeed.
+                             * 
+                             * Instead, dependencyResolver#abort() is called.
+                             */
                             callTarget(module);
+                            
+                            // Reporting this module as processed if no error is encountered.
                             dependencyResolver.moduleProcessed(module);
                         }
                     }
                     catch (Throwable ex) {
                         buildFailed.set(true);
                         buildFailureException.set(ex);
+                        /* ensure that other threads will stop module processing right after
+                           their current module is processed. */
+                        dependencyResolver.abort();
                     }
                 }
             };
