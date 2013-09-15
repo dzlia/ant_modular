@@ -113,6 +113,7 @@ public class ParallelDependencyResolver implements DependencyResolver
     {
         ensureInitialised();
         shortlist.clear();
+        modulesAcquired.clear(); // Tracking the acquired modules does not make sense anymore.
         remainingModuleCount = -1; // Indicates that #abort() has been called.
         notifyAll();
     }
