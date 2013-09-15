@@ -181,49 +181,59 @@ public class CallTargetForModules extends Task
         final AtomicBoolean buildFailed = new AtomicBoolean(false);
         final AtomicReference<Throwable> buildFailureException = new AtomicReference<Throwable>();
         
-        final Thread[] threads = new Thread[threadCount];
-        for (int i = 0; i < threadCount; ++i) {
-            final Thread t = new Thread()
+        /* A stateless worker to process modules using ParallelDependencyResolver.
+         * This instance can be used by multiple threads simultaneously.
+         */
+        final Runnable parallelBuildWorker = new Runnable()
+        {
+            public void run()
             {
-                @Override
-                public void run()
-                {
-                    try {
-                        // This thread is non-interruptible because its workflow does not need this.
-                        for (;;) {
-                            final Module module = dependencyResolver.getFreeModule();
-                            if (module == null) {
-                                /* Either all modules are processed or the build has failed and
-                                 * the resolver was aborted. Finishing execution.
-                                 */
-                                return;
-                            }
-                            
-                            /* Do not call dependencyResolver#moduleProcessed in case of exception!
-                             * This could make the modules that depend upon this module
-                             * (whose processing has failed!) free for acquisition, despite of
-                             * their dependee module did not succeed.
-                             * 
-                             * Instead, dependencyResolver#abort() is called.
+                try {
+                    // This thread is non-interruptible because its workflow does not need this.
+                    for (;;) {
+                        final Module module = dependencyResolver.getFreeModule();
+                        if (module == null) {
+                            /* Either all modules are processed or the build has failed and
+                             * the resolver was aborted. Finishing execution.
                              */
-                            callTarget(module);
-                            
-                            // Reporting this module as processed if no error is encountered.
-                            dependencyResolver.moduleProcessed(module);
+                            return;
                         }
-                    }
-                    catch (Throwable ex) {
-                        buildFailed.set(true);
-                        buildFailureException.set(ex);
-                        /* Ensure that other threads will stop module processing right after
-                           their current module is processed. */
-                        dependencyResolver.abort();
+                        
+                        /* Do not call dependencyResolver#moduleProcessed in case of exception!
+                         * This could make the modules that depend upon this module
+                         * (whose processing has failed!) free for acquisition, despite of
+                         * their dependee module did not succeed.
+                         * 
+                         * Instead, dependencyResolver#abort() is called.
+                         */
+                        callTarget(module);
+                        
+                        // Reporting this module as processed if no error is encountered.
+                        dependencyResolver.moduleProcessed(module);
                     }
                 }
-            };
+                catch (Throwable ex) {
+                    buildFailed.set(true);
+                    buildFailureException.set(ex);
+                    /* Ensure that other threads will stop module processing right after
+                       their current module is processed. */
+                    dependencyResolver.abort();
+                }
+            }
+        };
+        
+        // The current thread will be the last thread to process modules.
+        final int threadsToCreate = threadCount-1;
+        final Thread[] threads = new Thread[threadsToCreate];
+        for (int i = 0; i < threadsToCreate; ++i) {
+            final Thread t = new Thread(parallelBuildWorker);
             threads[i] = t;
             t.start();
         }
+        
+        // The current thread is one of the threads that process the modules.
+        parallelBuildWorker.run();
+        
         try {
             for (final Thread t : threads) {
                 t.join();
