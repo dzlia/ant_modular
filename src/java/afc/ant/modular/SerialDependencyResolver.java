@@ -128,19 +128,18 @@ public class SerialDependencyResolver implements DependencyResolver
         }
         
         /* A loop is detected. It does not necessarily end with the starting node,
-           some leading nodes could be truncated. */
-        int loopSize = ctx.path.size();
+         * some leading path elements could be truncated.
+         * 
+         * it.remove() has non-optional performance: just skipping to the module's
+         * position and then copy the remanings modules to a list works faster.
+         * However, this implementation is simpler and for an error case
+         * the minor difference in performance does not matter.
+         */
         final Iterator<Module> it = ctx.path.iterator();
         while (it.next() != module) {
-            // skipping all leading nodes that are outside the loop
-            --loopSize;
+            // skipping all leading modules that are outside the loop
+            it.remove();
         }
-        final ArrayList<Module> loop = new ArrayList<Module>(loopSize);
-        loop.add(module);
-        while (it.hasNext()) {
-            loop.add(it.next());
-        }
-        assert loopSize == loop.size();
-        throw new CyclicDependenciesDetectedException(loop);
+        throw new CyclicDependenciesDetectedException(new ArrayList<Module>(ctx.path));
     }
 }
