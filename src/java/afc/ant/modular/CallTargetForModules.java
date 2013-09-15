@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Location;
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.CallTarget;
@@ -95,10 +96,10 @@ public class CallTargetForModules extends Task
             }
         }
         catch (ModuleNotLoadedException ex) {
-            throw new BuildException(ex.getMessage(), ex);
+            throw buildException(ex);
         }
         catch (CyclicDependenciesDetectedException ex) {
-            throw new BuildException(ex.getMessage(), ex);
+            throw buildException(ex);
         }
     }
     
@@ -124,7 +125,39 @@ public class CallTargetForModules extends Task
         antcall.setInheritRefs(inheritRefs);
         antcall.setTarget(target);
         
-        antcall.perform();
+        try {
+            antcall.perform();
+        }
+        catch (RuntimeException ex) {
+            throw buildExceptionForModule(ex, module);
+        }
+    }
+    
+    private BuildException buildException(final Throwable cause)
+    {
+        Location location = getLocation();
+        if (location == null) {
+            location = Location.UNKNOWN_LOCATION;
+        }
+        
+        return new BuildException(cause.getMessage(), cause, location);
+    }
+    
+    private BuildException buildExceptionForModule(final Throwable cause, final Module module)
+    {
+        final BuildException ex = new BuildException(MessageFormat.format(
+                "Module ''{0}'': {1}", module.getPath(), cause.getMessage()), cause);
+        
+        // Gathering all information available from the original build exception.
+        if (cause instanceof BuildException) {
+            /* The thread that generated this exception is either the current thread or
+               a dead thread so synchronisation is not needed to read location. */
+            final Location location = ((BuildException) cause).getLocation();
+            ex.setLocation(location == null ? Location.UNKNOWN_LOCATION : location);
+            ex.setStackTrace(cause.getStackTrace());
+        }
+        
+        return ex;
     }
     
     private void processModulesSerial(final ArrayList<Module> modules) throws CyclicDependenciesDetectedException

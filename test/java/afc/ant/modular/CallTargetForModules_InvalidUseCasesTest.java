@@ -23,6 +23,7 @@
 package afc.ant.modular;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Location;
 
 import junit.framework.TestCase;
 
@@ -176,7 +177,36 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         }
     }
     
-    public void testRootModuleWithDependency_CyclicDependency()
+    public void testRootModuleWithDependency_CyclicDependency_TaskLocationDefined()
+    {
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        moduleInfo1.addDependency("bar/");
+        moduleInfo2.addDependency("foo/");
+        moduleLoader.modules.put("foo/", moduleInfo1);
+        moduleLoader.modules.put("bar/", moduleInfo2);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final Location location = new Location("some_file");
+        task.setLocation(location);
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertTrue(ex.getCause() instanceof CyclicDependenciesDetectedException);
+            assertEquals(ex.getMessage(), ex.getCause().getMessage());
+            assertSame(location, ex.getLocation());
+        }
+    }
+    
+    public void testRootModuleWithDependency_CyclicDependency_TaskLocationUndefined()
     {
         final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
         final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
@@ -198,10 +228,43 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         catch (BuildException ex) {
             assertTrue(ex.getCause() instanceof CyclicDependenciesDetectedException);
             assertEquals(ex.getMessage(), ex.getCause().getMessage());
+            assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
         }
     }
     
-    public void testMissingModule()
+    public void testMissingModule_TaskLocationDefined()
+    {
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        moduleInfo1.addDependency("bar/");
+        moduleInfo2.addDependency("baz/"); // this dependency will not be resolved
+        moduleLoader.modules.put("foo/", moduleInfo1);
+        moduleLoader.modules.put("bar/", moduleInfo2);
+        
+        final ModuleNotLoadedException exception = new ModuleNotLoadedException("test_msg");
+        moduleLoader.modules.put("baz/", exception);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final Location location = new Location("some_file");
+        task.setLocation(location);
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertSame(exception, ex.getCause());
+            assertEquals(ex.getMessage(), "test_msg");
+            assertSame(location, ex.getLocation());
+        }
+    }
+    
+    public void testMissingModule_TaskLocationUnefined()
     {
         final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
         final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
@@ -225,7 +288,8 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         }
         catch (BuildException ex) {
             assertSame(exception, ex.getCause());
-            assertEquals("test_msg", ex.getMessage());
+            assertEquals(ex.getMessage(), "test_msg");
+            assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
         }
     }
     

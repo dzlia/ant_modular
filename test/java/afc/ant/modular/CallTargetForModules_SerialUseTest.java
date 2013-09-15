@@ -24,14 +24,13 @@ package afc.ant.modular;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.tools.ant.MagicNames;
-import org.apache.tools.ant.Project;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Location;
 import org.apache.tools.ant.taskdefs.Ant.Reference;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PropertySet;
@@ -1633,5 +1632,118 @@ public class CallTargetForModules_SerialUseTest extends TestCase
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         TestUtil.assertCallTargetState(task4, true, "someTarget", true, false, "mProp", moduleInfo,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+    }
+    
+    public void testSerialRun_ModuleWithDeps_BuildFailure()
+    {
+        // Unambiguous order of module processing is selected for the sake of simplicity.
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleInfo.addDependency("bar/");
+        moduleInfo.addDependency("baz/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        dep1.addDependency("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        dep2.addAttribute("qq", "ww");
+        dep2.addAttribute("aa", "ss");
+        
+        moduleLoader.modules.put("foo/", moduleInfo);
+        moduleLoader.modules.put("bar/", dep1);
+        moduleLoader.modules.put("baz/", dep2);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        final MockCallTargetTask task2 = new MockCallTargetTask(project);
+        project.tasks.add(task2);
+        final MockCallTargetTask task3 = new MockCallTargetTask(project);
+        project.tasks.add(task3);
+        
+        final Location location = new Location("some_file", 10, 20);
+        final BuildException exception = new BuildException("test_failure_msg", location);
+        task2.exception = exception;
+        
+        task.init();
+        task.setTarget("someTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param = task.createParam();
+        param.setName("p");
+        param.setValue("o");
+        
+        project.setProperty("qwerty", "board");
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("Module 'bar/': test_failure_msg", ex.getMessage());
+            assertSame(exception, ex.getCause());
+            assertSame(location, ex.getLocation());
+            assertTrue(Arrays.equals(exception.getStackTrace(), ex.getStackTrace()));
+        }
+        
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleProp", dep1,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        assertFalse(task3.executed);
+    }
+    
+    public void testSerialRun_ModuleWithDeps_RuntimeExceptionInATarget()
+    {
+        // Unambiguous order of module processing is selected for the sake of simplicity.
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleInfo.addDependency("bar/");
+        moduleInfo.addDependency("baz/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        dep1.addDependency("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        dep2.addAttribute("qq", "ww");
+        dep2.addAttribute("aa", "ss");
+        
+        moduleLoader.modules.put("foo/", moduleInfo);
+        moduleLoader.modules.put("bar/", dep1);
+        moduleLoader.modules.put("baz/", dep2);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        final MockCallTargetTask task2 = new MockCallTargetTask(project);
+        project.tasks.add(task2);
+        final MockCallTargetTask task3 = new MockCallTargetTask(project);
+        project.tasks.add(task3);
+        
+        final RuntimeException exception = new RuntimeException("test_failure_msg");
+        task2.exception = exception;
+        
+        task.init();
+        task.setTarget("someTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param = task.createParam();
+        param.setName("p");
+        param.setValue("o");
+        
+        project.setProperty("qwerty", "board");
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("Module 'bar/': " + ex.getCause().getMessage(), ex.getMessage());
+            assertNotNull(ex.getLocation());
+        }
+        
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleProp", dep1,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        assertFalse(task3.executed);
     }
 }
