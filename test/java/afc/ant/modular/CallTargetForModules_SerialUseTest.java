@@ -1426,6 +1426,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         final MockCallTargetTask task4 = new MockCallTargetTask(project);
         project.tasks.add(task4);
         
+        /* Verifying that module-specific targets to not see the changes of each other.
+           Support of MockCallTargetTask is needed for correct emulation. */
+        task1.propertiesToSet = Collections.<String, Object>singletonMap("task1", "prop1");
+        task2.propertiesToSet = Collections.<String, Object>singletonMap("task2", "prop2");
+        task3.propertiesToSet = Collections.<String, Object>singletonMap("task3", "prop3");
+        task4.propertiesToSet = Collections.<String, Object>singletonMap("task4", "prop4");
+        
         task.init();
         task.setTarget("someTarget");
         task.setModuleProperty("mProp");
@@ -1460,13 +1467,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         assertTrue(modulePaths.indexOf("baz/") > modulePaths.indexOf("quux/"));
         
         assertCallTargetState(task1, true, "someTarget", true, false, "mProp", moduleInfos.get(modulePaths.get(0)),
-                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task1", "prop1"));
         assertCallTargetState(task2, true, "someTarget", true, false, "mProp", moduleInfos.get(modulePaths.get(1)),
-                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task2", "prop2"));
         assertCallTargetState(task3, true, "someTarget", true, false, "mProp", moduleInfos.get(modulePaths.get(2)),
-                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task3", "prop3"));
         assertCallTargetState(task4, true, "someTarget", true, false, "mProp", moduleInfos.get(modulePaths.get(3)),
-                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task4", "prop4"));
     }
     
     public void testSerialRun_MultipleModulesWithDeps_UnrelatedHierarchies_ModulePropertyUndefined()
@@ -1499,6 +1506,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         final MockCallTargetTask task4 = new MockCallTargetTask(project);
         project.tasks.add(task4);
         
+        /* Verifying that module-specific targets to not see the changes of each other.
+           Support of MockCallTargetTask is needed for correct emulation. */
+        task1.propertiesToSet = Collections.<String, Object>singletonMap("task1", "prop1");
+        task2.propertiesToSet = Collections.<String, Object>singletonMap("task2", "prop2");
+        task3.propertiesToSet = Collections.<String, Object>singletonMap("task3", "prop3");
+        task4.propertiesToSet = Collections.<String, Object>singletonMap("task4", "prop4");
+        
         task.init();
         task.setTarget("someTarget");
         task.createModule().setPath("foo");
@@ -1516,12 +1530,68 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         /* Since no module is passed to the targets there is not way to determine
            what targets were called for what modules. */
         assertCallTargetState(task1, true, "someTarget", true, false,
-                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task1", "prop1"));
         assertCallTargetState(task2, true, "someTarget", true, false,
-                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task2", "prop2"));
         assertCallTargetState(task3, true, "someTarget", true, false,
-                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task3", "prop3"));
         assertCallTargetState(task4, true, "someTarget", true, false,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task4", "prop4"));
+    }
+    
+    public void testSerialRun_MultipleModulesWithDeps_ThreadCountSetToOne()
+    {
+        // Unambiguous order of module processing is selected for the sake of simplicity.
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleInfo.addDependency("bar/");
+        moduleInfo.addDependency("baz/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        dep1.addDependency("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        moduleInfo2.addAttribute("qq", "ww");
+        moduleInfo2.addAttribute("aa", "ss");
+        moduleInfo2.addDependency("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        dep2.addAttribute("z", "x");
+        
+        moduleLoader.modules.put("foo/", moduleInfo);
+        moduleLoader.modules.put("bar/", dep1);
+        moduleLoader.modules.put("baz/", moduleInfo2);
+        moduleLoader.modules.put("quux/", dep2);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        final MockCallTargetTask task2 = new MockCallTargetTask(project);
+        project.tasks.add(task2);
+        final MockCallTargetTask task3 = new MockCallTargetTask(project);
+        project.tasks.add(task3);
+        final MockCallTargetTask task4 = new MockCallTargetTask(project);
+        project.tasks.add(task4);
+        
+        task.init();
+        task.setTarget("someTarget");
+        task.setModuleProperty("mProp");
+        task.createModule().setPath("foo");
+        task.createModule().setPath("baz");
+        task.addConfigured(moduleLoader);
+        task.setThreadCount(1); // indicates serial execution
+        
+        final ParamElement param = task.createParam();
+        param.setName("p");
+        param.setValue("o");
+        
+        project.setProperty("qwerty", "board");
+        
+        task.perform();
+        
+        assertCallTargetState(task1, true, "someTarget", true, false, "mProp", dep2,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        assertCallTargetState(task2, true, "someTarget", true, false, "mProp", moduleInfo2,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        assertCallTargetState(task3, true, "someTarget", true, false, "mProp", dep1,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        assertCallTargetState(task4, true, "someTarget", true, false, "mProp", moduleInfo,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
     }
     

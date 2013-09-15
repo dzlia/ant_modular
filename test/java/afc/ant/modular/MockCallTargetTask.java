@@ -39,6 +39,9 @@ import junit.framework.Assert;
 
 public class MockCallTargetTask extends CallTarget
 {
+    // Allows tests verify isolation between module targets.
+    public Map<String, Object> propertiesToSet;
+    
     public Throwable exception;
     public boolean executed;
     
@@ -85,7 +88,7 @@ public class MockCallTargetTask extends CallTarget
                 if (propertyName.equals(MagicNames.PROJECT_BASEDIR)) {
                     continue;
                 }
-                helper.setNewProperty("", (String) prop.getKey(), prop.getValue());
+                helper.setNewProperty("", propertyName, prop.getValue());
             }
         }
         
@@ -103,6 +106,13 @@ public class MockCallTargetTask extends CallTarget
         for (final Reference ref : references) {
             Assert.assertNotNull(ref.getProject());
             ownProject.addReference(ref.getRefId(), ref.getReferencedObject(null));
+        }
+        
+        if (propertiesToSet != null)
+        {
+            for (final Map.Entry<String, Object> prop : propertiesToSet.entrySet()) {
+                helper.setNewProperty("", (String) prop.getKey(), prop.getValue());
+            }
         }
         
         if (exception instanceof RuntimeException) {
