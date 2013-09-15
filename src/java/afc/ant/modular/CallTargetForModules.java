@@ -237,11 +237,14 @@ public class CallTargetForModules extends Task
         }
         
         if (buildFailed.get()) {
-            final Throwable ex = (Throwable) buildFailureException.get();
-            if (ex instanceof BuildException) {
-                throw (BuildException) ex;
+            /* buildFailureException could contain either RuntimeException or Error
+               because this is what could be thrown in thread#run(). */
+            final Throwable ex = buildFailureException.get();
+            if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex; // includes properly initialised BuildException
+            } else {
+                throw (Error) ex;
             }
-            throw new BuildException(MessageFormat.format("Build failed. Cause: ''{0}''.", ex.getMessage()), ex);
         }
     }
     
