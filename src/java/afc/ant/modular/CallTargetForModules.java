@@ -191,13 +191,11 @@ public class CallTargetForModules extends Task
                     try {
                         // This thread is non-interruptible because its workflow does not need this.
                         for (;;) {
-                            if (buildFailed.get()) {
-                                // No need to get another module is the build has failed already.
-                                return;
-                            }
-                            
                             final Module module = dependencyResolver.getFreeModule();
                             if (module == null) {
+                                /* Either all modules are processed or the build has failed and
+                                 * the resolver was aborted. Finishing execution.
+                                 */
                                 return;
                             }
                             
