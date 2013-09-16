@@ -84,15 +84,23 @@ public class CallTargetForModules extends Task
         
         try {
             final ArrayList<Module> modules = new ArrayList<Module>(moduleCount);
-            final IdentityHashMap<Module, String> overriddenTargets = new IdentityHashMap<Module, String>();
+            final IdentityHashMap<Module, String> overriddenTargets =
+                    new IdentityHashMap<Module, String>(modules.size());
+            
             for (int i = 0, n = moduleCount; i < n; ++i) {
                 final ModuleElement moduleParam = moduleElements.get(i);
                 
                 final Module module = registry.resolveModule(moduleParam.path);
                 modules.add(module);
                 
-                if (moduleParam.target != null) { // This target will be invoked for this module.
-                    overriddenTargets.put(module, moduleParam.target);
+                // This target will be invoked for this module.
+                String moduleTarget = moduleParam.target == null ? target : moduleParam.target;
+                final String oldTarget = overriddenTargets.put(module, moduleTarget);
+                if (oldTarget != null && !oldTarget.equals(moduleTarget)) {
+                    throw new BuildException(MessageFormat.format(
+                            "Ambiguous choice of target to be invoked for the module ''{0}''. " +
+                            "At least the targets ''{1}'' and ''{2}'' are configured.",
+                            module.getPath(), oldTarget, moduleTarget));
                 }
             }
             
