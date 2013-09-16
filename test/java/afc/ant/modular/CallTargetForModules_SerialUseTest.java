@@ -35,6 +35,7 @@ import org.apache.tools.ant.taskdefs.Ant.Reference;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PropertySet;
 
+import afc.ant.modular.CallTargetForModules.ModuleElement;
 import afc.ant.modular.CallTargetForModules.ParamElement;
 
 import junit.framework.TestCase;
@@ -1745,5 +1746,121 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleProp", dep1,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task3.executed);
+    }
+    
+    public void testSerialRun_MultipleModulesWithDeps_CustomTarget_ModulePropertyDefined()
+    {
+        // Unambiguous order of module processing is selected for the sake of simplicity.
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleInfo.addDependency("bar/");
+        moduleInfo.addDependency("baz/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        dep1.addDependency("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        moduleInfo2.addAttribute("qq", "ww");
+        moduleInfo2.addAttribute("aa", "ss");
+        moduleInfo2.addDependency("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        dep2.addAttribute("z", "x");
+        
+        moduleLoader.modules.put("foo/", moduleInfo);
+        moduleLoader.modules.put("bar/", dep1);
+        moduleLoader.modules.put("baz/", moduleInfo2);
+        moduleLoader.modules.put("quux/", dep2);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        final MockCallTargetTask task2 = new MockCallTargetTask(project);
+        project.tasks.add(task2);
+        final MockCallTargetTask task3 = new MockCallTargetTask(project);
+        project.tasks.add(task3);
+        final MockCallTargetTask task4 = new MockCallTargetTask(project);
+        project.tasks.add(task4);
+        
+        task.init();
+        task.setTarget("someTarget");
+        task.setModuleProperty("mProp");
+        task.createModule().setPath("foo");
+        final ModuleElement moduleElem = task.createModule();
+        moduleElem.setPath("baz");
+        moduleElem.setTarget("customTarget");
+        final ModuleElement moduleElem2 = task.createModule();
+        moduleElem2.setPath("bar");
+        moduleElem2.setTarget("customTarget2");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param = task.createParam();
+        param.setName("p");
+        param.setValue("o");
+        
+        project.setProperty("qwerty", "board");
+        
+        task.perform();
+        
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "mProp", dep2,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        TestUtil.assertCallTargetState(task2, true, "customTarget", true, false, "mProp", moduleInfo2,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        TestUtil.assertCallTargetState(task3, true, "customTarget2", true, false, "mProp", dep1,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        TestUtil.assertCallTargetState(task4, true, "someTarget", true, false, "mProp", moduleInfo,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+    }
+    
+    public void testSerialRun_MultipleModulesWithDeps_CustomTarget_ModulePropertyUndefined()
+    {
+        // Unambiguous order of module processing is selected for the sake of simplicity.
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleInfo.addDependency("bar/");
+        moduleInfo.addDependency("baz/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        dep1.addDependency("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        moduleInfo2.addAttribute("qq", "ww");
+        moduleInfo2.addAttribute("aa", "ss");
+        moduleInfo2.addDependency("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        dep2.addAttribute("z", "x");
+        
+        moduleLoader.modules.put("foo/", moduleInfo);
+        moduleLoader.modules.put("bar/", dep1);
+        moduleLoader.modules.put("baz/", moduleInfo2);
+        moduleLoader.modules.put("quux/", dep2);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        final MockCallTargetTask task2 = new MockCallTargetTask(project);
+        project.tasks.add(task2);
+        final MockCallTargetTask task3 = new MockCallTargetTask(project);
+        project.tasks.add(task3);
+        final MockCallTargetTask task4 = new MockCallTargetTask(project);
+        project.tasks.add(task4);
+        
+        task.init();
+        task.setTarget("someTarget");
+        task.createModule().setPath("foo");
+        final ModuleElement moduleElem = task.createModule();
+        moduleElem.setPath("baz");
+        moduleElem.setTarget("customTarget");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param = task.createParam();
+        param.setName("p");
+        param.setValue("o");
+        
+        project.setProperty("qwerty", "board");
+        
+        task.perform();
+        
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        TestUtil.assertCallTargetState(task2, true, "customTarget", true, false,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        TestUtil.assertCallTargetState(task3, true, "someTarget", true, false,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        TestUtil.assertCallTargetState(task4, true, "someTarget", true, false,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
     }
 }

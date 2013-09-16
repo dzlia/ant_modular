@@ -26,6 +26,7 @@ import java.io.File;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -83,16 +84,22 @@ public class CallTargetForModules extends Task
         
         try {
             final ArrayList<Module> modules = new ArrayList<Module>(moduleCount);
+            final IdentityHashMap<Module, String> overriddenTargets = new IdentityHashMap<Module, String>();
             for (int i = 0, n = moduleCount; i < n; ++i) {
                 final ModuleElement moduleParam = moduleElements.get(i);
                 
-                modules.add(registry.resolveModule(moduleParam.path));
+                final Module module = registry.resolveModule(moduleParam.path);
+                modules.add(module);
+                
+                if (moduleParam.target != null) { // This target will be invoked for this module.
+                    overriddenTargets.put(module, moduleParam.target);
+                }
             }
             
             if (threadCount == 1) {
-                processModulesSerial(modules);
+                processModulesSerial(modules, overriddenTargets);
             } else {
-                processModulesParallel(modules);
+                processModulesParallel(modules, overriddenTargets);
             }
         }
         catch (ModuleNotLoadedException ex) {
@@ -103,7 +110,7 @@ public class CallTargetForModules extends Task
         }
     }
     
-    private void callTarget(final Module module)
+    private void callTarget(final Module module, final String target)
     {
         final CallTarget antcall = (CallTarget) getProject().createTask("antcall");
         antcall.init();
@@ -160,20 +167,27 @@ public class CallTargetForModules extends Task
         return ex;
     }
     
-    private void processModulesSerial(final ArrayList<Module> modules) throws CyclicDependenciesDetectedException
+    private void processModulesSerial(final ArrayList<Module> modules,
+            final IdentityHashMap<Module, String> overriddenTargets) throws CyclicDependenciesDetectedException
     {
         final SerialDependencyResolver dependencyResolver = new SerialDependencyResolver();
         dependencyResolver.init(modules);
         
         Module module;
         while ((module = dependencyResolver.getFreeModule()) != null) {
-            callTarget(module);
+            String target = overriddenTargets.get(module);
+            if (target == null) {
+                target = this.target;
+            }
+            
+            callTarget(module, target);
             
             dependencyResolver.moduleProcessed(module);
         }
     }
     
-    private void processModulesParallel(final ArrayList<Module> modules) throws CyclicDependenciesDetectedException
+    private void processModulesParallel(final ArrayList<Module> modules,
+            final IdentityHashMap<Module, String> overriddenTargets) throws CyclicDependenciesDetectedException
     {
         final ParallelDependencyResolver dependencyResolver = new ParallelDependencyResolver();
         dependencyResolver.init(modules);
@@ -199,6 +213,11 @@ public class CallTargetForModules extends Task
                             return;
                         }
                         
+                        String target = overriddenTargets.get(module);
+                        if (target == null) {
+                            target = CallTargetForModules.this.target;
+                        }
+                        
                         /* Do not call dependencyResolver#moduleProcessed in case of exception!
                          * This could make the modules that depend upon this module
                          * (whose processing has failed!) free for acquisition, despite of
@@ -206,7 +225,7 @@ public class CallTargetForModules extends Task
                          * 
                          * Instead, dependencyResolver#abort() is called.
                          */
-                        callTarget(module);
+                        callTarget(module, target);
                         
                         // Reporting this module as processed if no error is encountered.
                         dependencyResolver.moduleProcessed(module);
@@ -323,10 +342,16 @@ public class CallTargetForModules extends Task
     public static class ModuleElement
     {
         private String path;
+        private String target;
         
         public void setPath(final String path)
         {
             this.path = path;
+        }
+        
+        public void setTarget(final String target)
+        {
+            this.target = target;
         }
     }
     
