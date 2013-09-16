@@ -45,8 +45,12 @@ public class TestUtil
     {
         Assert.assertTrue(parts.length % 2 == 0);
         final HashMap<K, V> map = new HashMap<K, V>();
-        for (int i = 0; i < parts.length; i+=2) {
-            map.put((K) parts[i], (V) parts[i+1]);
+        for (int i = 0; i < parts.length;) {
+            @SuppressWarnings("unchecked") // the caller is responsible for passing correct objects
+            final K key = (K) parts[i++];
+            @SuppressWarnings("unchecked") // the caller is responsible for passing correct objects
+            final V value = (V) parts[i++];
+            map.put(key, value);
         }
         return map;
     }
