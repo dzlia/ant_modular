@@ -338,17 +338,56 @@ public class CallTargetForModules extends Task
         this.propertySet.addPropertyset(propertySet);
     }
     
+    /**
+     * <p>Serves as the nested element {@code <module>} of the task
+     * {@link CallTargetForModules &lt;callTargetForModules&gt;} and defines the root modules
+     * to start build with. All modules this module depend upon (directly or indirectly)
+     * are included into the build process.</p>
+     * 
+     * <p>The following attributes are supported:
+     * <table border="1">
+     * <thead>
+     *  <tr><th>Attribute</th>
+     *      <th>Required?</th>
+     *      <th>Description</th></tr>
+     * </thead>
+     * <tbody>
+     *  <tr><td>path</td>
+     *      <td>yes</td>
+     *      <td>The path of the module to be included. Non-normalised paths are allowed.</td></tr>
+     *  <tr><td>target</td>
+     *      <td>no</td>
+     *      <td>Specifies the name of the target that must be invoked for this module by
+     *          {@code <callTargetForModules>}. If this attribute is undefined then the
+     *          target defined in {@code <callTargetForModules>} is used.
+     *          This target name is not propagated to the dependee modules.</td></tr>
+     * </tbody>
+     * </table></p>
+     */
     // TODO support defining modules using regular expressions
     public static class ModuleElement
     {
         private String path;
         private String target;
         
+        /**
+         * <p>Sets the path of the module to be included into the build process.</p>
+         * 
+         * @param path the module path. Non-normalised paths are allowed.
+         *      {@code null} should not be set because this leads to build failure.
+         */
         public void setPath(final String path)
         {
             this.path = path;
         }
         
+        /**
+         * <p>Sets the target to be invoked for the module defined by this
+         * {@code <module>} element. If the module-specific target is undefined then
+         * the target defined in {@code <callTargetForModules>} is used.</p>
+         * 
+         * @param target the name of the target to be invoked.
+         */
         public void setTarget(final String target)
         {
             this.target = target;
