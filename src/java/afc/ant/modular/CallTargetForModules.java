@@ -84,6 +84,7 @@ public class CallTargetForModules extends Task
         
         try {
             final ArrayList<Module> modules = new ArrayList<Module>(moduleCount);
+            // These targets will be invoked for these modules despite of the default target name.
             final IdentityHashMap<Module, String> overriddenTargets =
                     new IdentityHashMap<Module, String>(modules.size());
             
@@ -93,12 +94,16 @@ public class CallTargetForModules extends Task
                 final Module module = registry.resolveModule(moduleParam.path);
                 modules.add(module);
                 
-                // This target will be invoked for this module.
+                /* Resolving the name of the target to be invoked for this module. If the choice
+                 * if ambiguous (i.e. there are multiple <module> elements that define the same
+                 * module whose target name configured is different) then a BuildException
+                 * is thrown to terminate the build.
+                 */
                 String moduleTarget = moduleParam.target == null ? target : moduleParam.target;
                 final String oldTarget = overriddenTargets.put(module, moduleTarget);
                 if (oldTarget != null && !oldTarget.equals(moduleTarget)) {
                     throw new BuildException(MessageFormat.format(
-                            "Ambiguous choice of target to be invoked for the module ''{0}''. " +
+                            "Ambiguous choice of the target to be invoked for the module ''{0}''. " +
                             "At least the targets ''{1}'' and ''{2}'' are configured.",
                             module.getPath(), oldTarget, moduleTarget));
                 }

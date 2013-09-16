@@ -668,7 +668,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
             fail();
         }
         catch (BuildException ex) {
-            assertEquals("Ambiguous choice of target to be invoked for the module 'baz/'. " +
+            assertEquals("Ambiguous choice of the target to be invoked for the module 'baz/'. " +
                     "At least the targets 'customTarget' and 'anotherCustomTarget' are configured.", ex.getMessage());
         }
         
@@ -731,7 +731,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
             fail();
         }
         catch (BuildException ex) {
-            assertEquals("Ambiguous choice of target to be invoked for the module 'baz/'. " +
+            assertEquals("Ambiguous choice of the target to be invoked for the module 'baz/'. " +
                     "At least the targets 'customTarget' and 'someTarget' are configured.", ex.getMessage());
         }
         
