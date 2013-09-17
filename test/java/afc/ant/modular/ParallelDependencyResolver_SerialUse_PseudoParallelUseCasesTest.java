@@ -25,6 +25,8 @@ package afc.ant.modular;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicReference;
 
 import junit.framework.TestCase;
 
@@ -214,5 +216,123 @@ public class ParallelDependencyResolver_SerialUse_PseudoParallelUseCasesTest ext
         assertNull(m5);
         
         assertEquals(TestUtil.set(module1, module3), TestUtil.set(m1, m2));
+    }
+    
+    /**
+     * <p>Tests that execution of resolver#getFreeModule() ends with {@link IllegalStateException}
+     * thrown if this thread gets interrupted while it is waiting for a free module.</p>
+     */
+    public void testModuleProcessingThreadWaitsForFreeModule_ThreadInterrupted() throws Throwable
+    {
+        final AtomicReference<Throwable> testFailureCause = new AtomicReference<Throwable>();
+        final CyclicBarrier b = new CyclicBarrier(2);
+        
+        final Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try {
+                    final Module module1 = new Module("foo");
+                    final Module module2 = new Module("bar");
+                    final Module module3 = new Module("baz");
+                    module2.addDependency(module1);
+                    module2.addDependency(module3);
+                    
+                    resolver.init(Arrays.asList(module2));
+                    resolver.getFreeModule();
+                    resolver.getFreeModule();
+                    
+                    /* Ensures that the code below the barrier is executed before the code in the test thread.
+                     * This works because ParallelDependencyResolver#getFreeModule waits against the resolver
+                     * itself so that while it waits the resolver's monitor gets released.
+                     */
+                    synchronized (resolver) {
+                        b.await();
+                        resolver.getFreeModule(); // hangs up here
+                    }
+                    fail();
+                }
+                catch (IllegalStateException ex) {
+                    // expected
+                }
+                catch (Throwable ex) {
+                    testFailureCause.set(ex);
+                }
+            }
+        };
+        
+        t.start();
+        
+        b.await();
+        // Ensures that the code within is executed after the code in the resolver thread.
+        synchronized (resolver) {
+            t.interrupt();
+        }
+        t.join();
+        
+        if (testFailureCause.get() != null) {
+            throw testFailureCause.get();
+        }
+    }
+    
+    /**
+     * <p>Tests that ParallelDependencyResolver#abort() wakes all threads that wait
+     * for free modules from this resolver and that these threads get {@code null}
+     * even though there were modules to process.</p>
+     */
+    public void testModuleProcessingThreadWaitsForFreeModule_ResolverIsAborted() throws Throwable
+    {
+        final AtomicReference<Throwable> testFailureCause = new AtomicReference<Throwable>();
+        final CyclicBarrier b = new CyclicBarrier(2);
+        
+        final Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try {
+                    final Module module1 = new Module("foo");
+                    final Module module2 = new Module("bar");
+                    final Module module3 = new Module("baz");
+                    module2.addDependency(module1);
+                    module2.addDependency(module3);
+                    
+                    resolver.init(Arrays.asList(module2));
+                    resolver.getFreeModule();
+                    resolver.getFreeModule();
+                    
+                    final Module m;
+                    
+                    /* Ensures that the code below the barrier is executed before the code in the test thread.
+                     * This works because ParallelDependencyResolver#getFreeModule waits against the resolver
+                     * itself so that while it waits the resolver's monitor gets released.
+                     */
+                    synchronized (resolver) {
+                        b.await();
+                        m = resolver.getFreeModule(); // hangs up here
+                    }
+                    
+                    assertNull(m);
+                    assertNull(resolver.getFreeModule());
+                }
+                catch (Throwable ex) {
+                    testFailureCause.set(ex);
+                }
+            }
+        };
+        
+        t.start();
+        
+        b.await();
+        // Ensures that the code within is executed after the code in the resolver thread.
+        synchronized (resolver) {
+            resolver.abort();
+        }
+        t.join();
+        
+        if (testFailureCause.get() != null) {
+            throw testFailureCause.get();
+        }
     }
 }
