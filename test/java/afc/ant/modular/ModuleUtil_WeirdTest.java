@@ -73,6 +73,45 @@ public class ModuleUtil_WeirdTest extends TestCase
         }
     }
     
+    public void testGetPath_PrivateFunction() throws Exception
+    {
+        final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_private.class");
+        
+        try {
+            ModuleUtil.getPath(wrongModule);
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("Unable to invoke module#getPath().", ex.getMessage());
+        }
+    }
+    
+    public void testGetDependencies_PrivateFunction() throws Exception
+    {
+        final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_private.class");
+        
+        try {
+            ModuleUtil.getDependencies(wrongModule);
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("Unable to invoke module#getDependencies().", ex.getMessage());
+        }
+    }
+    
+    public void testGetAttributes_PrivateFunction() throws Exception
+    {
+        final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_private.class");
+        
+        try {
+            ModuleUtil.getAttributes(wrongModule);
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("Unable to invoke module#getAttributes().", ex.getMessage());
+        }
+    }
+    
     private static Object createModuleWithDifferentClassLoader(final String pathToModuleClass) throws Exception
     {
         final Class<?> c = new ModuleClassLoader(pathToModuleClass).loadClass(Module.class.getName());

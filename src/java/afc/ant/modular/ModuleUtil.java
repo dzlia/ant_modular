@@ -189,11 +189,11 @@ public class ModuleUtil
     private static Object callFunction(final Object module, final String functionName)
     {
         try {
-            return module.getClass().getMethod(functionName).invoke(module);
+            return module.getClass().getDeclaredMethod(functionName).invoke(module);
         }
         catch (IllegalAccessException ex) {
             throw new BuildException(MessageFormat.format(
-                    "No permission to invoke module#{0}().", functionName));
+                    "Unable to invoke module#{0}().", functionName));
         }
         catch (NoSuchMethodException ex) {
             throw new BuildException(MessageFormat.format(
