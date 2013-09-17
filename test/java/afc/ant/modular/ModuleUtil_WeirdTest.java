@@ -112,6 +112,48 @@ public class ModuleUtil_WeirdTest extends TestCase
         }
     }
     
+    public void testGetPath_FunctionThrowsException() throws Exception
+    {
+        final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_exception.class");
+        
+        try {
+            ModuleUtil.getPath(wrongModule);
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("module#getPath() has thrown an exception.", ex.getMessage());
+            assertNotNull(ex.getCause());
+        }
+    }
+    
+    public void testGetDependencies_FunctionThrowsException() throws Exception
+    {
+        final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_exception.class");
+        
+        try {
+            ModuleUtil.getDependencies(wrongModule);
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("module#getDependencies() has thrown an exception.", ex.getMessage());
+            assertNotNull(ex.getCause());
+        }
+    }
+    
+    public void testGetAttributes_FunctionThrowsException() throws Exception
+    {
+        final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_exception.class");
+        
+        try {
+            ModuleUtil.getAttributes(wrongModule);
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("module#getAttributes() has thrown an exception.", ex.getMessage());
+            assertNotNull(ex.getCause());
+        }
+    }
+    
     private static Object createModuleWithDifferentClassLoader(final String pathToModuleClass) throws Exception
     {
         final Class<?> c = new ModuleClassLoader(pathToModuleClass).loadClass(Module.class.getName());
