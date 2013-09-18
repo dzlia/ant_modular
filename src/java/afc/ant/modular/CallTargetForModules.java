@@ -273,7 +273,7 @@ public class CallTargetForModules extends Task
         }
         catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            throw new BuildException("The build thread was interrupted.", ex);
+            throw new BuildException("The build thread was interrupted.");
         }
         
         if (buildFailed.get()) {

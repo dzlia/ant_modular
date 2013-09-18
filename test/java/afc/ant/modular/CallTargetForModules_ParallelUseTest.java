@@ -778,6 +778,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
                     catch (BuildException ex) {
                         // expected
                         assertEquals("The build thread was interrupted.", ex.getMessage());
+                        assertNull(ex.getCause());
                     }
                     
                     assertTrue(Thread.currentThread().isInterrupted());
