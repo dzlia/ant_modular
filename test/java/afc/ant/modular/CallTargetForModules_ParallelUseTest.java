@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Location;
@@ -739,5 +742,118 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         assertFalse(task2.executed);
         assertFalse(task3.executed);
         assertFalse(task4.executed);
+    }
+    
+    /**
+     * <p>Tests that the build thread is interruptible if a helper thread does not respond.</p>
+     */
+    public void testParallelRun_MultipleModules_HelperThreadHangsUp() throws Throwable
+    {
+        // Unambiguous order of module processing is selected for the sake of simplicity.
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        moduleInfo2.addAttribute("qq", "ww");
+        moduleInfo2.addAttribute("aa", "ss");
+        
+        moduleLoader.modules.put("foo/", moduleInfo);
+        moduleLoader.modules.put("bar/", moduleInfo2);
+        
+        final AtomicBoolean task1Hangs = new AtomicBoolean(true);
+        final AtomicBoolean task2Hangs = new AtomicBoolean(true);
+        final CyclicBarrier hangBarrier = new CyclicBarrier(3);
+        
+        final AtomicReference<Throwable> failureCause = new AtomicReference<Throwable>();
+        
+        final Thread buildThread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try {
+                    try {
+                        task.perform();
+                        fail();
+                    }
+                    catch (BuildException ex) {
+                        // expected
+                        assertEquals("The build thread was interrupted.", ex.getMessage());
+                    }
+                    
+                    assertTrue(Thread.currentThread().isInterrupted());
+                }
+                catch (Throwable ex) {
+                    failureCause.set(ex);
+                }
+            }
+        };
+        
+        final HangingMockCallTargetTask task1 = new HangingMockCallTargetTask(project,
+                task1Hangs, hangBarrier, failureCause);
+        project.tasks.add(task1);
+        final HangingMockCallTargetTask task2 = new HangingMockCallTargetTask(project,
+                task2Hangs, hangBarrier, failureCause);
+        project.tasks.add(task2);
+        
+        task.init();
+        task.setTarget("someTarget");
+        task.setModuleProperty("mProp");
+        task.createModule().setPath("foo");
+        task.createModule().setPath("bar");
+        task.addConfigured(moduleLoader);
+        task.setThreadCount(2);
+        
+        final ParamElement param = task.createParam();
+        param.setName("p");
+        param.setValue("o");
+        
+        project.setProperty("qwerty", "board");
+        
+        buildThread.start();
+        
+        hangBarrier.await();
+        
+        final HangingMockCallTargetTask buildThreadTask;
+        final HangingMockCallTargetTask helperThreadTask;
+        final AtomicBoolean buildThreadFlag;
+        final AtomicBoolean helperThreadFlag;
+        
+        assertNotNull(task1.hangingThread);
+        assertNotNull(task2.hangingThread);
+        assertFalse(task1.hangingThread == task2.hangingThread);
+        if (task1.hangingThread == buildThread) {
+            buildThreadTask = task1;
+            helperThreadTask = task2;
+            buildThreadFlag = task1Hangs;
+            helperThreadFlag = task2Hangs;
+        } else {
+            buildThreadTask = task2;
+            helperThreadTask = task1;
+            buildThreadFlag = task2Hangs;
+            helperThreadFlag = task1Hangs;
+        }
+        
+        buildThreadFlag.set(false);
+        synchronized (buildThreadTask) {
+            buildThreadTask.notify();
+        }
+        
+        buildThread.interrupt();
+        
+        buildThread.join();
+        
+        helperThreadFlag.set(false);
+        synchronized (helperThreadTask) {
+            helperThreadTask.notify();
+        }
+        helperThreadTask.hangingThread.join();
+        
+        if (failureCause.get() != null) {
+            throw failureCause.get();
+        }
+        
+        // the other checks are performed thoroughly in other tests.
+        assertTrue(task1.executed);
+        assertTrue(task2.executed);
     }
 }
