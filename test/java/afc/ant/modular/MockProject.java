@@ -32,7 +32,7 @@ import junit.framework.Assert;
 
 public class MockProject extends Project
 {
-    public final ArrayList<Task> tasks = new ArrayList<Task>();
+    public final ArrayList<Object> tasks = new ArrayList<Object>();
     public int tasksReturned = 0;
     
     @Override
@@ -41,6 +41,13 @@ public class MockProject extends Project
         Assert.assertNotNull(taskType);
         Assert.assertFalse(taskType.length() == 0);
         Assert.assertTrue(tasksReturned < tasks.size());
-        return tasks.get(tasksReturned++);
+        final Object result = tasks.get(tasksReturned++);
+        if (result instanceof RuntimeException) {
+            throw (RuntimeException) result;
+        }
+        if (result instanceof Error) {
+            throw (Error) result;
+        }
+        return (Task) result;
     }
 }

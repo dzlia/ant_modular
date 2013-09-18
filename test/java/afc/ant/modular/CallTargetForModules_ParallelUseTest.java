@@ -920,4 +920,110 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         assertTrue(task1.executed);
         assertTrue(task2.executed);
     }
+    
+    public void testParallelRun_BuildFailure_ProjectCreateTargetThrowsRuntimeException()
+    {
+        // Unambiguous order of module processing is selected for the sake of simplicity.
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleInfo.addDependency("bar/");
+        moduleInfo.addDependency("baz/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        dep1.addDependency("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        dep2.addAttribute("qq", "ww");
+        dep2.addAttribute("aa", "ss");
+        
+        moduleLoader.modules.put("foo/", moduleInfo);
+        moduleLoader.modules.put("bar/", dep1);
+        moduleLoader.modules.put("baz/", dep2);
+        
+        final RuntimeException exception = new RuntimeException("test_msg");
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        project.tasks.add(exception); // task2 fails to be created
+        final MockCallTargetTask task3 = new MockCallTargetTask(project);
+        project.tasks.add(task3);
+        
+        task.init();
+        task.setTarget("someTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        task.setThreadCount(2);
+        
+        final ParamElement param = task.createParam();
+        param.setName("p");
+        param.setValue("o");
+        
+        project.setProperty("qwerty", "board");
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertNotNull(ex.getMessage());
+            assertSame(exception, ex.getCause());
+            assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
+        }
+        
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        assertFalse(task3.executed);
+    }
+    
+    public void testParallelRun_BuildFailure_ProjectCreateTargetThrowsError()
+    {
+        // Unambiguous order of module processing is selected for the sake of simplicity.
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleInfo.addDependency("bar/");
+        moduleInfo.addDependency("baz/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        dep1.addDependency("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        dep2.addAttribute("qq", "ww");
+        dep2.addAttribute("aa", "ss");
+        
+        moduleLoader.modules.put("foo/", moduleInfo);
+        moduleLoader.modules.put("bar/", dep1);
+        moduleLoader.modules.put("baz/", dep2);
+        
+        final Error exception = new Error("test_msg");
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        project.tasks.add(exception); // task2 fails to be created
+        final MockCallTargetTask task3 = new MockCallTargetTask(project);
+        project.tasks.add(task3);
+        
+        task.init();
+        task.setTarget("someTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        task.setThreadCount(2);
+        
+        final ParamElement param = task.createParam();
+        param.setName("p");
+        param.setValue("o");
+        
+        project.setProperty("qwerty", "board");
+        
+        try {
+            task.perform();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertNotNull(ex.getMessage());
+            assertSame(exception, ex.getCause());
+            assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
+        }
+        
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+                TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
+        assertFalse(task3.executed);
+    }
 }
