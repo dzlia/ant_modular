@@ -116,10 +116,10 @@ public class CallTargetForModules extends Task
             }
         }
         catch (ModuleNotLoadedException ex) {
-            throw buildException(ex);
+            throw new BuildException(ex.getMessage(), ex);
         }
         catch (CyclicDependenciesDetectedException ex) {
-            throw buildException(ex);
+            throw new BuildException(ex.getMessage(), ex);
         }
     }
     
@@ -151,16 +151,6 @@ public class CallTargetForModules extends Task
         catch (RuntimeException ex) {
             throw buildExceptionForModule(ex, module);
         }
-    }
-    
-    private BuildException buildException(final Throwable cause)
-    {
-        Location location = getLocation();
-        if (location == null) {
-            location = Location.UNKNOWN_LOCATION;
-        }
-        
-        return new BuildException(cause.getMessage(), cause, location);
     }
     
     private BuildException buildExceptionForModule(final Throwable cause, final Module module)
