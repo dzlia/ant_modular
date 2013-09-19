@@ -87,7 +87,7 @@ public class ModuleUtil
      * as different types. This function handles {@code Module} objects that are loaded by
      * an arbitrary class loader.</p>
      * 
-     * @param module the module object. It must be non-{@code}.
+     * @param module the module object. It must be non-{@code null}.
      * 
      * @return the same result as if {@code module.getPath()} were invoked.
      * 
@@ -119,7 +119,7 @@ public class ModuleUtil
      * as different types. This function handles {@code Module} objects that are loaded by
      * an arbitrary class loader.</p>
      * 
-     * @param module the module object. It must be non-{@code}.
+     * @param module the module object. It must be non-{@code null}.
      * 
      * @return the same result as if {@code module.getDependencies()} were invoked.
      * 
@@ -155,7 +155,7 @@ public class ModuleUtil
      * class loader then an attempt to use it could still cause {@link ClassCastException}
      * exceptions.</p>
      * 
-     * @param module the module object. It must be non-{@code}.
+     * @param module the module object. It must be non-{@code null}.
      * 
      * @return the same result as if {@code module.getAttributes()} were invoked.
      * 
