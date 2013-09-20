@@ -30,12 +30,14 @@ import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Task;
 
 /**
- * <p>An Ant task that sets the path of a {@link Module} object as a {@link Project project}
- * property. If the property is already created then it is <em>not</em> updated. This task works
- * with {@code Module} objects that are loaded by any class loader. It is only required that
- * the class name of the object is exactly {@code afc.ant.modular.Module} and it has
- * the public member function {@link Module#getPath()}. Incompatible module objects passed
- * cause an exception raised by this task.</p>
+ * <p>An Ant task that sets the {@link Module#getPath() path} of a {@link Module} object
+ * as a {@link Project} property. If the property is already created then
+ * it is <em>not</em> updated.</p>
+ * 
+ * <p>This task works with {@code Module} objects that are loaded by any class loader.
+ * It is only required that the class name of the object is exactly {@code afc.ant.modular.Module}
+ * and it has the public member function {@link Module#getPath()}. Incompatible module objects
+ * passed cause an exception raised by this task.</p>
  * 
  * <h3>Task input</h3>
  * <p>
@@ -63,6 +65,8 @@ import org.apache.tools.ant.Task;
  * the task executes the module path is assigned to the property named <em>project.module.path</em>.
  * Note that the latter property must be undefined. Otherwise the task does not assign the new
  * value to this property.</p>
+ * 
+ * @see Module#getPath()
  * 
  * @author D&#378;mitry La&#365;&#269;uk
  */
@@ -111,7 +115,7 @@ public class GetModulePath extends Task
     }
     
     /**
-     * <p>Sets the name of the property which hold the module whose path is to be obtained.</p>
+     * <p>Sets the name of the property which holds the module whose path is to be obtained.</p>
      * 
      * @param moduleProperty the name of the property. It must not be {@code null}.
      *      Otherwise a {@link BuildException} will be thrown by {@link #execute()}.
@@ -125,11 +129,11 @@ public class GetModulePath extends Task
      * <p>Sets the name of the property to which the module path is to be set. This property
      * should be undefined. Otherwise this task will not assign the new value to it.</p>
      * 
-     * @param name the name of the property. It must not be {@code null}.
+     * @param outputProperty the name of the property. It must not be {@code null}.
      *      Otherwise a {@link BuildException} will be thrown by {@link #execute()}.
      */
-    public void setOutputProperty(final String name)
+    public void setOutputProperty(final String outputProperty)
     {
-        outputProperty = name;
+        this.outputProperty = outputProperty;
     }
 }
