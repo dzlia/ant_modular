@@ -185,6 +185,7 @@ public class GetModuleAttributeTest extends TestCase
         task.execute();
         
         assertSame(null, PropertyHelper.getProperty(project, "out"));
+        assertFalse(project.getProperties().contains("out"));
         assertSame(module, PropertyHelper.getProperty(project, "in"));
         assertEquals(TestUtil.<String, Object>map("attrib1", "1", "attrib2", "3"), module.getAttributes());
     }

@@ -68,7 +68,10 @@ public class GetModuleAttribute extends Task
                     moduleProperty, Module.class.getName(), moduleObject.getClass().getName()));
         }
         
-        propHelper.setNewProperty("", outputProperty, ModuleUtil.getAttributes(moduleObject).get(name));
+        final Object value = ModuleUtil.getAttributes(moduleObject).get(name);
+        if (value != null) {
+            propHelper.setNewProperty("", outputProperty, value);
+        }
     }
     
     public void setModuleProperty(final String moduleProperty)
