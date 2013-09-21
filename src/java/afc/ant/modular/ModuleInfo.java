@@ -29,6 +29,31 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * <p>An entity that serves as a prototype of a {@link Module}. Each module is identified
+ * by its {@link #getPath() path} relative to the root directory of this environment.
+ * In addition, each module has metadata associated with it. This metadata consists of
+ * {@link #getDependencies() dependencies} and {@link #getAttributes() attributes}.</p>
+ * 
+ * <p>The module dependencies is a set of modules which this module depends upon.
+ * Typically the dependee modules should be processed before this module can be
+ * processed. A {@code ModuleInfo} holds references to its dependee modules by their paths.</p>
+ * 
+ * <p>The module attributes are named pieces of data of free format. Attribute names
+ * are case-sensitive. The {@code null} name is not allowed. An attribute value can be
+ * any object or {@code null}.</p>
+ * 
+ * <p>A typical workflow of module metadata processing is the following. A {@link ModuleLoader}
+ * creates {@code ModuleInfo} instances that hold information about modules. These
+ * {@code ModuleInfo}s are then converted into {@code Module}s by {@link ModuleRegistry}.
+ * The dependency paths defined in the {@code ModuleInfo} are converted into {@code Module}
+ * instances and the attributes are copied with no transformation.</p>
+ * 
+ * <p>{@code ModuleInfo} is not thread-safe. Its instances are expected to be processed
+ * by a single thread.</p>
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
 public final class ModuleInfo
 {
     private final String path;
