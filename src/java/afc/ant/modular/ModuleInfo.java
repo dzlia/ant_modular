@@ -30,10 +30,16 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * <p>An entity that serves as a prototype of a {@link Module}. Each module is identified
- * by its {@link #getPath() path} relative to the root directory of this environment.
- * In addition, each module has metadata associated with it. This metadata consists of
- * {@link #getDependencies() dependencies} and {@link #getAttributes() attributes}.</p>
+ * <p>An entity that serves as a prototype of a {@link Module}. As against {@code Module}
+ * objects, {@code ModuleInfo} instances hold references to their dependee module by their
+ * paths, not as instances of {@code ModuleInfo} or {@code Module}. This allows metadata
+ * to be loaded for all modules before the modules are linked to each other, which is
+ * a non-trivial task if there are cyclic dependencies between them.</p>
+ * 
+ * <p>Each module is identified by its {@link #getPath() path} relative to the root directory
+ * of this environment. In addition, each module has metadata associated with it.
+ * This metadata consists of {@link #getDependencies() dependencies} and
+ * {@link #getAttributes() attributes}.</p>
  * 
  * <p>The module dependencies is a set of modules which this module depends upon.
  * Typically the dependee modules should be processed before this module can be
