@@ -22,10 +22,6 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 
 import org.apache.tools.ant.BuildException;
@@ -163,32 +159,5 @@ public class ModuleUtil_WeirdTest extends TestCase
         final Constructor<?> constructor = c.getDeclaredConstructor();
         
         return constructor.newInstance();
-    }
-    
-    private static class ModuleClassLoader extends ClassLoader
-    {
-        public ModuleClassLoader(final String pathToModuleClass) throws IOException
-        {
-            /* Defining Module and its nested classes explicitly so that
-             * this class loader does not ask the parent class loader to load them,
-             * and a brand new classes are associated with this class loader.
-             */ 
-            final FileInputStream in = new FileInputStream(pathToModuleClass);
-            
-            try {
-                final BufferedInputStream bufferedIn = new BufferedInputStream(in);
-                final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-                
-                int b;
-                while ((b = bufferedIn.read()) >= 0) {
-                    buf.write(b);
-                }
-                
-                defineClass(Module.class.getName(), buf.toByteArray(), 0, buf.size());
-            }
-            finally {
-                in.close();
-            }
-        }
     }
 }
