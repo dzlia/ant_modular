@@ -36,6 +36,17 @@ import junit.framework.Assert;
 
 public class TestUtil
 {
+    /**
+     * <p>Creates a {@link HashSet} populated with given elements. All duplicate
+     * elements, if any, are removed by the set. It is useful for creating sets
+     * of few elements in a single line.</p>
+     *  
+     * @param elements the elements to initialise a set with.
+     * 
+     * @param <T> the type of the elements.
+     * 
+     * @return a set that is populated with the given elements.
+     */
     public static <T> HashSet<T> set(final T... elements)
     {
         return new HashSet<T>(Arrays.asList(elements));
