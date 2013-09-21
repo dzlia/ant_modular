@@ -111,7 +111,10 @@ public class GetModulePath extends Task
                     moduleProperty, Module.class.getName(), moduleObject.getClass().getName()));
         }
         
-        propHelper.setNewProperty("", outputProperty, ModuleUtil.getPath(moduleObject));
+        final String path = ModuleUtil.getPath(moduleObject);
+        if (path != null) { // null value must not be passed to #setNewProperty.
+            propHelper.setNewProperty("", outputProperty, path);
+        }
     }
     
     /**

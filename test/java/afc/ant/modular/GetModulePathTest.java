@@ -149,7 +149,46 @@ public class GetModulePathTest extends TestCase
         
         task.execute();
         
-        assertEquals("bar", PropertyHelper.getProperty(project, "out"));
+        assertSame("bar", PropertyHelper.getProperty(project, "out"));
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+    }
+    
+    public void testNullModulePath() throws Exception
+    {
+        // This class loader loads the class afc.ant.modular.Module that returns null path.
+        final ModuleClassLoader cl = new ModuleClassLoader("test/data/GetModulePath/Module_null.class");
+        final Class<?> moduleClass = cl.loadClass(Module.class.getName());
+        
+        final Object module = moduleClass.newInstance();
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        
+        task.execute();
+        
+        assertNull(PropertyHelper.getProperty(project, "out"));
+        assertFalse(project.getProperties().contains("out"));
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+    }
+    
+    public void testNullModulePath_OutputPropertyAlreadyDefined() throws Exception
+    {
+        project.setProperty("out", "bar");
+        
+        // This class loader loads the class afc.ant.modular.Module that returns null path.
+        final ModuleClassLoader cl = new ModuleClassLoader("test/data/GetModulePath/Module_null.class");
+        final Class<?> moduleClass = cl.loadClass(Module.class.getName());
+        
+        final Object module = moduleClass.newInstance();
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        
+        task.execute();
+        
+        assertSame("bar", PropertyHelper.getProperty(project, "out"));
         assertSame(module, PropertyHelper.getProperty(project, "in"));
     }
 }
