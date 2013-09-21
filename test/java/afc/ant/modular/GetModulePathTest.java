@@ -165,7 +165,13 @@ public class GetModulePathTest extends TestCase
         task.setModuleProperty("in");
         task.setOutputProperty("out");
         
-        task.execute();
+        try {
+            task.execute();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("The module path is undefined.", ex.getMessage());
+        }
         
         assertNull(PropertyHelper.getProperty(project, "out"));
         assertFalse(project.getProperties().contains("out"));
@@ -186,7 +192,13 @@ public class GetModulePathTest extends TestCase
         task.setModuleProperty("in");
         task.setOutputProperty("out");
         
-        task.execute();
+        try {
+            task.execute();
+            fail();
+        }
+        catch (BuildException ex) {
+            assertEquals("The module path is undefined.", ex.getMessage());
+        }
         
         assertSame("bar", PropertyHelper.getProperty(project, "out"));
         assertSame(module, PropertyHelper.getProperty(project, "in"));

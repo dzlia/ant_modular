@@ -112,9 +112,10 @@ public class GetModulePath extends Task
         }
         
         final String path = ModuleUtil.getPath(moduleObject);
-        if (path != null) { // null value must not be passed to #setNewProperty.
-            propHelper.setNewProperty("", outputProperty, path);
+        if (path == null) { // null path indicates that this module is invalid.
+            throw new BuildException("The module path is undefined.");
         }
+        propHelper.setNewProperty("", outputProperty, path);
     }
     
     /**
