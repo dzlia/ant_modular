@@ -115,8 +115,9 @@ public interface DependencyResolver
      * @throws IllegalStateException if this {@code DependencyResolver} is not initialised or
      *      is in inconsistent state.
      * @throws IllegalStateException if this function is invoked when there are modules
-     *      to be processed but each module has unprocessed dependencies and this implementation
-     *      does not support waiting for free modules.
+     *      to be processed but: each module has unprocessed dependencies and this implementation
+     *      does not support waiting for free modules, or a limit is reached on number of modules
+     *      that can be processed at the same time.
      * @throws IllegalStateException if it is a blocking implementation and the current thread
      *      is interrupted while waiting for a free module. The <em>interrupted status</em>
      *      of this thread is not reset in this case.
