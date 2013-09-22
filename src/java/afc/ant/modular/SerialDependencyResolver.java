@@ -69,9 +69,6 @@ public class SerialDependencyResolver implements DependencyResolver
         if (module == null) {
             throw new NullPointerException("module");
         }
-        if (moduleAcquired == null) {
-            throw new IllegalStateException("No module is being processed.");
-        }
         if (moduleAcquired != module) {
             throw new IllegalArgumentException(MessageFormat.format(
                     "The module ''{0}'' is not being processed.", module.getPath()));

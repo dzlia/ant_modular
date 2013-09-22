@@ -481,8 +481,8 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testReInit_InTheMiddle_ModuleNotAcquired() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
+        final Module module1 = new Module("foo/");
+        final Module module2 = new Module("bar/");
         module1.addDependency(module2);
         
         resolver.init(Arrays.asList(module1, module2));
@@ -490,8 +490,8 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         assertSame(module2, resolver.getFreeModule());
         resolver.moduleProcessed(module2);
         
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
+        final Module module3 = new Module("baz/");
+        final Module module4 = new Module("quux/");
         module3.addDependency(module4);
         
         resolver.init(Arrays.asList(module3, module4));
@@ -506,24 +506,24 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
             resolver.moduleProcessed(module2);
             fail();
         }
-        catch (IllegalStateException ex) {
-            assertEquals("No module is being processed.", ex.getMessage());
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'bar/' is not being processed.", ex.getMessage());
         }
         assertSame(null, resolver.getFreeModule());
     }
     
     public void testReInit_InTheMiddle_ModuleAcquired() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
+        final Module module1 = new Module("foo/");
+        final Module module2 = new Module("bar/");
         module1.addDependency(module2);
         
         resolver.init(Arrays.asList(module1, module2));
         
         assertSame(module2, resolver.getFreeModule());
         
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
+        final Module module3 = new Module("baz/");
+        final Module module4 = new Module("quux/");
         module3.addDependency(module4);
         
         resolver.init(Arrays.asList(module3, module4));
@@ -538,16 +538,16 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
             resolver.moduleProcessed(module1);
             fail();
         }
-        catch (IllegalStateException ex) {
-            assertEquals("No module is being processed.", ex.getMessage());
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'foo/' is not being processed.", ex.getMessage());
         }
         assertSame(null, resolver.getFreeModule());
     }
     
     public void testReInit_InTheEnd_ModuleAcquired() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
+        final Module module1 = new Module("foo/");
+        final Module module2 = new Module("bar/");
         module1.addDependency(module2);
         
         resolver.init(Arrays.asList(module1, module2));
@@ -557,8 +557,8 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         assertSame(module1, resolver.getFreeModule());
         resolver.moduleProcessed(module1);
         
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
+        final Module module3 = new Module("baz/");
+        final Module module4 = new Module("quux/");
         module3.addDependency(module4);
         
         resolver.init(Arrays.asList(module3, module4));
@@ -573,8 +573,8 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
             resolver.moduleProcessed(module1);
             fail();
         }
-        catch (IllegalStateException ex) {
-            assertEquals("No module is being processed.", ex.getMessage());
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'foo/' is not being processed.", ex.getMessage());
         }
         assertSame(null, resolver.getFreeModule());
     }

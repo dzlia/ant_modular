@@ -136,36 +136,36 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_NoModuleIsBeingProcessed_AlienModule_NoModuleWasEverProcessed() throws Exception
     {
-        resolver.init(Arrays.asList(new Module("foo"), new Module("bar")));
+        resolver.init(Arrays.asList(new Module("foo/"), new Module("bar/")));
         
         try {
-            resolver.moduleProcessed(new Module("baz"));
+            resolver.moduleProcessed(new Module("baz/"));
             fail();
         }
-        catch (IllegalStateException ex) {
-            assertEquals("No module is being processed.", ex.getMessage());
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'baz/' is not being processed.", ex.getMessage());
         }
     }
     
     public void testCallModuleProcessed_NoModuleIsBeingProcessed_AlienModule_SomeModulesWereProcessed() throws Exception
     {
-        resolver.init(Arrays.asList(new Module("foo"), new Module("bar")));
+        resolver.init(Arrays.asList(new Module("foo/"), new Module("bar/")));
         resolver.moduleProcessed(resolver.getFreeModule());
         
         try {
-            resolver.moduleProcessed(new Module("baz"));
+            resolver.moduleProcessed(new Module("baz/"));
             fail();
         }
-        catch (IllegalStateException ex) {
-            assertEquals("No module is being processed.", ex.getMessage());
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'baz/' is not being processed.", ex.getMessage());
         }
     }
     
     public void testCallModuleProcessed_NoModuleIsBeingProcessed_NativeModule_NoModuleWasEverProcessed() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
+        final Module module1 = new Module("foo/");
+        final Module module2 = new Module("bar/");
+        final Module module3 = new Module("baz/");
         module1.addDependency(module2);
         module2.addDependency(module3);
         
@@ -175,8 +175,8 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
             resolver.moduleProcessed(module3); // module3 is processed first because of dependencies
             fail();
         }
-        catch (IllegalStateException ex) {
-            assertEquals("No module is being processed.", ex.getMessage());
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'baz/' is not being processed.", ex.getMessage());
         }
         
         assertSame(module3, resolver.getFreeModule());
@@ -190,9 +190,9 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_NoModuleIsBeingProcessed_NativeModule_SomeModulesWereProcessed() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
+        final Module module1 = new Module("foo/");
+        final Module module2 = new Module("bar/");
+        final Module module3 = new Module("baz/");
         module1.addDependency(module2);
         module2.addDependency(module3);
         
@@ -205,8 +205,8 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
             resolver.moduleProcessed(module1); // module1 is processed last because of dependencies
             fail();
         }
-        catch (IllegalStateException ex) {
-            assertEquals("No module is being processed.", ex.getMessage());
+        catch (IllegalArgumentException ex) {
+            assertEquals("The module 'foo/' is not being processed.", ex.getMessage());
         }
         
         assertSame(module1, resolver.getFreeModule());
