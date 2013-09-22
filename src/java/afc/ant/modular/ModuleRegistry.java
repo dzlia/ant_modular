@@ -64,7 +64,7 @@ public class ModuleRegistry
             final Module module = new Module(normalisedPath);
             module.setAttributes(moduleInfo.getAttributes());
             /* The module under construction is put into the registry to prevent infinite
-               module loading in case of cycling dependencies, which causes stack overflow. */
+               module loading in case of cyclic dependencies, which causes stack overflow. */
             modules.put(normalisedPath, module);
             for (final String depPath : moduleInfo.getDependencies()) {
                 module.addDependency(resolveModule(depPath));
