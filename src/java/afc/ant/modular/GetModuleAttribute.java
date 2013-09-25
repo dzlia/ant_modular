@@ -41,7 +41,6 @@ import org.apache.tools.ant.Task;
  * Incompatible module objects passed cause an exception raised by this task.</p>
  * 
  * <h3>Task input</h3>
- * <p>
  * <table border="1">
  * <thead>
  *  <tr><th>Attribute</th>
@@ -59,7 +58,7 @@ import org.apache.tools.ant.Task;
  *      <td>yes</td>
  *      <td>The name of the attribute.</td></tr>
  * </tbody>
- * </table></p>
+ * </table>
  * 
  * <h3>Usage example</h3>
  * <p>

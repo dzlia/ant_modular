@@ -27,7 +27,7 @@ package afc.ant.modular;
  * This information is stored in {@link afc.ant.modular.ModuleInfo}
  * objects as attributes in the form of {@code key->value}.
  * An implementation of this interface is free to choose any representation of
- * module meta information, except the following:
+ * module meta information, except the following:</p>
  * <ul>
  *  <li>the module path is stored in the
  *      {@link afc.ant.modular.ModuleInfo#getPath() path} property</li>
@@ -37,10 +37,10 @@ package afc.ant.modular;
  *  <li>for the sake of inter-operability, it is recommended (though not required)
  *      that the module classpath attributes are stored as
  *      {@link org.apache.tools.ant.types.Path} objects</li>
- * </ul><br/>
- * The dependee modules should not be resolved recursively.</p>
+ * </ul>
+ * <p>The dependee modules should not be resolved recursively.</p>
  * 
- * <p>Additional notes:
+ * <p>Additional notes:<p>
  * <ul>
  *  <li>{@code ModuleLoader} instance are used in the single threaded execution model</li>
  *  <li>no caching of meta information is generally needed. Each module is loaded
@@ -48,7 +48,7 @@ package afc.ant.modular;
  *  <li>implementations of this interface are used by the task
  *      {@link afc.ant.modular.CallTargetForModules} as pluggable components
  *      to define a way in which module meta information is to be loaded</li>
- * </ul></p>
+ * </ul>
  *
  * @author D&#378;mitry La&#365;&#269;uk
  */

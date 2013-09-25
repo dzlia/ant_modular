@@ -347,7 +347,7 @@ public class CallTargetForModules extends Task
      * to start build with. All modules this module depend upon (directly or indirectly)
      * are included into the build process.</p>
      * 
-     * <p>The following attributes are supported:
+     * <h3>Attributes</h3>
      * <table border="1">
      * <thead>
      *  <tr><th>Attribute</th>
@@ -365,7 +365,7 @@ public class CallTargetForModules extends Task
      *          target defined in {@code <callTargetForModules>} is used.
      *          This target name is not propagated to the dependee modules.</td></tr>
      * </tbody>
-     * </table></p>
+     * </table>
      */
     // TODO support defining modules using regular expressions
     public static class ModuleElement

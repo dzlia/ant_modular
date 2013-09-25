@@ -30,7 +30,7 @@ import java.util.Collection;
  * after all modules it depends upon are processed. The order of processing of independent
  * modules is undefined.</p>
  * 
- * <p>The lifecycle of a {@code DependencyResolver} instance is the following:
+ * <p>The lifecycle of a {@code DependencyResolver} instance is the following:</p>
  * <ol type="1">
  *  <li>{@link #init(Collection)} is invoked with a collection of root modules
  *      passed it. All direct and indirect dependee modules of these root modules
@@ -44,7 +44,7 @@ import java.util.Collection;
  *  <li>the steps <tt>2-4</tt> are repeated until there are no modules unprocessed, that is
  *      until {@link #getFreeModule()} returns {@code null}</li>
  * </ol>
- * If there are cyclic dependencies between modules (so that the order of module processing
+ * <p>If there are cyclic dependencies between modules (so that the order of module processing
  * is undefined) then a {@link CyclicDependenciesDetectedException} is thrown at the
  * step <tt>1</tt>.</p>
  * 
