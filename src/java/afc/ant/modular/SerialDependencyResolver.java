@@ -160,7 +160,11 @@ public class SerialDependencyResolver implements DependencyResolver
         return ctx.moduleOrder;
     }
     
-    // Data that is used by addModuleDeep. These objects are the same at each step of the recusion.
+    /* Data that is used by addModuleDeep. These objects are the same at each step of the recursion
+     * so there is no need to pass them again and again thus wasting stack space. The instance of
+     * Context being used is likely to be in the processor cache so that its fields are accessed
+     * with little overhead.
+     */
     private static class Context
     {
         public final IdentityHashMap<Module, ?> registry = new IdentityHashMap<Module, Object>();
