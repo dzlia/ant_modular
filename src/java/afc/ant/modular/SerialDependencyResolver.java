@@ -29,12 +29,47 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+/**
+ * <p>A {@link DependencyResolver} that supports only single-threaded {@link Module module}
+ * processing. That is, at the moment at most a single module could be acquired for processing.
+ * An attempt to acquire more than a single module leads to an {@link IllegalStateException}
+ * thrown by {@link #getFreeModule()}. Refer to the class description of {@code DependencyResolver}
+ * for more details.</p>
+ * 
+ * <p>As against {@link ParallelDependencyResolver}, {@code SerialDependencyResolver} is
+ * much more efficient with respect to both processor and memory footprint.</p>
+ * 
+ * <p>{@code SerialDependencyResolver} is not thread-safe. It is expected to be used
+ * within a single thread only.</p>
+ * 
+ * @see ParallelDependencyResolver
+ * @see CallTargetForModules
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
 public class SerialDependencyResolver implements DependencyResolver
 {
     private ArrayList<Module> moduleOrder;
     private Module moduleAcquired;
     private int pos;
     
+    /**
+     * <p>Initialises this {@code SerialDependencyResolver} with a set of {@link Module modules} to
+     * process. The resulting set includes these root modules and all their direct and indirect
+     * {@link Module#getDependencies() dependee modules}. If this {@code SerialDependencyResolver} is
+     * already initialised with another set of modules then its state is reset so that the new set
+     * of modules is being used.</p>
+     * 
+     * @param rootModules the modules that constitute with their direct and indirect dependee
+     *      modules a set of modules. The order of processing of modules in this set is to be
+     *      resolved by this {@code SerialDependencyResolver}. This collection and all of its
+     *      elements must be non-{@code null}.
+     * 
+     * @throws CyclicDependenciesDetectedException if there are cyclic dependencies between
+     *      the modules.
+     * @throws NullPointerException if either <em>rootModules</em> or any of its elements
+     *      is {@code null}.
+     */
     public void init(final Collection<Module> rootModules) throws CyclicDependenciesDetectedException
     {
         if (rootModules == null) {
@@ -50,7 +85,21 @@ public class SerialDependencyResolver implements DependencyResolver
         moduleAcquired = null;
     }
     
-    // returns a module that does not have dependencies
+    /**
+     * <p>Returns a {@link Module module} that does not have {@link Module#getDependencies()
+     * dependencies} unprocessed. If all modules are already processed then {@code null} is returned.
+     * This {@code SerialDependencyResolver} must be initialised before this function can be used.
+     * Each module that is successfully processed must be released by invoking
+     * {@link #moduleProcessed(Module)} with this module passed as a parameter. At most a single module
+     * could be acquired for processing at the moment. An attempt to acquire more than a single module
+     * leads to an {@link IllegalStateException} thrown.</p>
+     * 
+     * @return a module which has no unprocessed dependee modules, or {@code null} if all modules
+     *      are already processed.
+     * 
+     * @throws IllegalStateException if this {@code SerialDependencyResolver} is not initialised.
+     * @throws IllegalStateException if this function is invoked when there is a module acquired.
+     */
     public Module getFreeModule()
     {
         ensureInitialised();
@@ -63,6 +112,22 @@ public class SerialDependencyResolver implements DependencyResolver
         return moduleAcquired = moduleOrder.get(pos);
     }
     
+    /**
+     * <p>Marks a given {@link Module module} as processed, so that the modules that depend upon
+     * this module have one less unprocessed dependency. The modules for which this module is
+     * the last unprocessed dependency become available for processing and can be acquired by
+     * invoking {@link #getFreeModule()}.</p>
+     * 
+     * @param module the module to be marked as processed. It must belong to the set of modules
+     *      this {@code SerialDependencyResolver} is initialised with. It must be acquired for
+     *      processing by invoking {@code getFreeModule()} before it is released by this function.
+     *      It must be non-{@code null}.
+     * 
+     * @throws NullPointerException if <em>module</em> is {@code null}.
+     * @throws IllegalArgumentException if the given module does not belong to the modules this
+     *      {@code SerialDependencyResolver} is initialised with or if this module is not
+     *      acquired for processing by {@code getFreeModule()}.
+     */
     public void moduleProcessed(final Module module)
     {
         ensureInitialised();
