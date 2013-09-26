@@ -29,12 +29,49 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+/**
+ * <p>A {@link DependencyResolver} that supports multi-threaded {@link Module module}
+ * processing. That is, at the moment multiple modules could be acquired for processing
+ * (by different threads). An attempt to acquire a module if there are no modules with
+ * no unprocessed dependencies will block the thread until such a module appears (other
+ * threads must mark at least a single module as processed for this) or this
+ * {@code ParallelDependencyResolver} is {@link #abort() aborted}. Refer to the class
+ * description of {@code DependencyResolver} for more details.</p>
+ * 
+ * <p>As against {@link SerialDependencyResolver}, {@code ParallelDependencyResolver} is
+ * much less efficient with respect to both processor and memory footprint which is
+ * compensated by allowing for parallel processing or independent modules.</p>
+ * 
+ * <p>{@code ParallelDependencyResolver} is thread-safe.</p>
+ * 
+ * @see SerialDependencyResolver
+ * @see CallTargetForModules
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
 public class ParallelDependencyResolver implements DependencyResolver
 {
     private ArrayList<Node> shortlist;
     private IdentityHashMap<Module, Node> modulesAcquired;
     private int remainingModuleCount;
     
+    /**
+     * <p>Initialises this {@code ParallelDependencyResolver} with a set of {@link Module modules}
+     * to process. The resulting set includes these root modules and all their direct and indirect
+     * {@link Module#getDependencies() dependee modules}. If this {@code ParallelDependencyResolver}
+     * is already initialised with another set of modules then its state is reset so that the new
+     * set of modules is being used.</p>
+     * 
+     * @param rootModules the modules that constitute with their direct and indirect dependee
+     *      modules a set of modules. The order of processing of modules in this set is to be
+     *      resolved by this {@code ParallelDependencyResolver}. This collection and all of
+     *      its elements must be non-{@code null}.
+     * 
+     * @throws CyclicDependenciesDetectedException if there are cyclic dependencies between
+     *      the modules.
+     * @throws NullPointerException if either <em>rootModules</em> or any of its elements
+     *      is {@code null}.
+     */
     public void init(final Collection<Module> rootModules) throws CyclicDependenciesDetectedException
     {
         if (rootModules == null) {
@@ -56,7 +93,28 @@ public class ParallelDependencyResolver implements DependencyResolver
         }
     }
     
-    // returns a module that does not have dependencies
+    /**
+     * <p>Returns a {@link Module module} that does not have {@link Module#getDependencies()
+     * dependencies} unprocessed. If all modules are already processed then {@code null} is returned.
+     * This {@code ParallelDependencyResolver} must be initialised before this function can be used.
+     * Each module that is successfully processed must be released by invoking
+     * {@link #moduleProcessed(Module)} with this module passed as a parameter. If this rule is not
+     * followed then module processing could get stuck.</p>
+     * 
+     * <p>If this function is invoked when there are no modules with no unprocessed dependencies then
+     * it blocks this thread waiting for a free module to appear. A different thread must report some
+     * module previously acquired as processed for this function to return. Another way for this
+     * function to return control is to invoke {@link #abort()}. In this case {@code null} is
+     * returned.</p>
+     * 
+     * @return a module which has no unprocessed dependee modules, or {@code null} if all modules
+     *      are already processed or this {@code ParallelDependencyResolver} is aborted.
+     * 
+     * @throws IllegalStateException if this {@code ParallelDependencyResolver} is not initialised.
+     * @throws IllegalStateException if this function is waiting for a free module and the current
+     *      thread is interrupted. The <em>interrupted status</em> of this thread is not reset in
+     *      this case.
+     */
     public synchronized Module getFreeModule()
     {
         ensureInitialised();
@@ -82,6 +140,25 @@ public class ParallelDependencyResolver implements DependencyResolver
         }
     }
     
+    /**
+     * <p>Marks a given {@link Module module} as processed, so that the modules that depend upon
+     * this module have one less unprocessed dependency. The modules for which this module is
+     * the last unprocessed dependency become available for processing and can be acquired by
+     * invoking {@link #getFreeModule()}. All threads waiting for a free module are notified
+     * by this function.</p>
+     * 
+     * @param module the module to be marked as processed. It must belong to the set of modules
+     *      this {@code ParallelDependencyResolver} is initialised with. It must be acquired for
+     *      processing by invoking {@code getFreeModule()} before it is released by this function.
+     *      It must be non-{@code null}.
+     * 
+     * @throws NullPointerException if <em>module</em> is {@code null}.
+     * @throws IllegalArgumentException if the given module does not belong to the modules this
+     *      {@code ParallelDependencyResolver} is initialised with or if this module is not
+     *      acquired for processing by {@code getFreeModule()}. This does not happen if this
+     *      {@code ParallelDependencyResolver} is aborted.
+     * @throws IllegalStateException if this {@code ParallelDependencyResolver} is not initialised.
+     */
     public synchronized void moduleProcessed(final Module module)
     {
         ensureInitialised();
@@ -109,6 +186,25 @@ public class ParallelDependencyResolver implements DependencyResolver
         notifyAll();
     }
     
+    /**
+     * <p>Aborts the module processing routine associated with this
+     * {@code ParallelDependencyResolver} so that:</p>
+     * <ul>
+     *  <li>all threads waiting for a free module within {@link #getFreeModule()} are
+     *      notified and {@code null} is returned by them to indicate that there are no
+     *      more modules to process</li>
+     *  <li>any subsequent invocation of {@code getFreeModule()} returns {@code null}</li>
+     *  <li>any subsequent invocation of {@link #moduleProcessed(Module)} accepts any
+     *      non-{@code null} module and just returns</li>
+     * </ul>
+     * <p>It is supposed that all threads that perform parallel module processing
+     * will finish it rapidly after {@code abort()} is invoked.</p>
+     * 
+     * <p>It is safe to invoke {@code abort()} for an already aborted
+     * {@code ParallelDependencyResolver}. Successful {@link #init(Collection)
+     * re-initialisation} of a {@code ParallelDependencyResolver} resets its
+     * <em>aborted status</em>.
+     */
     public synchronized void abort()
     {
         ensureInitialised();
