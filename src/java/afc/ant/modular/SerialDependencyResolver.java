@@ -127,6 +127,7 @@ public class SerialDependencyResolver implements DependencyResolver
      * @throws IllegalArgumentException if the given module does not belong to the modules this
      *      {@code SerialDependencyResolver} is initialised with or if this module is not
      *      acquired for processing by {@code getFreeModule()}.
+     * @throws IllegalStateException if this {@code SerialDependencyResolver} is not initialised.
      */
     public void moduleProcessed(final Module module)
     {
