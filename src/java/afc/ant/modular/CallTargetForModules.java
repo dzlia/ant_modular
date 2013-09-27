@@ -206,8 +206,7 @@ public class CallTargetForModules extends Task
             public void run()
             {
                 try {
-                    // This thread is non-interruptible because its workflow does not need this.
-                    for (;;) {
+                    do {
                         final Module module = dependencyResolver.getFreeModule();
                         if (module == null) {
                             /* Either all modules are processed or the build has failed and
@@ -232,7 +231,7 @@ public class CallTargetForModules extends Task
                         
                         // Reporting this module as processed if no error is encountered.
                         dependencyResolver.moduleProcessed(module);
-                    }
+                    } while (!Thread.currentThread().isInterrupted());
                 }
                 catch (Throwable ex) {
                     buildFailed.set(true);
@@ -262,15 +261,7 @@ public class CallTargetForModules extends Task
              * a module that was being processed by this thread. This will allow the
              * 'build failed' message to be the last one.
              */
-            try {
-                for (final Thread t : threads) {
-                    t.join();
-                }
-            }
-            catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-                throw new BuildException("The build thread was interrupted.");
-            }
+            joinThreads(threads);
         }
         
         if (buildFailed.get()) {
@@ -282,6 +273,26 @@ public class CallTargetForModules extends Task
             } else {
                 throw (Error) ex;
             }
+        }
+    }
+    
+    private static void joinThreads(final Thread[] threads)
+    {
+        try {
+            for (final Thread t : threads) {
+                t.join();
+            }
+        }
+        catch (InterruptedException ex) {
+            /* Interrupting all the activities so that the build finishes as quick as possible.
+             * This is fine if an already finished thread is interrupted.
+             */
+            for (final Thread t : threads) {
+                t.interrupt();
+            }
+            
+            Thread.currentThread().interrupt();
+            throw new BuildException("The build thread was interrupted.");
         }
     }
     
