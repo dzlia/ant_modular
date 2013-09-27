@@ -59,6 +59,7 @@ public class HangingMockCallTargetTask extends MockCallTargetTask
             }
         }
         catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
             interrupted = true;
             return;
         }

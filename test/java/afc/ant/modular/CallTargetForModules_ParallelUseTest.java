@@ -808,9 +808,13 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     }
     
     /**
-     * <p>Tests that the build thread is interruptible if a helper thread does not respond.</p>
+     * <p>Tests that:</p>
+     * <ul>
+     *  <li>the build thread is interruptible if a helper thread does not respond</li>
+     *  <li>all the helper threads are interrupted the build thread is interrupted</li>
+     * </ul>
      */
-    public void testParallelRun_MultipleModules_HelperThreadHangsUp() throws Throwable
+    public void testParallelRun_MultipleModules_BuildThreadIsInterrupted() throws Throwable
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
         final ModuleInfo moduleInfo = new ModuleInfo("foo/");
@@ -818,13 +822,16 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
+        final ModuleInfo moduleInfo3 = new ModuleInfo("baz/");
         
         moduleLoader.modules.put("foo/", moduleInfo);
         moduleLoader.modules.put("bar/", moduleInfo2);
+        moduleLoader.modules.put("baz/", moduleInfo3);
         
         final AtomicBoolean task1Hangs = new AtomicBoolean(true);
         final AtomicBoolean task2Hangs = new AtomicBoolean(true);
-        final CyclicBarrier hangBarrier = new CyclicBarrier(3);
+        final AtomicBoolean task3Hangs = new AtomicBoolean(true);
+        final CyclicBarrier hangBarrier = new CyclicBarrier(4);
         
         final AtomicReference<Throwable> failureCause = new AtomicReference<Throwable>();
         
@@ -858,14 +865,18 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         final HangingMockCallTargetTask task2 = new HangingMockCallTargetTask(project,
                 task2Hangs, hangBarrier, failureCause);
         project.tasks.add(task2);
+        final HangingMockCallTargetTask task3 = new HangingMockCallTargetTask(project,
+                task3Hangs, hangBarrier, failureCause);
+        project.tasks.add(task3);
         
         task.init();
         task.setTarget("someTarget");
         task.setModuleProperty("mProp");
         task.createModule().setPath("foo");
         task.createModule().setPath("bar");
+        task.createModule().setPath("baz");
         task.addConfigured(moduleLoader);
-        task.setThreadCount(2);
+        task.setThreadCount(3);
         
         final ParamElement param = task.createParam();
         param.setName("p");
@@ -879,22 +890,29 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         final HangingMockCallTargetTask buildThreadTask;
         final HangingMockCallTargetTask helperThreadTask;
+        final HangingMockCallTargetTask helperThreadTask2;
         final AtomicBoolean buildThreadFlag;
-        final AtomicBoolean helperThreadFlag;
         
         assertNotNull(task1.hangingThread);
         assertNotNull(task2.hangingThread);
-        assertFalse(task1.hangingThread == task2.hangingThread);
+        assertNotNull(task3.hangingThread);
+        assertEquals(3, TestUtil.set(task1.hangingThread, task2.hangingThread, task3.hangingThread).size());
+        
         if (task1.hangingThread == buildThread) {
             buildThreadTask = task1;
             helperThreadTask = task2;
+            helperThreadTask2 = task3;
             buildThreadFlag = task1Hangs;
-            helperThreadFlag = task2Hangs;
-        } else {
+        } else if (task1.hangingThread == buildThread) {
             buildThreadTask = task2;
             helperThreadTask = task1;
+            helperThreadTask2 = task3;
             buildThreadFlag = task2Hangs;
-            helperThreadFlag = task1Hangs;
+        } else {
+            buildThreadTask = task3;
+            helperThreadTask = task1;
+            helperThreadTask2 = task2;
+            buildThreadFlag = task3Hangs;
         }
         
         buildThreadFlag.set(false);
@@ -907,8 +925,10 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         buildThread.join();
         
         helperThreadTask.hangingThread.join(1000); // reasonable timeout
+        helperThreadTask2.hangingThread.join(1000); // reasonable timeout
         
         assertTrue(helperThreadTask.interrupted);
+        assertTrue(helperThreadTask2.interrupted);
         
         if (failureCause.get() != null) {
             throw failureCause.get();
@@ -917,6 +937,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         // the other checks are performed thoroughly in other tests.
         assertTrue(task1.executed);
         assertTrue(task2.executed);
+        assertTrue(task3.executed);
     }
     
     public void testParallelRun_BuildFailure_ProjectCreateTargetThrowsRuntimeException()
