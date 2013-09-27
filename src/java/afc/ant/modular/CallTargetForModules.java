@@ -253,17 +253,24 @@ public class CallTargetForModules extends Task
             t.start();
         }
         
-        // The current thread is one of the threads that process the modules.
-        parallelBuildWorker.run();
-        
         try {
-            for (final Thread t : threads) {
-                t.join();
-            }
+            // The current thread is one of the threads that process the modules.
+            parallelBuildWorker.run();
         }
-        catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new BuildException("The build thread was interrupted.");
+        finally {
+            /* Waiting for all worker threads to finish even if the build fails on
+             * a module that was being processed by this thread. This will allow the
+             * 'build failed' message to be the last one.
+             */
+            try {
+                for (final Thread t : threads) {
+                    t.join();
+                }
+            }
+            catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                throw new BuildException("The build thread was interrupted.");
+            }
         }
         
         if (buildFailed.get()) {
