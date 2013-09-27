@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tools.ant.BuildException;
@@ -811,7 +810,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
      * <p>Tests that:</p>
      * <ul>
      *  <li>the build thread is interruptible if a helper thread does not respond</li>
-     *  <li>all the helper threads are interrupted the build thread is interrupted</li>
+     *  <li>all the helper threads are interrupted if the build thread is interrupted</li>
      * </ul>
      */
     public void testParallelRun_MultipleModules_BuildThreadIsInterrupted() throws Throwable
@@ -885,7 +884,6 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         assertNotNull(task1.hangingThread);
         assertNotNull(task2.hangingThread);
         assertNotNull(task3.hangingThread);
-        assertEquals(3, TestUtil.set(task1.hangingThread, task2.hangingThread, task3.hangingThread).size());
         final Map<Thread, HangingMockCallTargetTask> threadToTaskMap = TestUtil.map(
                 task1.hangingThread, task1, task2.hangingThread, task2, task3.hangingThread, task3);
         assertEquals(3, threadToTaskMap.size());
@@ -893,7 +891,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         final HangingMockCallTargetTask buildThreadTask = threadToTaskMap.remove(buildThread);
         assertNotNull(buildThreadTask);
         
-        buildThreadTask.flag.set(false);
+        buildThreadTask.hang = false;
         synchronized (buildThreadTask) {
             buildThreadTask.notify();
         }
@@ -904,6 +902,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         for (final Map.Entry<Thread, HangingMockCallTargetTask> entry : threadToTaskMap.entrySet()) {
             entry.getKey().join(); // reasonable timeout
+            
             assertTrue(entry.getValue().interrupted);
         }
         
@@ -915,6 +914,123 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         assertTrue(task1.executed);
         assertTrue(task2.executed);
         assertTrue(task3.executed);
+    }
+    
+    /**
+     * <p>Tests that:</p>
+     * <ul>
+     *  <li>the build thread is interruptible while it processes modules</li>
+     *  <li>all the helper threads are interrupted if the build thread is interrupted</li>
+     * </ul>
+     */
+    public void testParallelRun_MultipleModules_BuildThreadIsInterruptedWhileProcessingNotBlocked() throws Throwable
+    {
+        // Unambiguous order of module processing is selected for the sake of simplicity.
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        moduleInfo2.addAttribute("qq", "ww");
+        moduleInfo2.addAttribute("aa", "ss");
+        final ModuleInfo moduleInfo3 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo4 = new ModuleInfo("quux/");
+        
+        moduleLoader.modules.put("foo/", moduleInfo);
+        moduleLoader.modules.put("bar/", moduleInfo2);
+        moduleLoader.modules.put("baz/", moduleInfo3);
+        moduleLoader.modules.put("quux/", moduleInfo4);
+        
+        final CyclicBarrier hangBarrier = new CyclicBarrier(4);
+        
+        final AtomicReference<Throwable> failureCause = new AtomicReference<Throwable>();
+        
+        final Thread buildThread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try {
+                    try {
+                        task.perform();
+                        fail();
+                    }
+                    catch (BuildException ex) {
+                        // expected
+                        assertEquals("The build thread was interrupted.", ex.getMessage());
+                        assertNull(ex.getCause());
+                    }
+                    
+                    assertTrue(Thread.currentThread().isInterrupted());
+                }
+                catch (Throwable ex) {
+                    failureCause.set(ex);
+                }
+            }
+        };
+        
+        final HangingMockCallTargetTask task1 = new HangingMockCallTargetTask(project, hangBarrier, failureCause);
+        project.tasks.add(task1);
+        final HangingMockCallTargetTask task2 = new HangingMockCallTargetTask(project, hangBarrier, failureCause);
+        project.tasks.add(task2);
+        final HangingMockCallTargetTask task3 = new HangingMockCallTargetTask(project, hangBarrier, failureCause);
+        project.tasks.add(task3);
+        final HangingMockCallTargetTask task4 = new HangingMockCallTargetTask(project, hangBarrier, failureCause);
+        project.tasks.add(task4);
+        
+        task.init();
+        task.setTarget("someTarget");
+        task.setModuleProperty("mProp");
+        task.createModule().setPath("foo");
+        task.createModule().setPath("bar");
+        task.createModule().setPath("baz");
+        task.createModule().setPath("quux");
+        task.addConfigured(moduleLoader);
+        task.setThreadCount(3);
+        
+        final ParamElement param = task.createParam();
+        param.setName("p");
+        param.setValue("o");
+        
+        project.setProperty("qwerty", "board");
+        
+        buildThread.start();
+        
+        hangBarrier.await();
+        
+        // One of the tasks is not started and its hanging thread is undefined.
+        final Map<Thread, HangingMockCallTargetTask> threadToTaskMap = TestUtil.map(
+                task1.hangingThread, task1, task2.hangingThread, task2, task3.hangingThread, task3,
+                task4.hangingThread, task4);
+        assertEquals(4, threadToTaskMap.size());
+        assertTrue(threadToTaskMap.containsKey(null));
+        
+        final HangingMockCallTargetTask buildThreadTask = threadToTaskMap.remove(buildThread);
+        assertNotNull(buildThreadTask);
+        
+        buildThreadTask.selfInterrupt = true;
+        buildThreadTask.hang = false;
+        synchronized (buildThreadTask) {
+            buildThreadTask.notify();
+        }
+        
+        buildThread.join();
+        
+        assertTrue(buildThreadTask.executed);
+        
+        final HangingMockCallTargetTask unprocessedTask = threadToTaskMap.remove(null);
+        assertNotNull(unprocessedTask);
+        
+        for (final Map.Entry<Thread, HangingMockCallTargetTask> entry : threadToTaskMap.entrySet()) {
+            entry.getKey().join(); // reasonable timeout
+            
+            assertTrue(entry.getValue().interrupted);
+            assertTrue(entry.getValue().executed);
+        }
+        
+        assertFalse(unprocessedTask.executed);
+        
+        if (failureCause.get() != null) {
+            throw failureCause.get();
+        }
     }
     
     public void testParallelRun_BuildFailure_ProjectCreateTargetThrowsRuntimeException()

@@ -32,7 +32,8 @@ import org.apache.tools.ant.Project;
 public class HangingMockCallTargetTask extends MockCallTargetTask
 {
     public volatile Thread hangingThread;
-    public final AtomicBoolean flag;
+    public volatile boolean hang;
+    public volatile boolean selfInterrupt = false;
     private final CyclicBarrier hangBarrier;
     private final AtomicReference<Throwable> failureCause;
     public volatile boolean interrupted;
@@ -41,7 +42,7 @@ public class HangingMockCallTargetTask extends MockCallTargetTask
             final AtomicReference<Throwable> failureCause)
     {
         super(project);
-        flag = new AtomicBoolean(true);
+        hang = true;
         this.hangBarrier = hangBarrier;
         this.failureCause = failureCause;
     }
@@ -54,8 +55,12 @@ public class HangingMockCallTargetTask extends MockCallTargetTask
         try {
             hangingThread = Thread.currentThread();
             hangBarrier.await();
-            while(flag.get()) {
+            while(hang) {
                 wait();
+            }
+            if (selfInterrupt) {
+                // The only way to interrupt a thread with guaranteed not throwing an InterruptedException.
+                Thread.currentThread().interrupt();
             }
         }
         catch (InterruptedException ex) {

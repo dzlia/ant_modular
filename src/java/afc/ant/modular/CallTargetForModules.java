@@ -200,6 +200,9 @@ public class CallTargetForModules extends Task
         
         /* A stateless worker to process modules using ParallelDependencyResolver.
          * This instance can be used by multiple threads simultaneously.
+         * 
+         * It does not throw an exception outside run() and preserves the
+         * interrupted status of the thread it is executed in.
          */
         final Runnable parallelBuildWorker = new Runnable()
         {
@@ -278,6 +281,11 @@ public class CallTargetForModules extends Task
     
     private static void joinThreads(final Thread[] threads)
     {
+        /* parallelBuildWorker preserves the interrupted status of the current thread
+         * so an InterruptedException is thrown if this thread starts waiting
+         * for a helper thread to join. This leads to all helper threads interrupted
+         * so that the build finished rapidly and gracefully.
+         */
         try {
             for (final Thread t : threads) {
                 t.join();
