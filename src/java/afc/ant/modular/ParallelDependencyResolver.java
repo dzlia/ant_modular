@@ -223,18 +223,18 @@ public class ParallelDependencyResolver implements DependencyResolver
     
     private static class Node
     {
-        private Node(final Module module)
+        Node(final Module module)
         {
             this.module = module;
             dependencyCount = module.getDependencies().size();
             dependencyOf = new ArrayList<Node>();
         }
         
-        private final Module module;
+        final Module module;
         /* Knowing just dependency count is enough to detect the moment
            when this node has no dependencies remaining. */
-        private int dependencyCount;
-        private final ArrayList<Node> dependencyOf;
+        int dependencyCount;
+        final ArrayList<Node> dependencyOf;
     }
     
     /*
