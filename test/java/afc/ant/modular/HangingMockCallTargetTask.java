@@ -35,6 +35,7 @@ public class HangingMockCallTargetTask extends MockCallTargetTask
     private final AtomicBoolean flag;
     private final CyclicBarrier hangBarrier;
     private final AtomicReference<Throwable> failureCause;
+    public volatile boolean interrupted;
     
     public HangingMockCallTargetTask(final Project project, final AtomicBoolean hangWhileFlag,
             final CyclicBarrier hangBarrier, final AtomicReference<Throwable> failureCause)
@@ -58,10 +59,8 @@ public class HangingMockCallTargetTask extends MockCallTargetTask
             }
         }
         catch (InterruptedException ex) {
-            System.out.println("exit");
-            Thread.currentThread().interrupt();
-            failureCause.set(ex);
-            throw new IllegalStateException();
+            interrupted = true;
+            return;
         }
         catch (BrokenBarrierException ex) {
             System.out.println("exit");

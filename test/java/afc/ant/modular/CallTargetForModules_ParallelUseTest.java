@@ -906,11 +906,9 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         buildThread.join();
         
-        helperThreadFlag.set(false);
-        synchronized (helperThreadTask) {
-            helperThreadTask.notify();
-        }
-        helperThreadTask.hangingThread.join();
+        helperThreadTask.hangingThread.join(1000); // reasonable timeout
+        
+        assertTrue(helperThreadTask.interrupted);
         
         if (failureCause.get() != null) {
             throw failureCause.get();
