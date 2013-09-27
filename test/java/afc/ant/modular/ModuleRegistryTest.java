@@ -459,6 +459,11 @@ public class ModuleRegistryTest extends TestCase
         public final ArrayList<String> paths = new ArrayList<String>();
         public final HashMap<String, Object> results = new HashMap<String, Object>();
         
+        // Does nothing, just prevents synthetic garbage to be created by a java compiler.
+        public MockModuleLoader()
+        {
+        }
+        
         public void init(Project project)
         {
             throw new UnsupportedOperationException();
