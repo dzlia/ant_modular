@@ -828,9 +828,6 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         moduleLoader.modules.put("bar/", moduleInfo2);
         moduleLoader.modules.put("baz/", moduleInfo3);
         
-        final AtomicBoolean task1Hangs = new AtomicBoolean(true);
-        final AtomicBoolean task2Hangs = new AtomicBoolean(true);
-        final AtomicBoolean task3Hangs = new AtomicBoolean(true);
         final CyclicBarrier hangBarrier = new CyclicBarrier(4);
         
         final AtomicReference<Throwable> failureCause = new AtomicReference<Throwable>();
@@ -859,14 +856,11 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
             }
         };
         
-        final HangingMockCallTargetTask task1 = new HangingMockCallTargetTask(project,
-                task1Hangs, hangBarrier, failureCause);
+        final HangingMockCallTargetTask task1 = new HangingMockCallTargetTask(project, hangBarrier, failureCause);
         project.tasks.add(task1);
-        final HangingMockCallTargetTask task2 = new HangingMockCallTargetTask(project,
-                task2Hangs, hangBarrier, failureCause);
+        final HangingMockCallTargetTask task2 = new HangingMockCallTargetTask(project, hangBarrier, failureCause);
         project.tasks.add(task2);
-        final HangingMockCallTargetTask task3 = new HangingMockCallTargetTask(project,
-                task3Hangs, hangBarrier, failureCause);
+        final HangingMockCallTargetTask task3 = new HangingMockCallTargetTask(project, hangBarrier, failureCause);
         project.tasks.add(task3);
         
         task.init();
@@ -888,34 +882,18 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         hangBarrier.await();
         
-        final HangingMockCallTargetTask buildThreadTask;
-        final HangingMockCallTargetTask helperThreadTask;
-        final HangingMockCallTargetTask helperThreadTask2;
-        final AtomicBoolean buildThreadFlag;
-        
         assertNotNull(task1.hangingThread);
         assertNotNull(task2.hangingThread);
         assertNotNull(task3.hangingThread);
         assertEquals(3, TestUtil.set(task1.hangingThread, task2.hangingThread, task3.hangingThread).size());
+        final Map<Thread, HangingMockCallTargetTask> threadToTaskMap = TestUtil.map(
+                task1.hangingThread, task1, task2.hangingThread, task2, task3.hangingThread, task3);
+        assertEquals(3, threadToTaskMap.size());
         
-        if (task1.hangingThread == buildThread) {
-            buildThreadTask = task1;
-            helperThreadTask = task2;
-            helperThreadTask2 = task3;
-            buildThreadFlag = task1Hangs;
-        } else if (task1.hangingThread == buildThread) {
-            buildThreadTask = task2;
-            helperThreadTask = task1;
-            helperThreadTask2 = task3;
-            buildThreadFlag = task2Hangs;
-        } else {
-            buildThreadTask = task3;
-            helperThreadTask = task1;
-            helperThreadTask2 = task2;
-            buildThreadFlag = task3Hangs;
-        }
+        final HangingMockCallTargetTask buildThreadTask = threadToTaskMap.remove(buildThread);
+        assertNotNull(buildThreadTask);
         
-        buildThreadFlag.set(false);
+        buildThreadTask.flag.set(false);
         synchronized (buildThreadTask) {
             buildThreadTask.notify();
         }
@@ -924,11 +902,10 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         buildThread.join();
         
-        helperThreadTask.hangingThread.join(1000); // reasonable timeout
-        helperThreadTask2.hangingThread.join(1000); // reasonable timeout
-        
-        assertTrue(helperThreadTask.interrupted);
-        assertTrue(helperThreadTask2.interrupted);
+        for (final Map.Entry<Thread, HangingMockCallTargetTask> entry : threadToTaskMap.entrySet()) {
+            entry.getKey().join(); // reasonable timeout
+            assertTrue(entry.getValue().interrupted);
+        }
         
         if (failureCause.get() != null) {
             throw failureCause.get();

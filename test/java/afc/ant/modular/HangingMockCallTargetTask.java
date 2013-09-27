@@ -32,16 +32,16 @@ import org.apache.tools.ant.Project;
 public class HangingMockCallTargetTask extends MockCallTargetTask
 {
     public volatile Thread hangingThread;
-    private final AtomicBoolean flag;
+    public final AtomicBoolean flag;
     private final CyclicBarrier hangBarrier;
     private final AtomicReference<Throwable> failureCause;
     public volatile boolean interrupted;
     
-    public HangingMockCallTargetTask(final Project project, final AtomicBoolean hangWhileFlag,
-            final CyclicBarrier hangBarrier, final AtomicReference<Throwable> failureCause)
+    public HangingMockCallTargetTask(final Project project, final CyclicBarrier hangBarrier,
+            final AtomicReference<Throwable> failureCause)
     {
         super(project);
-        flag = hangWhileFlag;
+        flag = new AtomicBoolean(true);
         this.hangBarrier = hangBarrier;
         this.failureCause = failureCause;
     }
