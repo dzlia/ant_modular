@@ -32,6 +32,15 @@ public class ModuleRegistry
     private final HashMap<String, Object> modules; // values are either ModuleInfo instances of 'moduleNotLoaded'
     private final ModuleLoader moduleLoader;
     
+    /**
+     * <p>Creates an instance of {@code ModuleRegistry} that uses given {@link ModuleLoader}
+     * to obtain module metadata.</p>
+     * 
+     * @param moduleLoader the {@code ModuleLoader} to be used by the {@code ModuleRegistry}
+     *      created. It must not be {@code null}.
+     * 
+     * @throws NullPointerException if <em>moduleLoader</em> is {@code null}.
+     */
     public ModuleRegistry(final ModuleLoader moduleLoader)
     {
         if (moduleLoader == null) {
@@ -41,6 +50,35 @@ public class ModuleRegistry
         this.modules = new HashMap<String, Object>();
     }
     
+    /**
+     * <p>Returns a {@link Module} that is associated with a given module path, or throws
+     * {@link ModuleNotLoadedException} if no module is associated with this path or if the
+     * module metadata cannot be loaded. If {@code resolveModule(String)} is invoked with paths
+     * that correspond to the same module then the same {@code Module} instance is returned for
+     * these invocations. The path that is assigned to the {@code Module} returned is a
+     * normalised path, which could be different from the given path.</p>
+     * 
+     * <p>The {@code ModuleLoader} this {@code ModuleRegistry} was created with is used to
+     * load module metadata. The metadata (in form of {@link ModuleInfo}) loaded is converted
+     * to a {@code Module} object. In particular, the dependency paths defined in the
+     * {@code ModuleInfo} are converted into correspondent {@code Module} instances by
+     * resolving them with this {@code ModuleRegistry}, and the attributes are copied with
+     * no transformation.</p>
+     * 
+     * <p>For each given normalised path {@link ModuleLoader#loadModule(String)} is invoked
+     * at most once.</p>
+     * 
+     * @param path the path of the module to be resolved. It must not be {@code null}.
+     *      The module path is normalised, so the path of the module returned could
+     *      differ from this path.
+     * 
+     * @return the {@code Module} object that corresponds to the given path.
+     *      It is never {@code null}.
+     * 
+     * @throws NullPointerException if <em>path</em> is {@code null}.
+     * @throws ModuleNotLoadedException if there is no module associated with the given path
+     *      or if the module metadata cannot be loaded.
+     */
     public Module resolveModule(final String path) throws ModuleNotLoadedException
     {
         if (path == null) {
