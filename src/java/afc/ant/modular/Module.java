@@ -217,7 +217,8 @@ public final class Module
      * and {@link #setAttributes(Map)} operations is immediately visible in the map returned.</p>
      * 
      * <p>The map returned is thread-safe. However it is necessary to synchronise on this map
-     * to ensure that a bulk operation on the map is atomic. For instance:
+     * to ensure that a bulk operation on the map is atomic. For instance:</p>
+     * 
      * <pre>
      * final Module module = getModule();
      * final Map&lt;String, Object&gt; attribs = module.getAttributes();
@@ -233,7 +234,8 @@ public final class Module
      *         }
      *     }
      * }</pre>
-     * Failure to follow this rule may lead to non-deterministic behaviour.</p>
+     * 
+     * <p>Failure to follow this rule may lead to non-deterministic behaviour.</p>
      * 
      * @return a thread-safe and unmodifiable map of this {@code Module}'s attributes.
      */
