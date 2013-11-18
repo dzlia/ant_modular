@@ -36,7 +36,7 @@ import java.util.HashMap;
  * <p>Guarantees provided by {@code ModuleRegistry}:</p>
  * <ul>
  *  <li>{@code ModuleRegistry} is not thread-safe</li>
- *  <li>for each module path (after it is normalised) {@code ModuleLoader#loadModule(String)}
+ *  <li>for each module path (after it is normalised) {@link ModuleLoader#loadModule(String)}
  *      is invoked at most once</li>
  *  <li>each module path is associated with at most a single {@code Module} instance</li>
  *  <li>the module's dependee modules are assigned to this {@code Module} instance before
