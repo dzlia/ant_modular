@@ -324,19 +324,22 @@ public class CallTargetForModules extends Task
      * task. The name of the nested element is defined by the name of the Ant type used to pass
      * this instance of {@code ModuleLoader}.</p>
      * 
-     * @param loader the {@code ModuleLoader} instance to be used by this
-     *      {@code <callTargetForModules>} task. If {@code null} is passed then
-     *      this call is ignored.
+     * @param moduleLoader the {@code ModuleLoader} instance to be used by this
+     *      {@code <callTargetForModules>} task. {@code null} value is not allowed.
      * 
      * @throws BuildException if more than one {@code ModuleLoader} is defined for this
      *      {@code <callTargetForModules>} task.
+     * @throws NullPointerException if <em>moduleLoader</em> is {@code null}.
      */
-    public void addConfigured(final ModuleLoader loader)
+    public void addConfigured(final ModuleLoader moduleLoader)
     {
-        if (moduleLoader != null) {
+        if (moduleLoader == null) {
+            throw new NullPointerException("moduleLoader");
+        }
+        if (this.moduleLoader != null) {
             throw new BuildException("Only a single module loader element is allowed.");
         }
-        moduleLoader = loader;
+        this.moduleLoader = moduleLoader;
     }
     
     public void setThreadCount(final int threadCount)

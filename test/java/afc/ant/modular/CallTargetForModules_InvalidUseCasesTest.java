@@ -334,4 +334,31 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
             assertEquals("Invalid thread count: '-1'. It must be a positive value.", ex.getMessage());
         }
     }
+    
+    /**
+     * <p>Tests that {@code NullPointerException} is thrown if {@code null} module loader is passed
+     * to {@code CallTargetForModules}.</p>
+     */
+    public void testNullModuleLoaderIsPassed()
+    {
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        
+        try {
+            task.addConfigured(null);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("moduleLoader", ex.getMessage());
+        }
+    }
 }
