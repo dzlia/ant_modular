@@ -304,6 +304,13 @@ public class CallTargetForModules extends Task
         }
     }
     
+    /**
+     * <p>Creates a new {@link ModuleElement} container that backs the nested element
+     * {@code <module>} of this {@code <callTargetForModules>} task. Multiple nested
+     * {@code <module>} elements are allowed.</p>
+     * 
+     * @return the {@code ModuleElement} container created. It is never {@code null}.
+     */
     public ModuleElement createModule()
     {
         final ModuleElement module = new ModuleElement();
@@ -311,6 +318,19 @@ public class CallTargetForModules extends Task
         return module;
     }
     
+    /**
+     * <p>Sets a {@link ModuleLoader} that is to be used by this {@code <callTargetForModules>}
+     * task. One and only one module loader must be defined for a {@code <callTargetForModules>}
+     * task. The name of the nested element is defined by the name of the Ant type used to pass
+     * this instance of {@code ModuleLoader}.</p>
+     * 
+     * @param loader the {@code ModuleLoader} instance to be used by this
+     *      {@code <callTargetForModules>} task. If {@code null} is passed then
+     *      this call is ignored.
+     * 
+     * @throws BuildException if more than one {@code ModuleLoader} is defined for this
+     *      {@code <callTargetForModules>} task.
+     */
     public void addConfigured(final ModuleLoader loader)
     {
         if (moduleLoader != null) {
