@@ -25,6 +25,26 @@ package afc.ant.modular;
 import java.text.MessageFormat;
 import java.util.HashMap;
 
+/**
+ * <p>Manages {@link Module} instances in scope of a single {@link CallTargetForModules}
+ * task. In particular, it allows the client to get a {@code Module} instance that
+ * corresponds to a given module path, and this instance is the same for all such invocations
+ * (see {@link #resolveModule(String)}). Metadata for each {@code Module} is loaded by a
+ * {@link ModuleLoader} with which the {@code ModuleRegistry} is created. Module's dependee
+ * modules are loaded by the {@code ModuleRegistry} itself.</p>
+ * 
+ * <p>Guarantees provided by {@code ModuleRegistry}:</p>
+ * <ul>
+ *  <li>{@code ModuleRegistry} is not thread-safe</li>
+ *  <li>for each module path (after it is normalised) {@code ModuleLoader#loadModule(String)}
+ *      is invoked at most once</li>
+ *  <li>each module path is associated with at most a single {@code Module} instance</li>
+ *  <li>the module's dependee modules are assigned to this {@code Module} instance before
+ *      it is returned outside {@code ModuleRegistry}</li>
+ * </ul>
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
 public class ModuleRegistry
 {
     private static final Object moduleNotLoaded = new Object();
