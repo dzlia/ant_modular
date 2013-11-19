@@ -4,14 +4,16 @@ Ant Modular
 Ant tasks that allow you to build multi-module applications with ease.
 
 Why to use Ant Modular? Why not to use Maven/Gradle/Ivy instead?
-------------------------------------------
+----------------------------------------------------------------
 
 ### Why Ant Modular?
 
 Ant Modular solves a single task of resolving dependencies between modules. It does not force
 you to create build scripts in one way or another. All the freedom of choice Ant provides is still there.
-With Ant modular you are free to choose the structure of module that fits your specific project/environment.
-In addition, you can migrate the existing Ant-based project to use Ant modular with little effort.
+With Ant Modular you are free to choose the structure of a module that fits your specific project/environment.
+In addition, you can migrate the existing Ant-based project to use Ant Modular with little effort, and,
+last but not least, improve performance of your build by using the parallel module building feature
+provided with Ant Modular.
 
 ### Why not Maven?
 
