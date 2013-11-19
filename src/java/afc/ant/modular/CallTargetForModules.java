@@ -56,6 +56,7 @@ public class CallTargetForModules extends Task
     private boolean inheritAll = true;
     private boolean inheritRefs = false;
     
+    // The number of threads used to build modules.
     private int threadCount = 1;
     
     @Override
@@ -342,6 +343,22 @@ public class CallTargetForModules extends Task
         this.moduleLoader = moduleLoader;
     }
     
+    /**
+     * <p>Sets the number of threads to be used by this {@code <callTargetForModules>}
+     * task to build independent modules in parallel. If <em>1</em> is passed then
+     * modules are built sequentally. By default, the number of threads used is
+     * <em>1</em>.</p>
+     * 
+     * <p>This setter is accessible via the attribute {@code threadCount} of this
+     * {@code <callTargetForModules>} task.</p>
+     * 
+     * @param threadCount the number of threads to be set. It must be a positive value.
+     * 
+     * @throws BuildException if <em>threadCount</em> is non-positive.
+     * 
+     * @see SerialDependencyResolver
+     * @see ParallelDependencyResolver
+     */
     public void setThreadCount(final int threadCount)
     {
         if (threadCount <= 0) {
