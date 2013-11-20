@@ -59,6 +59,8 @@ public class MockCallTargetTask extends CallTarget
     {
         setProject(project);
         ownProject = new MockProject();
+        // The target project inherits basedir from the invoker's project.
+        ownProject.setBaseDir(project.getBaseDir());
     }
     
     @Override

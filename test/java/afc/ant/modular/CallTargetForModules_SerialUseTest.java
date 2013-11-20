@@ -2264,4 +2264,40 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         assertFalse(task2.executed);
         assertFalse(task3.executed);
     }
+    
+    /**
+     * <p>Tests that the {@code <param>} elements of the task {@code <callTargetForModules}
+     * which are configured with paths resolve resources correctly if the project basedir
+     * is set non-default.</p>
+     */
+    public void testSerialRun_SingleModule_ParamsLoadedFromResource_NonDefaultProjectBasedir()
+    {
+        project.setBaseDir(new File("test/data/"));
+        
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement param1 = task.createParam();
+        param1.setResource("/params_for_test.properties");
+        final Path path1 = param1.createClasspath();
+        path1.setPath("CallTargetForModules/");
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
+        
+        task.perform();
+        
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
+    }
 }
