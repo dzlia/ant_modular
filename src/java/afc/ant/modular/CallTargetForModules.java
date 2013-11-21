@@ -110,6 +110,12 @@ public class CallTargetForModules extends Task
                 }
             }
             
+            /* Params that define the property with the name equal to the moduleProperty value
+             * (if the latter is set) must be removed so that moduleProperty overrides them
+             * in module-specific projects.
+             */
+            deleteModulePropertyParams();
+            
             if (threadCount == 1) {
                 processModulesSerial(modules, overriddenTargets);
             } else {
@@ -129,6 +135,9 @@ public class CallTargetForModules extends Task
         final CallTarget antcall = (CallTarget) getProject().createTask("antcall");
         antcall.init();
         
+        /* moduleProperty is expected to override properties with the same name
+         * defined in params. That's why it goes first.
+         */
         if (moduleProperty != null) {
             final Property moduleParam = antcall.createParam();
             moduleParam.setName(moduleProperty);
@@ -169,6 +178,20 @@ public class CallTargetForModules extends Task
         }
         
         return ex;
+    }
+    
+    // Removes all params which define a property with the name equal to what is set to moduleProperty.
+    private void deleteModulePropertyParams()
+    {
+        if (moduleProperty == null || moduleProperty.length() == 0) {
+            return;
+        }
+        for (int i = params.size() - 1; i >= 0; --i) {
+            final String paramName = params.get(i).name;
+            if (paramName != null && moduleProperty.equals(paramName)) {
+                params.remove(i);
+            }
+        }
     }
     
     private void processModulesSerial(final ArrayList<Module> modules,

@@ -2300,4 +2300,80 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
+    
+    /**
+     * <p>Tests that {@code moduleProperty} overrides {@code <param>} elements if both define
+     * property with the same name.</p>
+     */
+    public void testThatModulePropertyOverridesParamElements()
+    {
+        project.setBaseDir(new File("test/data/"));
+        
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("moduleProp");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        final ParamElement p = task.createParam();
+        p.setName("moduleProp");
+        p.setValue("val");
+        
+        final ParamElement param1 = task.createParam();
+        param1.setResource("/params_for_test.properties");
+        final Path path1 = param1.createClasspath();
+        path1.setPath("CallTargetForModules/");
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
+        
+        task.perform();
+        
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+                TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
+    }
+    
+    /**
+     * <p>Tests that {@code moduleProperty} overrides {@code <param>} elements' properties
+     * read from a file if both define property with the same name.</p>
+     */
+    public void testThatModulePropertyOverridesParamElementsReadFromFile()
+    {
+        project.setBaseDir(new File("test/data/"));
+        
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("qwerty");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        task.createParam().setFile(new File("test/data/CallTargetForModules/params_for_test.properties"));
+        
+        final ParamElement param1 = task.createParam();
+        param1.setResource("/params_for_test.properties");
+        final Path path1 = param1.createClasspath();
+        path1.setPath("CallTargetForModules/");
+        
+        project.setProperty("123", "456");
+        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
+        
+        task.perform();
+        
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "qwerty", moduleInfo,
+                TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456"));
+    }
 }
