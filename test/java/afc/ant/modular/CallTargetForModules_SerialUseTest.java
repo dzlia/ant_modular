@@ -2376,4 +2376,34 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "qwerty", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456"));
     }
+    
+    /**
+     * <p>Tests that an empty string passed to
+     * {@link CallTargetForModules#setModuleProperty(String)} is considered
+     * a defined property.</p>
+     */
+    public void testThatEmptyModulePropertyIsConsideredADefinedProperty()
+    {
+        project.setBaseDir(new File("test/data/"));
+        
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        moduleInfo.addAttribute("1", "2");
+        moduleLoader.modules.put("foo/", moduleInfo);
+        
+        final MockCallTargetTask task1 = new MockCallTargetTask(project);
+        project.tasks.add(task1);
+        
+        task.init();
+        task.setTarget("testTarget");
+        task.setModuleProperty("");
+        task.createModule().setPath("foo");
+        task.addConfigured(moduleLoader);
+        
+        project.setProperty("123", "456");
+        
+        task.perform();
+        
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "", moduleInfo,
+                Collections.<String, Object>singletonMap("123", "456"));
+    }
 }

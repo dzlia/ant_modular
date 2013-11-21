@@ -183,7 +183,7 @@ public class CallTargetForModules extends Task
     // Removes all params which define a property with the name equal to what is set to moduleProperty.
     private void deleteModulePropertyParams()
     {
-        if (moduleProperty == null || moduleProperty.length() == 0) {
+        if (moduleProperty == null) {
             return;
         }
         for (int i = params.size() - 1; i >= 0; --i) {
@@ -407,6 +407,7 @@ public class CallTargetForModules extends Task
      * attributes (which is possible if two modules are linked one to the other).</p>
      * 
      * @param propertyName the name of the property to set {@code Module} instances to.
+     *      An empty string is considered a defined property.
      * 
      * @see Module
      * @see GetModuleAttribute
