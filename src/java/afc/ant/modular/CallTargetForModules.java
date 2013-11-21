@@ -434,16 +434,18 @@ public class CallTargetForModules extends Task
     }
     
     /**
-     * <p>Creates a new {@link ParamElement} container that backs the nested element
-     * {@code <param>} of this {@code <callTargetForModules>} task. Multiple nested
-     * {@code <param>} elements are allowed.</p>
+     * <p>Creates a new {@link ParamElement ParamElement} container that backs the nested
+     * element {@code <param>} of this {@code <callTargetForModules>} task. Multiple
+     * nested {@code <param>} elements are allowed.</p>
      * 
      * <p>This element represents a property set that is passed to the Ant project
      * created for each module or any project created in that project regardless of what
-     * is set to {@code inheritAll}. This property set overrides the properties with the
-     * same name defined in the project it is passed to. However, it does not override
-     * the user-defined properties with the same name. This allows you to parameterise
-     * targets that are invoked for modules.</p>
+     * is set to {@link #setInheritAll(boolean) inheritAll}. This property set overrides the
+     * properties with the same name defined in the project it is passed to. However, it does
+     * not override the user-defined properties with the same name. Nor it overrides the
+     * property defined by the attribute {@link #setModuleProperty(String) moduleProperty}.</p>
+     * 
+     * <p>This allows you to parameterise targets that are invoked for modules.</p>
      * 
      * @return the {@code ParamElement} created. It is never {@code null}.
      */
