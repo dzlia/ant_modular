@@ -369,6 +369,27 @@ public class CallTargetForModules extends Task
         this.threadCount = threadCount;
     }
     
+    /**
+     * <p>Sets the name of the Ant property in a module-specific project that is assigned
+     * with the {@link Module} instance that is associated with this module. If it is not
+     * set then the {@code Module} is not passed to that project. This property value overrides
+     * the property with the same name passed with {@link #createParam() &lt;param&gt;} elements.
+     * If the property with the same name is defined in the caller project or in the module
+     * project then it is overridden regardless of what is set to the
+     * {@link #setInheritAll(boolean) inheritAll} attribute. However, the user-defined property
+     * with the same name is not overridden.</p>
+     * 
+     * <p>It is used to extract module metadata in module-specific Ant projects. In addition,
+     * it could be used to pass information between module-specific projects via module
+     * attributes (which is possible if two modules are linked one to the other).</p>
+     * 
+     * @param propertyName the name of the property to set {@code Module} instances to.
+     * 
+     * @see Module
+     * @see GetModuleAttribute
+     * @see GetModulePath
+     * @see GetModuleClasspath
+     */
     public void setModuleProperty(final String propertyName)
     {
         moduleProperty = propertyName;
