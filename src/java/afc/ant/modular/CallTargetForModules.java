@@ -329,11 +329,17 @@ public class CallTargetForModules extends Task
     }
     
     /**
-     * <p>Creates a new {@link ModuleElement} container that backs the nested element
-     * {@code <module>} of this {@code <callTargetForModules>} task. Multiple nested
-     * {@code <module>} elements are allowed.</p>
+     * <p>Creates a new {@link ModuleElement ModuleElement} container that backs the
+     * nested element {@code <module>} of this {@code <callTargetForModules>} task.
+     * The module it refers to will be built by this {@code <callTargetForModules>} along
+     * with all modules it depends upon (directly or indirectly).</p>
+     * 
+     * <p>At least one {@code <module>} element must be specified. Otherwise the build
+     * process fails.</p>
      * 
      * @return the {@code ModuleElement} created. It is never {@code null}.
+     * 
+     * @see #setTarget(String)
      */
     public ModuleElement createModule()
     {
