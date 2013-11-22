@@ -419,6 +419,21 @@ public class CallTargetForModules extends Task
         moduleProperty = propertyName;
     }
     
+    /**
+     * <p>Sets the name of the target to be invoked by this {@code <callTargetForModules>}
+     * for modules involved in the build process by default. The target is expected to be
+     * defined in the current Ant project. If at least one module uses this target and the
+     * target itself is undefined in the current Ant project then the build fails.</p>
+     * 
+     * <p>A non-default target could be defined for a module by means of the attribute
+     * {@link ModuleElement#setTarget(String) target} of the nested element
+     * {@link #createModule() &lt;module&gt;}. </p>
+     * 
+     * <p>The attribute {@code target} is required. It must be defined even if all modules
+     * involved have custom targets.</p>
+     * 
+     * @param target the name of the target to invoke for modules by default.
+     */
     public void setTarget(final String target)
     {
         this.target = target;
