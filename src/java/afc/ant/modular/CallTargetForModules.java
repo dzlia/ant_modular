@@ -515,7 +515,6 @@ public class CallTargetForModules extends Task
      * </tbody>
      * </table>
      */
-    // TODO support defining modules using regular expressions
     public static class ModuleElement
     {
         private String path;
