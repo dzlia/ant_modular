@@ -59,6 +59,13 @@ public class CallTargetForModules extends Task
     // The number of threads used to build modules.
     private int threadCount = 1;
     
+    /**
+     * <p>Executes this {@code <callTargetForModules>} task. See the
+     * {@link CallTargetForModules class description} for the details.</p>
+     * 
+     * @throws BuildException if this task is configured incorrectly or
+     *      if the build of some module involved fails.
+     */
     @Override
     public void execute() throws BuildException
     {
