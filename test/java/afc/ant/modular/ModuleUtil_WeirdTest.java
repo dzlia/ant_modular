@@ -150,6 +150,66 @@ public class ModuleUtil_WeirdTest extends TestCase
         }
     }
     
+    /**
+     * <p>Tests that {@link ClassCastException} is thrown if a {@link Module} instance is passed
+     * whose {@code #getPath()} member function does not return {@link String}.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
+    public void testGetPath_WrongReturnType() throws Exception
+    {
+        final Object wrongModule = createModuleWithDifferentClassLoader(
+                "test/data/ModuleUtil/Module_wrong_types.class");
+        
+        try {
+            ModuleUtil.getPath(wrongModule);
+            fail();
+        }
+        catch (ClassCastException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * <p>Tests that {@link ClassCastException} is thrown if a {@link Module} instance is passed
+     * whose {@code #getDependencies()} member function does not return {@link java.util.Set}.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
+    public void testGetDependencies_WrongReturnType() throws Exception
+    {
+        final Object wrongModule = createModuleWithDifferentClassLoader(
+                "test/data/ModuleUtil/Module_wrong_types.class");
+        
+        try {
+            ModuleUtil.getDependencies(wrongModule);
+            fail();
+        }
+        catch (ClassCastException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * <p>Tests that {@link ClassCastException} is thrown if a {@link Module} instance is passed
+     * whose {@code #getDependencies()} member function does not return {@link java.util.Map}.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
+    public void testGetAttributes_WrongReturnType() throws Exception
+    {
+        final Object wrongModule = createModuleWithDifferentClassLoader(
+                "test/data/ModuleUtil/Module_wrong_types.class");
+        
+        try {
+            ModuleUtil.getAttributes(wrongModule);
+            fail();
+        }
+        catch (ClassCastException ex) {
+            // expected
+        }
+    }
+    
     private static Object createModuleWithDifferentClassLoader(final String pathToModuleClass) throws Exception
     {
         final Class<?> c = new ModuleClassLoader(pathToModuleClass).loadClass(Module.class.getName());

@@ -93,6 +93,8 @@ public class ModuleUtil
      * 
      * @throws NullPointerException if <em>module</em> is {@code null}.
      * @throws IllegalArgumentException if <em>module</em>'s class is not {@code Module}.
+     * @throws ClassCastException if <em>module</em>'s property {@code path} is not
+     *      an instance of {@link String}.
      * @throws BuildException if invocation of {@code module.getPath()} did not succeed.
      * 
      * @see #isModule(Object)
@@ -125,6 +127,8 @@ public class ModuleUtil
      * 
      * @throws NullPointerException if <em>module</em> is {@code null}.
      * @throws IllegalArgumentException if <em>module</em>'s class is not {@code Module}.
+     * @throws ClassCastException if <em>module</em>'s property {@code dependencies} is not
+     *      an instance of {@link Set}.
      * @throws BuildException if invocation of {@code module.getPath()} did not succeed.
      * 
      * @see #isModule(Object)
@@ -161,6 +165,8 @@ public class ModuleUtil
      * 
      * @throws NullPointerException if <em>module</em> is {@code null}.
      * @throws IllegalArgumentException if <em>module</em>'s class is not {@code Module}.
+     * @throws ClassCastException if <em>module</em>'s property {@code attributes} is not
+     *      an instance of {@link Map}.
      * @throws BuildException if invocation of {@code module.getPath()} did not succeed.
      * 
      * @see #isModule(Object)
@@ -170,7 +176,9 @@ public class ModuleUtil
     public static Map<String, Object> getAttributes(final Object module)
     {
         validateModule(module);
-        return (Map<String, Object>) callFunction(module, "getAttributes");
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> attribs = (Map<String, Object>) callFunction(module, "getAttributes");
+        return attribs;
     }
     
     private static void validateModule(final Object module)
