@@ -28,8 +28,21 @@ import org.apache.tools.ant.BuildException;
 
 import junit.framework.TestCase;
 
+/**
+ * <p>Contains unit tests for {@link ModuleUtil} that verify its behaviour when invalid
+ * {@link Module} objects are passed to its functions.</p>
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
 public class ModuleUtil_WeirdTest extends TestCase
 {
+    /**
+     * <p>Tests that a {@link BuildException} is thrown by {@link ModuleUtil#getPath(Object)}
+     * if a {@link Module} instance is passed that does not have the member function
+     * {@code #getPath()}.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
     public void testGetPath_NoSuchMethod() throws Exception
     {
         final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_empty.class");
@@ -43,6 +56,13 @@ public class ModuleUtil_WeirdTest extends TestCase
         }
     }
     
+    /**
+     * <p>Tests that a {@link BuildException} is thrown by {@link ModuleUtil#getDependencies(Object)}
+     * if a {@link Module} instance is passed that does not have the member function
+     * {@code #getDependencies()}.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
     public void testGetDependencies_NoSuchMethod() throws Exception
     {
         final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_empty.class");
@@ -56,6 +76,13 @@ public class ModuleUtil_WeirdTest extends TestCase
         }
     }
     
+    /**
+     * <p>Tests that a {@link BuildException} is thrown by {@link ModuleUtil#getAttributes(Object)}
+     * if a {@link Module} instance is passed that does not have the member function
+     * {@code #getAttributes()}.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
     public void testGetAttributes_NoSuchMethod() throws Exception
     {
         final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_empty.class");
@@ -69,6 +96,13 @@ public class ModuleUtil_WeirdTest extends TestCase
         }
     }
     
+    /**
+     * <p>Tests that a {@link BuildException} is thrown by {@link ModuleUtil#getPath(Object)}
+     * if a {@link Module} instance is passed whose {@code #getPath()} member function is private
+     * thus not invocable outside.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
     public void testGetPath_PrivateFunction() throws Exception
     {
         final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_private.class");
@@ -82,6 +116,13 @@ public class ModuleUtil_WeirdTest extends TestCase
         }
     }
     
+    /**
+     * <p>Tests that a {@link BuildException} is thrown by {@link ModuleUtil#getDependencies(Object)}
+     * if a {@link Module} instance is passed whose {@code #getDependencies()} member function is
+     * private thus not invocable outside.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
     public void testGetDependencies_PrivateFunction() throws Exception
     {
         final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_private.class");
@@ -95,6 +136,13 @@ public class ModuleUtil_WeirdTest extends TestCase
         }
     }
     
+    /**
+     * <p>Tests that a {@link BuildException} is thrown by {@link ModuleUtil#getAttributes(Object)}
+     * if a {@link Module} instance is passed whose {@code #getAttributes()} member function is
+     * private thus not invocable outside.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
     public void testGetAttributes_PrivateFunction() throws Exception
     {
         final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_private.class");
@@ -108,6 +156,12 @@ public class ModuleUtil_WeirdTest extends TestCase
         }
     }
     
+    /**
+     * <p>Tests that a {@link BuildException} is thrown by {@link ModuleUtil#getPath(Object)}
+     * if {@link Module#getPath()} throws an exception.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
     public void testGetPath_FunctionThrowsException() throws Exception
     {
         final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_exception.class");
@@ -122,6 +176,12 @@ public class ModuleUtil_WeirdTest extends TestCase
         }
     }
     
+    /**
+     * <p>Tests that a {@link BuildException} is thrown by {@link ModuleUtil#getDependencies(Object)}
+     * if {@link Module#getDependencies()} throws an exception.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
     public void testGetDependencies_FunctionThrowsException() throws Exception
     {
         final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_exception.class");
@@ -136,6 +196,12 @@ public class ModuleUtil_WeirdTest extends TestCase
         }
     }
     
+    /**
+     * <p>Tests that a {@link BuildException} is thrown by {@link ModuleUtil#getAttributes(Object)}
+     * if {@link Module#getAttributes()} throws an exception.</p>
+     * 
+     * @throws Exception if this test fails with an exception.
+     */
     public void testGetAttributes_FunctionThrowsException() throws Exception
     {
         final Object wrongModule = createModuleWithDifferentClassLoader("test/data/ModuleUtil/Module_exception.class");
@@ -151,8 +217,9 @@ public class ModuleUtil_WeirdTest extends TestCase
     }
     
     /**
-     * <p>Tests that {@link ClassCastException} is thrown if a {@link Module} instance is passed
-     * whose {@code #getPath()} member function does not return {@link String}.</p>
+     * <p>Tests that a {@link ClassCastException} is thrown by {@link ModuleUtil#getPath(Object)}
+     * if a {@link Module} instance is passed whose {@code #getPath()} member function does not
+     * return {@link String}.</p>
      * 
      * @throws Exception if this test fails with an exception.
      */
@@ -171,8 +238,9 @@ public class ModuleUtil_WeirdTest extends TestCase
     }
     
     /**
-     * <p>Tests that {@link ClassCastException} is thrown if a {@link Module} instance is passed
-     * whose {@code #getDependencies()} member function does not return {@link java.util.Set}.</p>
+     * <p>Tests that a {@link ClassCastException} is thrown by {@link ModuleUtil#getDependencies(Object)}
+     * if a {@link Module} instance is passed whose {@code #getDependencies()} member function does not
+     * return {@link java.util.Set}.</p>
      * 
      * @throws Exception if this test fails with an exception.
      */
@@ -191,8 +259,9 @@ public class ModuleUtil_WeirdTest extends TestCase
     }
     
     /**
-     * <p>Tests that {@link ClassCastException} is thrown if a {@link Module} instance is passed
-     * whose {@code #getDependencies()} member function does not return {@link java.util.Map}.</p>
+     * <p>Tests that a {@link ClassCastException} is thrown by {@link ModuleUtil#getAttributes(Object)}
+     * if a {@link Module} instance is passed whose {@code #getDependencies()} member function does not
+     * return {@link java.util.Map}.</p>
      * 
      * @throws Exception if this test fails with an exception.
      */
