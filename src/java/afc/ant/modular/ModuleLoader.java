@@ -31,7 +31,7 @@ package afc.ant.modular;
  *  <li>the module path is stored in the {@link ModuleInfo#getPath() path} property</li>
  *  <li>the module dependee modules are stored as their paths in the
  *      {@link ModuleInfo#getDependencies() dependencies} property. These paths are
- *      not required to be the normalised paths</li>
+ *      not required to be the {@link #normalisePath(String) normalised paths}</li>
  *  <li>for the sake of inter-operability, it is recommended (though not required)
  *      that the module classpath attributes are stored as
  *      {@code org.apache.tools.ant.types.Path} objects</li>
@@ -51,18 +51,38 @@ package afc.ant.modular;
 public interface ModuleLoader
 {
     /**
-     * <p>Loads metadata of the module with a given path. If the module metadata cannot be
-     * loaded then a {@link ModuleNotLoadedException} is thrown.</p>
+     * <p>Loads metadata of the module with a given path, not necessarily normalised.
+     * If the module metadata cannot be loaded then a {@link ModuleNotLoadedException}
+     * is thrown.</p>
      * 
      * @param path the module path. It is a path relative to the directory that is the root
-     *      for all modules (generally an Ant project base directory).
-     *      It must not be {@code null}.
+     *      for all modules (generally an Ant project base directory). This path is allowed
+     *      to be a non-normalised module path but must not be {@code null}.
      * 
      * @return a {@link afc.ant.modular.ModuleInfo} object that is initialised
-     *      with the module path, dependencies and attributes. It is never {@code null}.
+     *      with the module path, dependencies and attributes. It is never {@code null}
+     *      and is initialised with the {@link #normalisePath(String)
+     *      normalised module path}.
      * 
      * @throws NullPointerException if <em>path</em> is {@code null}.
      * @throws ModuleNotLoadedException if the module meta information cannot be loaded.
      */
     ModuleInfo loadModule(String path) throws ModuleNotLoadedException;
+    
+    /**
+     * <p>Returns the normalised path that corresponds to a given module path. Each module
+     * path has exactly one normalised path, even if the module with this path does not
+     * exist. Moreover, all paths that point to the same module w.r.t. this
+     * {@code ModuleLoader} have the same normalised path.</p>
+     * 
+     * <p>Each implementation of {@link #loadModule(String)} should use this function
+     * to get the module path to be used to load the module requested.</p>
+     * 
+     * @param path the module path to be normalised. It must not be {@code null}.
+     * 
+     * @return the normalised path the corresponds to the given module path.
+     * 
+     * @throws NullPointerException if <em>path</em> is {@code null}.
+     */
+    String normalisePath(String path);
 }

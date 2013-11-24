@@ -41,4 +41,9 @@ public class MockModuleLoader implements ModuleLoader
         return (ModuleInfo) val;
     }
 
+    public String normalisePath(final String path)
+    {
+        Assert.assertNotNull(path);
+        return ModuleInfo.normalisePath(path);
+    }
 }

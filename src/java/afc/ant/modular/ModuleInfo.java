@@ -234,6 +234,7 @@ public final class ModuleInfo
         return attributesView;
     }
     
+    // TODO remove this since ModuleLoader#normalisePath(String) is introduced.
     static String normalisePath(final String path)
     {
         if (path.length() == 0) {

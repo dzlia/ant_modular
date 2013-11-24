@@ -49,6 +49,12 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
     
     private final ArrayList<ClasspathAttribute> classpathAttributes = new ArrayList<ClasspathAttribute>();
     
+    public String normalisePath(final String path)
+    {
+        // TODO implement normalisation properly.
+        return ModuleInfo.normalisePath(path);
+    }
+    
     public ModuleInfo loadModule(final String path) throws ModuleNotLoadedException
     {
         final Attributes attributes = readManifestBuildSection(path);

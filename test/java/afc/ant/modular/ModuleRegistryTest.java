@@ -486,5 +486,11 @@ public class ModuleRegistryTest extends TestCase
             }
             return (ModuleInfo) result;
         }
+        
+        public String normalisePath(final String path)
+        {
+            assertNotNull(path);
+            return ModuleInfo.normalisePath(path);
+        }
     }
 }

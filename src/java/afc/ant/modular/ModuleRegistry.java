@@ -105,7 +105,7 @@ public class ModuleRegistry
             throw new NullPointerException("path");
         }
         
-        final String normalisedPath = ModuleInfo.normalisePath(path);
+        final String normalisedPath = moduleLoader.normalisePath(path);
         final Object cachedModule = modules.get(normalisedPath);
         if (cachedModule == moduleNotLoaded) {
             throw new ModuleNotLoadedException(normalisedPath);
