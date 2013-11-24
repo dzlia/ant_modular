@@ -73,7 +73,8 @@ public interface ModuleLoader
      * <p>Returns the normalised path that corresponds to a given module path. Each module
      * path has exactly one normalised path, even if the module with this path does not
      * exist. Moreover, all paths that point to the same module w.r.t. this
-     * {@code ModuleLoader} have the same normalised path.</p>
+     * {@code ModuleLoader} have the same normalised path. A normalised path must not
+     * be {@code null}.</p>
      * 
      * <p>Each implementation of {@link #loadModule(String)} should use this function
      * to get the module path to be used to load the module requested.</p>
@@ -81,6 +82,7 @@ public interface ModuleLoader
      * @param path the module path to be normalised. It must not be {@code null}.
      * 
      * @return the normalised path the corresponds to the given module path.
+     *      It is never {@code null}.
      * 
      * @throws NullPointerException if <em>path</em> is {@code null}.
      */
