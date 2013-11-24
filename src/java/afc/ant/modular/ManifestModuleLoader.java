@@ -57,8 +57,10 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
     
     public ModuleInfo loadModule(final String path) throws ModuleNotLoadedException
     {
-        final Attributes attributes = readManifestBuildSection(path);
-        final ModuleInfo moduleInfo = new ModuleInfo(path);
+        final String normalisedPath = normalisePath(path);
+        final Attributes attributes = readManifestBuildSection(normalisedPath);
+        // TODO Test that the normalised path is assigned to ModuleInfo instances.
+        final ModuleInfo moduleInfo = new ModuleInfo(normalisedPath);
         
         addDependencies(attributes, moduleInfo);
         addClasspathAttributes(attributes, moduleInfo);
