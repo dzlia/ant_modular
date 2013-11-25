@@ -51,8 +51,7 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
     
     public String normalisePath(final String path)
     {
-        // TODO implement normalisation properly.
-        return ModuleInfo.normalisePath(path);
+        return ModuleUtil.normalisePath(path, getProject().getBaseDir());
     }
     
     public ModuleInfo loadModule(final String path) throws ModuleNotLoadedException
