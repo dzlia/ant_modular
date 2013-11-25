@@ -34,30 +34,30 @@ import junit.framework.TestCase;
 
 public class ModuleRegistryTest extends TestCase
 {
-    private MockModuleLoader loader;
+    private MockModuleLoader moduleLoader;
     private ModuleRegistry registry;
     
     @Override
     protected void setUp()
     {
-        loader = new MockModuleLoader();
-        registry = new ModuleRegistry(loader);
+        moduleLoader = new MockModuleLoader();
+        registry = new ModuleRegistry(moduleLoader);
     }
     
     @Override
     protected void tearDown()
     {
         registry = null;
-        loader = null;
+        moduleLoader = null;
     }
     
     public void testCreateSingleModuleWithADependency_NoAttributes() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("foo");
-        final ModuleInfo dep = new ModuleInfo("bar");
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
+        final ModuleInfo dep = new ModuleInfo("bar", moduleLoader);
         module.addDependency("bar");
-        loader.results.put("foo/", module);
-        loader.results.put("bar/", dep);
+        moduleLoader.results.put("foo/", module);
+        moduleLoader.results.put("bar/", dep);
         
         final Module m1 = registry.resolveModule("foo");
         final Module m2 = registry.resolveModule("bar/");
@@ -67,21 +67,21 @@ public class ModuleRegistryTest extends TestCase
         
         assertSame(m1, registry.resolveModule("foo"));
         
-        assertEquals(2, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(loader.paths));
+        assertEquals(2, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(moduleLoader.paths));
     }
     
     public void testCreateSingleModuleWithADependency_WithAttributes() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("foo");
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
         module.addAttribute("1", "2");
         module.addAttribute("3", "4");
-        final ModuleInfo dep = new ModuleInfo("bar");
+        final ModuleInfo dep = new ModuleInfo("bar", moduleLoader);
         final Object val = new Object();
         dep.addAttribute("5", val);
         module.addDependency("bar");
-        loader.results.put("foo/", module);
-        loader.results.put("bar/", dep);
+        moduleLoader.results.put("foo/", module);
+        moduleLoader.results.put("bar/", dep);
         
         final Module m1 = registry.resolveModule("foo");
         final Module m2 = registry.resolveModule("bar");
@@ -91,25 +91,25 @@ public class ModuleRegistryTest extends TestCase
         
         assertSame(m1, registry.resolveModule("foo/"));
         
-        assertEquals(2, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(loader.paths));
+        assertEquals(2, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(moduleLoader.paths));
     }
     
     public void testCreateTwoIndependentModules() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("foo");
-        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
+        final ModuleInfo module2 = new ModuleInfo("bar", moduleLoader);
         module2.addAttribute("qqq", "www");
-        loader.results.put("foo/", module);
-        loader.results.put("bar/", module2);
+        moduleLoader.results.put("foo/", module);
+        moduleLoader.results.put("bar/", module2);
         
         final Module m1 = registry.resolveModule("foo");
         final Module m2 = registry.resolveModule("bar");
         final Module m3 = registry.resolveModule("foo");
         final Module m4 = registry.resolveModule("bar");
         
-        assertEquals(2, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(loader.paths));
+        assertEquals(2, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(moduleLoader.paths));
         
         assertSame(m1, m3);
         assertSame(m2, m4);
@@ -117,30 +117,30 @@ public class ModuleRegistryTest extends TestCase
         assertModule(m1, "foo/");
         assertModule(m2, "bar/", TestUtil.<String, Object>map("qqq", "www"));
         
-        assertEquals(2, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(loader.paths));
+        assertEquals(2, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(moduleLoader.paths));
     }
     
     public void testCreateTwoModulesAndDirectDependencies() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("foo");
-        final ModuleInfo dep = new ModuleInfo("baz");
-        final ModuleInfo dep2 = new ModuleInfo("quux");
-        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
+        final ModuleInfo dep = new ModuleInfo("baz", moduleLoader);
+        final ModuleInfo dep2 = new ModuleInfo("quux", moduleLoader);
+        final ModuleInfo module2 = new ModuleInfo("bar", moduleLoader);
         module.addDependency("baz");
         module.addDependency("quux");
-        loader.results.put("foo/", module);
-        loader.results.put("bar/", module2);
-        loader.results.put("baz/", dep);
-        loader.results.put("quux/", dep2);
+        moduleLoader.results.put("foo/", module);
+        moduleLoader.results.put("bar/", module2);
+        moduleLoader.results.put("baz/", dep);
+        moduleLoader.results.put("quux/", dep2);
         
         final Module m1 = registry.resolveModule("foo");
         final Module m2 = registry.resolveModule("bar");
         final Module m3 = registry.resolveModule("foo");
         final Module m4 = registry.resolveModule("bar");
         
-        assertEquals(4, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/"), new HashSet<String>(loader.paths));
+        assertEquals(4, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/"), new HashSet<String>(moduleLoader.paths));
         
         assertSame(m1, m3);
         assertSame(m2, m4);
@@ -153,33 +153,33 @@ public class ModuleRegistryTest extends TestCase
         assertModule(m5, "baz/");
         assertModule(m6, "quux/");
         
-        assertEquals(4, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/"), new HashSet<String>(loader.paths));
+        assertEquals(4, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/"), new HashSet<String>(moduleLoader.paths));
     }
     
     public void testCreateTwoModulesAndDeepDependencies() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("foo");
-        final ModuleInfo dep = new ModuleInfo("baz");
-        final ModuleInfo dep2 = new ModuleInfo("quux");
-        final ModuleInfo dep3 = new ModuleInfo("zoo");
-        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
+        final ModuleInfo dep = new ModuleInfo("baz", moduleLoader);
+        final ModuleInfo dep2 = new ModuleInfo("quux", moduleLoader);
+        final ModuleInfo dep3 = new ModuleInfo("zoo", moduleLoader);
+        final ModuleInfo module2 = new ModuleInfo("bar", moduleLoader);
         module.addDependency("baz");
         module.addDependency("quux");
         dep2.addDependency("zoo");
-        loader.results.put("foo/", module);
-        loader.results.put("bar/", module2);
-        loader.results.put("baz/", dep);
-        loader.results.put("quux/", dep2);
-        loader.results.put("zoo/", dep3);
+        moduleLoader.results.put("foo/", module);
+        moduleLoader.results.put("bar/", module2);
+        moduleLoader.results.put("baz/", dep);
+        moduleLoader.results.put("quux/", dep2);
+        moduleLoader.results.put("zoo/", dep3);
         
         final Module m1 = registry.resolveModule("foo");
         final Module m2 = registry.resolveModule("bar");
         final Module m3 = registry.resolveModule("foo");
         final Module m4 = registry.resolveModule("bar");
         
-        assertEquals(5, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/", "zoo/"), new HashSet<String>(loader.paths));
+        assertEquals(5, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/", "zoo/"), new HashSet<String>(moduleLoader.paths));
         
         assertSame(m1, m3);
         assertSame(m2, m4);
@@ -197,20 +197,20 @@ public class ModuleRegistryTest extends TestCase
         
         assertSame(m7, m8);
         
-        assertEquals(5, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/", "zoo/"), new HashSet<String>(loader.paths));
+        assertEquals(5, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/", "baz/", "quux/", "zoo/"), new HashSet<String>(moduleLoader.paths));
     }
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_ModuleNotLoadedException() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("foo");
-        final ModuleInfo dep = new ModuleInfo("quux");
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
+        final ModuleInfo dep = new ModuleInfo("quux", moduleLoader);
         module.addDependency("quux");
-        loader.results.put("foo/", module);
-        loader.results.put("quux/", dep);
+        moduleLoader.results.put("foo/", module);
+        moduleLoader.results.put("quux/", dep);
         
         final ModuleNotLoadedException exception = new ModuleNotLoadedException();
-        loader.results.put("bar/", exception);
+        moduleLoader.results.put("bar/", exception);
         
         final Module m1 = registry.resolveModule("foo");
         
@@ -240,21 +240,21 @@ public class ModuleRegistryTest extends TestCase
         assertSame(m1, m2);
         assertModule(m3, "quux/");
         
-        assertEquals(3, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(loader.paths));
+        assertEquals(3, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(moduleLoader.paths));
     }
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_RuntimeException() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("foo");
-        final ModuleInfo dep = new ModuleInfo("quux");
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
+        final ModuleInfo dep = new ModuleInfo("quux", moduleLoader);
         module.addDependency("quux");
-        final ModuleInfo module2 = new ModuleInfo("bar");
-        loader.results.put("foo/", module);
-        loader.results.put("quux/", dep);
+        final ModuleInfo module2 = new ModuleInfo("bar", moduleLoader);
+        moduleLoader.results.put("foo/", module);
+        moduleLoader.results.put("quux/", dep);
         
         final RuntimeException exception = new RuntimeException();
-        loader.results.put("bar/", exception);
+        moduleLoader.results.put("bar/", exception);
         
         final Module m1 = registry.resolveModule("foo");
         
@@ -266,7 +266,7 @@ public class ModuleRegistryTest extends TestCase
             assertSame(exception, ex);
         }
         
-        loader.results.put("bar/", module2);
+        moduleLoader.results.put("bar/", module2);
         
         final Module m2 = registry.resolveModule("foo");
         
@@ -279,21 +279,21 @@ public class ModuleRegistryTest extends TestCase
         assertModule(m3, "bar/");
         assertModule(m4, "quux/");
         
-        assertEquals(4, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(loader.paths));
+        assertEquals(4, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(moduleLoader.paths));
     }
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_Error() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("foo");
-        final ModuleInfo dep = new ModuleInfo("quux");
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
+        final ModuleInfo dep = new ModuleInfo("quux", moduleLoader);
         module.addDependency("quux");
-        final ModuleInfo module2 = new ModuleInfo("bar");
-        loader.results.put("foo/", module);
-        loader.results.put("quux/", dep);
+        final ModuleInfo module2 = new ModuleInfo("bar", moduleLoader);
+        moduleLoader.results.put("foo/", module);
+        moduleLoader.results.put("quux/", dep);
         
         final Error exception = new Error();
-        loader.results.put("bar/", exception);
+        moduleLoader.results.put("bar/", exception);
         
         final Module m1 = registry.resolveModule("foo");
         
@@ -305,7 +305,7 @@ public class ModuleRegistryTest extends TestCase
             assertSame(exception, ex);
         }
         
-        loader.results.put("bar/", module2);
+        moduleLoader.results.put("bar/", module2);
         
         final Module m2 = registry.resolveModule("foo");
         
@@ -318,19 +318,19 @@ public class ModuleRegistryTest extends TestCase
         assertModule(m3, "bar/");
         assertModule(m4, "quux/");
         
-        assertEquals(4, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(loader.paths));
+        assertEquals(4, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(moduleLoader.paths));
     }
     
     public void testCreateTwoModules_SecondModuleIsNotLoaded_NullIsReturned() throws Exception
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo");
-        final ModuleInfo dep = new ModuleInfo("quux");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo", moduleLoader);
+        final ModuleInfo dep = new ModuleInfo("quux", moduleLoader);
         moduleInfo.addDependency("quux");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("bar");
-        loader.results.put("foo/", moduleInfo);
-        loader.results.put("quux/", dep);
-        loader.results.put("bar/", null);
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar", moduleLoader);
+        moduleLoader.results.put("foo/", moduleInfo);
+        moduleLoader.results.put("quux/", dep);
+        moduleLoader.results.put("bar/", null);
         
         final Module m1 = registry.resolveModule("foo");
         
@@ -342,7 +342,7 @@ public class ModuleRegistryTest extends TestCase
             assertEquals("Module loader returned null for the path 'bar/'.", ex.getMessage());
         }
         
-        loader.results.put("bar/", moduleInfo2);
+        moduleLoader.results.put("bar/", moduleInfo2);
         
         final Module m2 = registry.resolveModule("foo");
         
@@ -355,14 +355,14 @@ public class ModuleRegistryTest extends TestCase
         assertModule(m3, "bar/");
         assertModule(m4, "quux/");
         
-        assertEquals(4, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(loader.paths));
+        assertEquals(4, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/", "quux/"), new HashSet<String>(moduleLoader.paths));
     }
     
     public void testNullPath() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("foo");
-        loader.results.put("foo/", module);
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
+        moduleLoader.results.put("foo/", module);
         
         try {
             registry.resolveModule(null);
@@ -376,7 +376,7 @@ public class ModuleRegistryTest extends TestCase
         
         assertModule(m, "foo/");
         
-        assertEquals(Collections.singletonList("foo/"), loader.paths);
+        assertEquals(Collections.singletonList("foo/"), moduleLoader.paths);
     }
     
     public void testCreateResolverWithNullModuleLoader()
@@ -392,12 +392,12 @@ public class ModuleRegistryTest extends TestCase
     
     public void testCreateTwoModules_CyclicDependency() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("foo");
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
         module.addDependency("bar");
-        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module2 = new ModuleInfo("bar", moduleLoader);
         module2.addDependency("foo");
-        loader.results.put("foo/", module);
-        loader.results.put("bar/", module2);
+        moduleLoader.results.put("foo/", module);
+        moduleLoader.results.put("bar/", module2);
         
         final Module m1 = registry.resolveModule("foo");
         final Module m2 = registry.resolveModule("bar");
@@ -408,21 +408,21 @@ public class ModuleRegistryTest extends TestCase
         assertSame(m1, registry.resolveModule("foo"));
         assertSame(m2, registry.resolveModule("bar"));
         
-        assertEquals(2, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(loader.paths));
+        assertEquals(2, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/"), new HashSet<String>(moduleLoader.paths));
     }
     
     public void testCreateThreeModules_CyclicDependency() throws Exception
     {
-        final ModuleInfo module = new ModuleInfo("foo");
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
         module.addDependency("bar");
-        final ModuleInfo module2 = new ModuleInfo("bar");
+        final ModuleInfo module2 = new ModuleInfo("bar", moduleLoader);
         module2.addDependency("baz");
-        final ModuleInfo module3 = new ModuleInfo("baz");
+        final ModuleInfo module3 = new ModuleInfo("baz", moduleLoader);
         module3.addDependency("foo");
-        loader.results.put("foo/", module);
-        loader.results.put("bar/", module2);
-        loader.results.put("baz/", module3);
+        moduleLoader.results.put("foo/", module);
+        moduleLoader.results.put("bar/", module2);
+        moduleLoader.results.put("baz/", module3);
         
         final Module m1 = registry.resolveModule("foo");
         final Module m2 = registry.resolveModule("bar");
@@ -436,8 +436,8 @@ public class ModuleRegistryTest extends TestCase
         assertSame(m2, registry.resolveModule("bar"));
         assertSame(m3, registry.resolveModule("baz"));
         
-        assertEquals(3, loader.paths.size());
-        assertEquals(TestUtil.set("foo/", "bar/", "baz/"), new HashSet<String>(loader.paths));
+        assertEquals(3, moduleLoader.paths.size());
+        assertEquals(TestUtil.set("foo/", "bar/", "baz/"), new HashSet<String>(moduleLoader.paths));
     }
     
     private static void assertModule(final Module module, final String path, final Module... dependencies)

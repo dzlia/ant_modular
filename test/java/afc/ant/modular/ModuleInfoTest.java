@@ -34,10 +34,24 @@ import junit.framework.TestCase;
 
 public class ModuleInfoTest extends TestCase
 {
+    private MockModuleLoader moduleLoader;
+    
+    @Override
+    protected void setUp()
+    {
+        moduleLoader = new MockModuleLoader();
+    }
+    
+    @Override
+    protected void tearDown()
+    {
+        moduleLoader = null;
+    }
+    
     public void testConstructWithNullPath()
     {
         try {
-            new ModuleInfo(null);
+            new ModuleInfo(null, moduleLoader);
             fail();
         }
         catch (NullPointerException ex) {
@@ -47,7 +61,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testConstructWithEmptyPath()
     {
-        final ModuleInfo m = new ModuleInfo("");
+        final ModuleInfo m = new ModuleInfo("", moduleLoader);
         
         assertEquals("/", m.getPath());
         assertEquals(Collections.emptySet(), m.getDependencies());
@@ -56,7 +70,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testConstructWithNonEmptyPath()
     {
-        final ModuleInfo m = new ModuleInfo("a/b/c");
+        final ModuleInfo m = new ModuleInfo("a/b/c", moduleLoader);
         
         assertEquals("a/b/c/", m.getPath());
         assertEquals(Collections.emptySet(), m.getDependencies());
@@ -65,7 +79,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testConstructWithNormalisedPath()
     {
-        final ModuleInfo m = new ModuleInfo("a/b/c/");
+        final ModuleInfo m = new ModuleInfo("a/b/c/", moduleLoader);
         
         assertEquals("a/b/c/", m.getPath());
         assertEquals(Collections.emptySet(), m.getDependencies());
@@ -74,7 +88,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testSetValidDependencies()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         final ArrayList<String> deps = new ArrayList<String>();
         deps.add("bar/");
         deps.add("baz");
@@ -93,7 +107,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testReSetValidDependencies()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
 
         m.setDependencies(Arrays.asList("bar"));
         assertEquals(Collections.singleton("bar/"), m.getDependencies());
@@ -106,7 +120,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testSetValidDependencies_InputCollectionDoesNotSupportNullElements()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         final TreeSet<String> deps = new TreeSet<String>();
         deps.add("bar");
         deps.add("baz");
@@ -125,7 +139,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testTryAddDependencyViaGetter()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.setDependencies(Arrays.asList("bar", "baz"));
         assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
@@ -144,7 +158,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testTryAddNullDependencyViaGetter()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.setDependencies(Arrays.asList("bar", "baz"));
         assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
@@ -163,7 +177,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testTryClearDependenciesViaGetter()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
 
         m.setDependencies(Arrays.asList("bar", "baz"));
         assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
@@ -182,7 +196,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testSetNullDependencies()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.setDependencies(Arrays.asList("bar", "baz"));
         assertEquals("foo/", m.getPath());
@@ -202,7 +216,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testSetDependenciesWithNullElement()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.setDependencies(Arrays.asList("bar", "baz/"));
         assertEquals("foo/", m.getPath());
@@ -222,7 +236,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testAddDependency_NoOtherDependencies()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.addDependency("bar");
         assertEquals("foo/", m.getPath());
@@ -233,7 +247,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testAddDependency_ToExistingDependencies()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.setDependencies(Arrays.asList("bar"));
         assertEquals("foo/", m.getPath());
@@ -248,7 +262,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testAddDependency_NullDependency()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.setDependencies(Collections.singletonList("bar"));
         assertEquals("foo/", m.getPath());
@@ -269,7 +283,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testAddDependency_AddItselfAsDependency_NonNormalisedDependency()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.setDependencies(Collections.singletonList("bar"));
         assertEquals("foo/", m.getPath());
@@ -294,7 +308,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testAddDependency_AddItselfAsDependency_NormalisedDependency()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.setDependencies(Collections.singletonList("bar"));
         assertEquals("foo/", m.getPath());
@@ -323,9 +337,9 @@ public class ModuleInfoTest extends TestCase
      */
     public void testEquals()
     {
-        final ModuleInfo m1 = new ModuleInfo("foo");
-        final ModuleInfo m2 = new ModuleInfo("bar");
-        final ModuleInfo m3 = new ModuleInfo("foo");
+        final ModuleInfo m1 = new ModuleInfo("foo", moduleLoader);
+        final ModuleInfo m2 = new ModuleInfo("bar", moduleLoader);
+        final ModuleInfo m3 = new ModuleInfo("foo", moduleLoader);
         
         assertFalse(m1.equals(null));
         assertFalse(m1.equals(new Object()));
@@ -342,7 +356,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testSetDependencyToItselfByMeansOfSetDependencies_NonNormalisedValue()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.addDependency("bar");
         
@@ -361,7 +375,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testSetDependencyToItselfByMeansOfSetDependencies_NormalisedValue()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.addDependency("bar");
         
@@ -380,7 +394,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testSetAttributes()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         final HashMap<String, Object> attributes = new HashMap<String, Object>();
         attributes.put("bar", new Object());
         attributes.put("baz", Integer.valueOf(2000));
@@ -401,7 +415,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testReSetAttributes()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         final HashMap<String, Object> attributes = new HashMap<String, Object>();
         final Object o = new Object();
         attributes.put("bar", o);
@@ -427,7 +441,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testReSetAttributes_WithNullAttributeName_InputMapSupportsNullKeys()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         m.addDependency("zoo");
         
         final HashMap<String, Object> attributes = new HashMap<String, Object>();
@@ -459,7 +473,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testSetAttributes_InputMapDoesNotSupportNullKeys()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         m.addDependency("zoo");
         
         final TreeMap<String, Object> attributes = new TreeMap<String, Object>();
@@ -477,7 +491,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testTryAddAttributeViaGetter()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
         assertEquals(Collections.singletonMap("bar", "baz"), m.getAttributes());
@@ -496,7 +510,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testTryClearAttributesViaGetter()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
         assertEquals(Collections.singletonMap("bar", "baz"), m.getAttributes());
@@ -515,7 +529,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testSetNullAttributes()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         
         m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
         
@@ -533,7 +547,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testAddAttribute_NoOtherAttributes()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         final Object val = new Object();
         
         m.addAttribute("bar", val);
@@ -545,7 +559,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testAddAttribute_ToExistingAttributes()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         m.addDependency("quux");
         
         final Object val = new Object();
@@ -567,7 +581,7 @@ public class ModuleInfoTest extends TestCase
     
     public void testAddAttribute_NullAttribute()
     {
-        final ModuleInfo m = new ModuleInfo("foo");
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
         m.addDependency("quux");
         
         final Object val = new Object();

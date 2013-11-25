@@ -62,7 +62,7 @@ public class ManifestModuleLoaderTest extends TestCase
         final ModuleInfo moduleInfo = loader.loadModule("NoDeps_NoAttributes");
         
         assertNotNull(moduleInfo);
-        assertEquals("NoDeps_NoAttributes/", moduleInfo.getPath());
+        assertEquals("NoDeps_NoAttributes", moduleInfo.getPath());
         assertEquals(Collections.emptySet(), moduleInfo.getDependencies());
         assertEquals(Collections.emptyMap(), moduleInfo.getAttributes());
     }
@@ -74,7 +74,7 @@ public class ManifestModuleLoaderTest extends TestCase
         final ModuleInfo moduleInfo = loader.loadModule("EmptyDeps_NoAttributes/");
         
         assertNotNull(moduleInfo);
-        assertEquals("EmptyDeps_NoAttributes/", moduleInfo.getPath());
+        assertEquals("EmptyDeps_NoAttributes", moduleInfo.getPath());
         assertEquals(Collections.emptySet(), moduleInfo.getDependencies());
         assertEquals(Collections.emptyMap(), moduleInfo.getAttributes());
     }
@@ -86,8 +86,8 @@ public class ManifestModuleLoaderTest extends TestCase
         final ModuleInfo moduleInfo = loader.loadModule("WithDeps_NoAttributes");
         
         assertNotNull(moduleInfo);
-        assertEquals("WithDeps_NoAttributes/", moduleInfo.getPath());
-        assertEquals(TestUtil.set("foo/", "\u0142aska/", "baz/quux/"), moduleInfo.getDependencies());
+        assertEquals("WithDeps_NoAttributes", moduleInfo.getPath());
+        assertEquals(TestUtil.set("foo", "\u0142aska", "baz/quux"), moduleInfo.getDependencies());
         assertEquals(Collections.emptyMap(), moduleInfo.getAttributes());
     }
     
@@ -98,8 +98,8 @@ public class ManifestModuleLoaderTest extends TestCase
         final ModuleInfo moduleInfo = loader.loadModule("WithDeps_WithAttributes");
         
         assertNotNull(moduleInfo);
-        assertEquals("WithDeps_WithAttributes/", moduleInfo.getPath());
-        assertEquals(TestUtil.set("foo/", "bar/baz/"), moduleInfo.getDependencies());
+        assertEquals("WithDeps_WithAttributes", moduleInfo.getPath());
+        assertEquals(TestUtil.set("foo", "bar/baz"), moduleInfo.getDependencies());
         assertEquals(TestUtil.map("Attrib1", "", "Attrib2", "a b  c+c/%C5%81/e",
                 "Attrib3", "hello, world!", "aTTRIB4", "12345"), moduleInfo.getAttributes());
     }
@@ -114,8 +114,8 @@ public class ManifestModuleLoaderTest extends TestCase
         final ModuleInfo moduleInfo = loader.loadModule("WithDeps_WithAttributes");
         
         assertNotNull(moduleInfo);
-        assertEquals("WithDeps_WithAttributes/", moduleInfo.getPath());
-        assertEquals(TestUtil.set("foo/", "bar/baz/"), moduleInfo.getDependencies());
+        assertEquals("WithDeps_WithAttributes", moduleInfo.getPath());
+        assertEquals(TestUtil.set("foo", "bar/baz"), moduleInfo.getDependencies());
         assertEquals(TestUtil.set("Attrib1", "ATTRIB2", "Attrib3", "aTTRIB4"), moduleInfo.getAttributes().keySet());
         assertEquals("", moduleInfo.getAttributes().get("Attrib1"));
         assertEquals("hello, world!", moduleInfo.getAttributes().get("Attrib3"));
@@ -136,8 +136,8 @@ public class ManifestModuleLoaderTest extends TestCase
         final ModuleInfo moduleInfo = loader.loadModule("WithDeps_WithAttributes");
         
         assertNotNull(moduleInfo);
-        assertEquals("WithDeps_WithAttributes/", moduleInfo.getPath());
-        assertEquals(TestUtil.set("foo/", "bar/baz/"), moduleInfo.getDependencies());
+        assertEquals("WithDeps_WithAttributes", moduleInfo.getPath());
+        assertEquals(TestUtil.set("foo", "bar/baz"), moduleInfo.getDependencies());
         assertEquals(TestUtil.set("Attrib1", "Attrib2", "Attrib3", "Attrib4"), moduleInfo.getAttributes().keySet());
         assertEquals("", moduleInfo.getAttributes().get("Attrib1"));
         assertEquals("hello, world!", moduleInfo.getAttributes().get("Attrib3"));
@@ -159,8 +159,8 @@ public class ManifestModuleLoaderTest extends TestCase
         final ModuleInfo moduleInfo = loader.loadModule("WithDeps_WithAttributes");
         
         assertNotNull(moduleInfo);
-        assertEquals("WithDeps_WithAttributes/", moduleInfo.getPath());
-        assertEquals(TestUtil.set("foo/", "bar/baz/"), moduleInfo.getDependencies());
+        assertEquals("WithDeps_WithAttributes", moduleInfo.getPath());
+        assertEquals(TestUtil.set("foo", "bar/baz"), moduleInfo.getDependencies());
         assertEquals(TestUtil.set("Attrib1", "Attrib2", "Attrib3", "aTTRIB4"), moduleInfo.getAttributes().keySet());
         assertEquals("", moduleInfo.getAttributes().get("Attrib1"));
         assertEquals("hello, world!", moduleInfo.getAttributes().get("Attrib3"));
@@ -310,7 +310,7 @@ public class ManifestModuleLoaderTest extends TestCase
             fail();
         }
         catch (ModuleNotLoadedException ex) {
-            assertEquals("Unable to load the module 'WithInvalidClasspathAttribute/'. " +
+            assertEquals("Unable to load the module 'WithInvalidClasspathAttribute'. " +
                     "The classpath attribute 'Attrib1' contains an invalid URL element: 'c+c/%'.", ex.getMessage());
         }
     }
@@ -325,7 +325,7 @@ public class ManifestModuleLoaderTest extends TestCase
             fail();
         }
         catch (ModuleNotLoadedException ex) {
-            assertEquals("Unable to load the module 'WithInvalidDependeeModulePath/'. " +
+            assertEquals("Unable to load the module 'WithInvalidDependeeModulePath'. " +
                     "This dependee module path is an invalid URL: 'foo%'.", ex.getMessage());
         }
     }

@@ -67,22 +67,34 @@ public final class ModuleInfo
     private final Set<String> dependenciesView = Collections.unmodifiableSet(dependencies);
     private final HashMap<String, Object> attributes = new HashMap<String, Object>();
     private final Map<String, Object> attributesView = Collections.unmodifiableMap(attributes);
+    private final ModuleLoader moduleLoader;
     
     /**
      * <p>Creates a {@code ModuleInfo} with a given path. The normalised path is assigned.
      * The {@code ModuleInfo} instance created has neither dependencies nor attributes.</p>
      * 
-     * @param path the module path. It must not be {@code null}.
+     * <p>The {@link ModuleLoader} passed is expected to be the {@code ModuleLoader} that
+     * creates this {@link ModuleInfo}. Its function {@link #normalisePath(String)} is used
+     * to normalise module paths (the path of this {@code ModuleInfo} and the paths of
+     * the dependee modules).</p>
      * 
-     * @throws NullPointerException if <em>path</em> is {@code null}.
+     * @param path the module path. It must be non-{@code null}.
+     * @param moduleLoader the module loader that creates this {@code ModuleInfo}.
+     *      It must be non-{@code null}.
+     * 
+     * @throws NullPointerException if either <em>path</em> or <em>moduleLoader</em>
+     *      is {@code null}.
      */
-    // TODO implement normalisation properly or remove it from here.
-    public ModuleInfo(final String path)
+    public ModuleInfo(final String path, final ModuleLoader moduleLoader)
     {
         if (path == null) {
             throw new NullPointerException("path");
         }
-        this.path = normalisePath(path);
+        if (moduleLoader == null) {
+            throw new NullPointerException("moduleLoader");
+        }
+        this.path = moduleLoader.normalisePath(path);
+        this.moduleLoader = moduleLoader;
     }
     
     /**
@@ -109,13 +121,12 @@ public final class ModuleInfo
      * @throws IllegalArgumentException if <em>dependency</em> in its normalised form is equal
      *      to this {@code ModuleInfo}'s path.
      */
-    // TODO implement normalisation properly or remove it from here.
     public void addDependency(final String dependency)
     {
         if (dependency == null) {
             throw new NullPointerException("dependency");
         }
-        final String normalisedDependency = normalisePath(dependency);
+        final String normalisedDependency = moduleLoader.normalisePath(dependency);
         if (normalisedDependency.equals(path)) {
             throw new IllegalArgumentException("Cannot add itself as a dependency.");
         }
@@ -139,7 +150,6 @@ public final class ModuleInfo
      * @throws IllegalArgumentException if <em>dependencies</em> contains this {@code ModuleInfo}'s path
      *      (normalised or non-normalised). This {@code ModuleInfo} instance is not modified in this case.
      */
-    // TODO implement normalisation properly or remove it from here.
     public void setDependencies(final Collection<String> dependencies)
     {
         if (dependencies == null) {
@@ -150,7 +160,7 @@ public final class ModuleInfo
             if (dependency == null) {
                 throw new NullPointerException("dependencies contains null dependency.");
             }
-            final String normalisedDependency = normalisePath(dependency);
+            final String normalisedDependency = moduleLoader.normalisePath(dependency);
             if (normalisedDependency.equals(path)) {
                 throw new IllegalArgumentException("Cannot add itself as a dependency.");
             }

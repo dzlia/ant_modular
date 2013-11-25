@@ -46,7 +46,7 @@ public class ModuleUtilTest extends TestCase
     
     public void testIsModule_ModuleInfo()
     {
-        assertFalse(ModuleUtil.isModule(new ModuleInfo("foo")));
+        assertFalse(ModuleUtil.isModule(new ModuleInfo("foo", new MockModuleLoader())));
     }
     
     public void testIsModule_Module()
@@ -87,7 +87,7 @@ public class ModuleUtilTest extends TestCase
     public void testGetPath_ModuleInfo()
     {
         try {
-            ModuleUtil.getPath(new ModuleInfo("foo/"));
+            ModuleUtil.getPath(new ModuleInfo("foo/", new MockModuleLoader()));
             fail();
         }
         catch (IllegalArgumentException ex) {
@@ -132,7 +132,7 @@ public class ModuleUtilTest extends TestCase
     public void testGetDependencies_ModuleInfo()
     {
         try {
-            ModuleUtil.getDependencies(new ModuleInfo("foo/"));
+            ModuleUtil.getDependencies(new ModuleInfo("foo/", new MockModuleLoader()));
             fail();
         }
         catch (IllegalArgumentException ex) {
@@ -192,7 +192,7 @@ public class ModuleUtilTest extends TestCase
     public void testGetAttributes_ModuleInfo()
     {
         try {
-            ModuleUtil.getAttributes(new ModuleInfo("foo/"));
+            ModuleUtil.getAttributes(new ModuleInfo("foo/", new MockModuleLoader()));
             fail();
         }
         catch (IllegalArgumentException ex) {

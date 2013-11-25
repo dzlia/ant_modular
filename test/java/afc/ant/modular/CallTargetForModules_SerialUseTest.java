@@ -65,7 +65,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_ModulePropertyDefined()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -86,7 +86,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_ModulePropertyUndefined()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -105,7 +105,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithReferences_InheritAll_InheritRefs()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -153,7 +153,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithReferences_InheritAll_DoNotInheritRefs()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -201,7 +201,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithReferences_DoNotInheritAll_InheritRefs()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -249,7 +249,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithReferences_DoNotInheritAll_DoNotInheritRefs()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -297,7 +297,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_NoReferencesPassed_DoNotInheritAll_DoNotInheritRefs()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -336,7 +336,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParams()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -364,7 +364,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParams_AndInheritedPropertiesByDefault()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -395,7 +395,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParams_AndInheritedPropertiesForced()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -427,7 +427,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParams_PropertiesNotInherited()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -459,7 +459,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamLocation()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -491,7 +491,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromFile_AndInheritedPropertiesByDefault()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -518,7 +518,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromFile_PropertiesNotInherited()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -546,7 +546,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromFileWithPrefix_AndInheritedPropertiesByDefault()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -575,7 +575,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromUrl_AndInheritedPropertiesByDefault() throws Exception
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -603,7 +603,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_SingleModule_WithUserParamsFromUrl_PropertiesNotInherited()
             throws Exception
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -632,7 +632,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_SingleModule_WithUserParamsFromUrlWithPrefix_AndInheritedPropertiesByDefault()
             throws Exception
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -661,7 +661,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspath_AndInheritedPropertiesByDefault()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -691,7 +691,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspath_PropertiesNotInherited()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -722,7 +722,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspathAndPrefix_AndInheritedPropertiesByDefault()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -754,7 +754,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_FirstCreateThenSet()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -786,7 +786,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_FirstSetThenCreate()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -818,7 +818,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_MultipleCreate()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -849,7 +849,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithMultiClasspath_MultipleCreate_WithPrefix()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -882,7 +882,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspathRef_RefContainsResource()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -918,7 +918,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspathRef_FirstSetThenSetRef_RefContainsResource()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -957,7 +957,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParamsFromResourceWithClasspathRef_FirstSetThenSetRef_RefDoesNotContainResource()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -996,7 +996,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithPropertySets_AndInheritedPropertiesByDefault()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -1033,7 +1033,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithPropertySets_AndInheritedPropertiesForced()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -1071,7 +1071,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithPropertySets_PropertiesNotInherited()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -1109,7 +1109,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParams_IncludingParamReference()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -1146,7 +1146,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParams_IncludingParamReference_ModulePropertyUndefined()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -1182,7 +1182,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_SingleModule_WithUserParams_IncludingParamEnvironment()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -1220,17 +1220,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_ModuleWithDeps_ModulePropertyDefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         dep2.addDependency("quux/");
-        final ModuleInfo dep3 = new ModuleInfo("quux/");
+        final ModuleInfo dep3 = new ModuleInfo("quux/", moduleLoader);
         dep3.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -1274,17 +1274,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_ModuleWithDeps_ModulePropertyUndefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         dep2.addDependency("quux/");
-        final ModuleInfo dep3 = new ModuleInfo("quux/");
+        final ModuleInfo dep3 = new ModuleInfo("quux/", moduleLoader);
         dep3.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -1327,17 +1327,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_MultipleModulesWithDeps_RelatedHierarchies_ModulePropertyDefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -1382,17 +1382,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_MultipleModulesWithDeps_RelatedHierarchies_ModulePropertyUndefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -1435,17 +1435,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     
     public void testSerialRun_MultipleModulesWithDeps_UnrelatedHierarchies_ModulePropertyDefined()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -1519,17 +1519,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_MultipleModulesWithDeps_UnrelatedHierarchies_ModulePropertyUndefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -1582,17 +1582,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_MultipleModulesWithDeps_ThreadCountSetToOne()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -1638,13 +1638,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_ModuleWithDeps_BuildFailure()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -1696,13 +1696,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_ModuleWithDeps_RuntimeExceptionInATarget()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -1751,17 +1751,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_MultipleModulesWithDeps_CustomTarget_ModulePropertyDefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -1811,17 +1811,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_MultipleModulesWithDeps_CustomTarget_ModulePropertyUndefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -1867,17 +1867,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_MultipleModulesWithDeps_RepeatedModuleElement_UnambiguousTarget()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -1928,17 +1928,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_MultipleModulesWithDeps_RepeatedModuleElement_AmbiguousNonDefaultTargets()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -1992,17 +1992,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_MultipleModulesWithDeps_RepeatedModuleElement_AmbiguousTargets_WithDefaultTarget()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -2054,13 +2054,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_BuildFailure_ProjectCreateTargetThrowsRuntimeException()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -2106,13 +2106,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_BuildFailure_ProjectCreateTargetThrowsError()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -2158,13 +2158,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_BuildFailure_BuildListenerThrowsRuntimeException()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -2213,13 +2213,13 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     public void testSerialRun_BuildFailure_BuildListenerThrowsError()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -2274,7 +2274,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     {
         project.setBaseDir(new File("test/data/"));
         
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -2309,7 +2309,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     {
         project.setBaseDir(new File("test/data/"));
         
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -2348,7 +2348,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     {
         project.setBaseDir(new File("test/data/"));
         
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
@@ -2386,7 +2386,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     {
         project.setBaseDir(new File("test/data/"));
         
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         

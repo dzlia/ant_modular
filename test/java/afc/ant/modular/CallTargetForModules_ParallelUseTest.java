@@ -64,17 +64,17 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_TwoThreads_MultipleModulesWithDeps_RelatedHierarchies_ModulePropertyDefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -120,17 +120,17 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_TwoThreads_MultipleModulesWithDeps_RelatedHierarchies_ModulePropertyUndefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -174,17 +174,17 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     
     public void testParallelRun_TwoThreads_MultipleModulesWithDeps_UnrelatedHierarchies_ModulePropertyDefined()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -259,17 +259,17 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_TwoThreads_MultipleModulesWithDeps_UnrelatedHierarchies_ModulePropertyUndefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -323,13 +323,13 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_ModuleWithDeps_BuildFailure()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -387,13 +387,13 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_ModuleWithDeps_BuildFailure_BuildExceptionHasNullLocation()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -445,13 +445,13 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_ModuleWithDeps_RuntimeExceptionInATarget()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -501,17 +501,17 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_MultipleModulesWithDeps_CustomTarget_ModulePropertyDefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -562,17 +562,17 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_MultipleModulesWithDeps_CustomTarget_ModulePropertyUndefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -619,17 +619,17 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_MultipleModulesWithDeps_RepeatedModuleElement_UnambiguousTarget()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -681,17 +681,17 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_MultipleModulesWithDeps_RepeatedModuleElement_AmbiguousNonDefaultTargets()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -746,17 +746,17 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_MultipleModulesWithDeps_RepeatedModuleElement_AmbiguousTargets_WithDefaultTarget()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("baz/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
         moduleInfo2.addDependency("quux/");
-        final ModuleInfo dep2 = new ModuleInfo("quux/");
+        final ModuleInfo dep2 = new ModuleInfo("quux/", moduleLoader);
         dep2.addAttribute("z", "x");
         
         moduleLoader.modules.put("foo/", moduleInfo);
@@ -816,12 +816,12 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_MultipleModules_BuildThreadIsInterrupted() throws Throwable
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
-        final ModuleInfo moduleInfo3 = new ModuleInfo("baz/");
+        final ModuleInfo moduleInfo3 = new ModuleInfo("baz/", moduleLoader);
         
         moduleLoader.modules.put("foo/", moduleInfo);
         moduleLoader.modules.put("bar/", moduleInfo2);
@@ -926,13 +926,13 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_MultipleModules_BuildThreadIsInterruptedWhileProcessingNotBlocked() throws Throwable
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/", moduleLoader);
         moduleInfo2.addAttribute("qq", "ww");
         moduleInfo2.addAttribute("aa", "ss");
-        final ModuleInfo moduleInfo3 = new ModuleInfo("baz/");
-        final ModuleInfo moduleInfo4 = new ModuleInfo("quux/");
+        final ModuleInfo moduleInfo3 = new ModuleInfo("baz/", moduleLoader);
+        final ModuleInfo moduleInfo4 = new ModuleInfo("quux/", moduleLoader);
         
         moduleLoader.modules.put("foo/", moduleInfo);
         moduleLoader.modules.put("bar/", moduleInfo2);
@@ -1036,13 +1036,13 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_BuildFailure_ProjectCreateTargetThrowsRuntimeException()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -1089,13 +1089,13 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_BuildFailure_ProjectCreateTargetThrowsError()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -1142,13 +1142,13 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_BuildFailure_BuildListenerThrowsRuntimeException()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         
@@ -1198,13 +1198,13 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     public void testParallelRun_BuildFailure_BuildListenerThrowsError()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleInfo.addDependency("bar/");
         moduleInfo.addDependency("baz/");
-        final ModuleInfo dep1 = new ModuleInfo("bar/");
+        final ModuleInfo dep1 = new ModuleInfo("bar/", moduleLoader);
         dep1.addDependency("baz/");
-        final ModuleInfo dep2 = new ModuleInfo("baz/");
+        final ModuleInfo dep2 = new ModuleInfo("baz/", moduleLoader);
         dep2.addAttribute("qq", "ww");
         dep2.addAttribute("aa", "ss");
         

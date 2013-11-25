@@ -153,8 +153,8 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     
     public void testTwoRootModules_CyclicDependency()
     {
-        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/", moduleLoader);
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/", moduleLoader);
         moduleInfo1.addDependency("bar/");
         moduleInfo2.addDependency("foo/");
         moduleLoader.modules.put("foo/", moduleInfo1);
@@ -179,8 +179,8 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     
     public void testRootModuleWithDependency_CyclicDependency_TaskLocationDefined()
     {
-        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/", moduleLoader);
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/", moduleLoader);
         moduleInfo1.addDependency("bar/");
         moduleInfo2.addDependency("foo/");
         moduleLoader.modules.put("foo/", moduleInfo1);
@@ -208,8 +208,8 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     
     public void testRootModuleWithDependency_CyclicDependency_TaskLocationUndefined()
     {
-        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/", moduleLoader);
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/", moduleLoader);
         moduleInfo1.addDependency("bar/");
         moduleInfo2.addDependency("foo/");
         moduleLoader.modules.put("foo/", moduleInfo1);
@@ -234,8 +234,8 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     
     public void testMissingModule_TaskLocationDefined()
     {
-        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/", moduleLoader);
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/", moduleLoader);
         moduleInfo1.addDependency("bar/");
         moduleInfo2.addDependency("baz/"); // this dependency will not be resolved
         moduleLoader.modules.put("foo/", moduleInfo1);
@@ -266,8 +266,8 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     
     public void testMissingModule_TaskLocationUnefined()
     {
-        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
-        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/");
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/", moduleLoader);
+        final ModuleInfo moduleInfo2 = new ModuleInfo("bar/", moduleLoader);
         moduleInfo1.addDependency("bar/");
         moduleInfo2.addDependency("baz/"); // this dependency will not be resolved
         moduleLoader.modules.put("foo/", moduleInfo1);
@@ -295,7 +295,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     
     public void testThreadCountIsInvalid_ZeroValue()
     {
-        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/", moduleLoader);
         moduleInfo1.addDependency("bar/");
         moduleLoader.modules.put("foo/", moduleInfo1);
         
@@ -316,7 +316,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     
     public void testThreadCountIsInvalid_NegativeValue()
     {
-        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo1 = new ModuleInfo("foo/", moduleLoader);
         moduleInfo1.addDependency("bar/");
         moduleLoader.modules.put("foo/", moduleInfo1);
         
@@ -341,7 +341,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
      */
     public void testNullModuleLoaderIsPassed()
     {
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/");
+        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
         moduleLoader.modules.put("foo/", moduleInfo);
         
