@@ -22,8 +22,10 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -211,5 +213,44 @@ public class ModuleUtil
             throw new BuildException(MessageFormat.format(
                     "module#{0}() has thrown an exception.", functionName), ex.getCause());
         }
+    }
+    
+    // TODO document me.
+    public static String normalisePath(final String path, final File baseDir)
+    {
+        if (path == null) {
+            throw new NullPointerException("path");
+        }
+        
+        // Adding path elements in the reverse order.
+        final ArrayList<String> parts = new ArrayList<String>();
+        for (File f = new File(path); f != null; f = f.getParentFile()) {
+            parts.add(f.getName());
+        }
+        final ArrayList<String> resultParts = new ArrayList<String>(parts.size());
+        int depth = 0;
+        for (int i = parts.size() - 1; i >= 0; --i) {
+            final String part = parts.get(i);
+            if (part.equals(".")) {
+                continue;
+            } else if (part.equals("..")) {
+                if (--depth < 0) {
+                    resultParts.add("..");
+                } else {
+                    resultParts.remove(resultParts.size() - 1);
+                }
+            } else {
+                ++depth;
+                resultParts.add(part);
+            }
+        }
+        // TODO support case normalisation for windows
+        // TODO normalise paths that go the the parent dirs of the basedir.
+        // TODO pre-allocate the buffer;
+        final StringBuilder buf = new StringBuilder();
+        for (final String part : resultParts) {
+            buf.append(part).append(File.separatorChar);
+        }
+        return buf.substring(0, buf.length() - 1);
     }
 }
