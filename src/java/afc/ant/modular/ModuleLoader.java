@@ -85,6 +85,8 @@ public interface ModuleLoader
      *      It is never {@code null}.
      * 
      * @throws NullPointerException if <em>path</em> is {@code null}.
+     * 
+     * @see ModuleUtil#normalisePath(String, java.io.File)
      */
     String normalisePath(String path);
 }
