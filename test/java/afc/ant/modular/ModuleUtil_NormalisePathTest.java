@@ -4,6 +4,7 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+// TODO add tests with absolute paths
 public class ModuleUtil_NormalisePathTest extends TestCase
 {
     public void testNormalisePath_BaseDirIsCurrentDir_NullPath()
@@ -40,6 +41,16 @@ public class ModuleUtil_NormalisePathTest extends TestCase
     public void testNormalisePath_BaseDirIsCurrentDir_DeepPathPathInNonNormalisedForm()
     {
         assertEquals("foo/bar/baz", ModuleUtil.normalisePath("foo/bar/baz/", new File("")));
+    }
+    
+    public void testNormalisePath_BaseDirIsCurrentDir_PathIsDotInNormalisedForm()
+    {
+        assertEquals(".", ModuleUtil.normalisePath(".", new File("")));
+    }
+    
+    public void testNormalisePath_BaseDirIsCurrentDir_PathIsDotInNonNormalisedForm()
+    {
+        assertEquals(".", ModuleUtil.normalisePath("./", new File("")));
     }
     
     public void testNormalisePath_BaseDirIsCurrentDir_PathStartsWithDot()
