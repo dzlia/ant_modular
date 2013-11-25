@@ -221,6 +221,10 @@ public class ModuleUtil
         if (path == null) {
             throw new NullPointerException("path");
         }
+        if (path.length() == 0) {
+            // path refers to baseDir.
+            return ".";
+        }
         
         // Adding path elements in the reverse order.
         final ArrayList<String> parts = new ArrayList<String>();
@@ -243,6 +247,10 @@ public class ModuleUtil
                 ++depth;
                 resultParts.add(part);
             }
+        }
+        if (resultParts.isEmpty()) {
+            // path refers to baseDir.
+            return ".";
         }
         // TODO support case normalisation for windows
         // TODO normalise paths that go the the parent dirs of the basedir.

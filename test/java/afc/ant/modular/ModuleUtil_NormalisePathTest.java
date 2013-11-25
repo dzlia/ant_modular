@@ -19,7 +19,7 @@ public class ModuleUtil_NormalisePathTest extends TestCase
     
     public void testNormalisePath_BaseDirIsCurrentDir_EmptyPath()
     {
-        assertEquals("", ModuleUtil.normalisePath("", new File("")));
+        assertEquals(".", ModuleUtil.normalisePath("", new File("")));
     }
     
     public void testNormalisePath_BaseDirIsCurrentDir_DirectChildPathInNormalisedForm()
