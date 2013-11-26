@@ -74,7 +74,8 @@ public final class ModuleInfo
      * The {@code ModuleInfo} instance created has neither dependencies nor attributes.</p>
      * 
      * <p>The {@link ModuleLoader} passed is expected to be the {@code ModuleLoader} that
-     * creates this {@code ModuleInfo}. Its function {@link #normalisePath(String)} is used
+     * creates this {@code ModuleInfo}. Its function
+     * {@link ModuleLoader#normalisePath(String) normalisePath(String)} is used
      * to normalise module paths (the path of this {@code ModuleInfo} and the paths of
      * the dependee modules).</p>
      * 
