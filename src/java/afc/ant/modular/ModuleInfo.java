@@ -167,7 +167,7 @@ public final class ModuleInfo
         }
         this.dependencies.clear();
         for (final String dependency : dependencies) {
-            this.dependencies.add(normalisePath(dependency));
+            this.dependencies.add(moduleLoader.normalisePath(dependency));
         }
     }
     
