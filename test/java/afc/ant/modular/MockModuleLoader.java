@@ -44,6 +44,12 @@ public class MockModuleLoader implements ModuleLoader
     public String normalisePath(final String path)
     {
         Assert.assertNotNull(path);
-        return ModuleInfo.normalisePath(path);
+        if (path.length() == 0) {
+            return "/";
+        }
+        if (path.charAt(path.length()-1) != '/') {
+            return path + '/';
+        }
+        return path;
     }
 }
