@@ -216,6 +216,8 @@ public class ModuleUtil
     }
     
     // TODO document me.
+    // TODO make this code readable.
+    // TODO improve performance.
     public static String normalisePath(final String path, final File baseDir)
     {
         if (path == null) {
@@ -231,21 +233,39 @@ public class ModuleUtil
         for (File f = new File(path); f != null; f = f.getParentFile()) {
             parts.add(f.getName());
         }
+        
+        // TODO initialise baseDirParts lazily.
+        final ArrayList<String> baseDirParts = new ArrayList<String>();
+        for (File f = baseDir.getAbsoluteFile(); f != null; f = f.getParentFile()) {
+            baseDirParts.add(f.getName());
+        }
+        
+        // Going through path elements from parents to children resolving '.' and '..'.
         final ArrayList<String> resultParts = new ArrayList<String>(parts.size());
+        int baseDirCommonCursor = 0;
         int depth = 0;
         for (int i = parts.size() - 1; i >= 0; --i) {
             final String part = parts.get(i);
             if (part.equals(".")) {
                 continue;
             } else if (part.equals("..")) {
-                if (--depth < 0) {
+                if (resultParts.isEmpty() || resultParts.get(resultParts.size() - 1).equals("..")) {
                     resultParts.add("..");
+                    if (baseDirCommonCursor == depth) {
+                        --baseDirCommonCursor;
+                    }
                 } else {
                     resultParts.remove(resultParts.size() - 1);
                 }
+                --depth;
             } else {
+                if (depth < 0 && baseDirCommonCursor == depth && part.equals(baseDirParts.get(-depth - 1))) {
+                    ++baseDirCommonCursor;
+                    resultParts.remove(resultParts.size() - 1);
+                } else {
+                    resultParts.add(part);
+                }
                 ++depth;
-                resultParts.add(part);
             }
         }
         if (resultParts.isEmpty()) {
@@ -253,7 +273,6 @@ public class ModuleUtil
             return ".";
         }
         // TODO support case normalisation for windows
-        // TODO normalise paths that go the the parent dirs of the basedir.
         // TODO pre-allocate the buffer;
         final StringBuilder buf = new StringBuilder();
         for (final String part : resultParts) {

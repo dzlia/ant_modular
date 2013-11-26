@@ -126,7 +126,15 @@ public class ModuleUtil_NormalisePathTest extends TestCase
     {
         final File baseDir = new File("/hello/world");
         
-        assertEquals("../foo/baz", ModuleUtil.normalisePath(
+        assertEquals("foo/baz", ModuleUtil.normalisePath(
                 "../qwe/../../hello/world/foo/bar/../baz/./quux/..", baseDir));
+    }
+    
+    public void testNormalisePath_BaseDirIsNotCurrentDir_PathGoesBeyondRoot()
+    {
+        final File baseDir = new File("/hello/world");
+        
+        assertEquals("foo/baz", ModuleUtil.normalisePath(
+                "../qwe/../../../hello/world/foo/bar/../baz/./quux/..", baseDir));
     }
 }
