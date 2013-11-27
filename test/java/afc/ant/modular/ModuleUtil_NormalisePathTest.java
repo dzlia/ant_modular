@@ -7,6 +7,25 @@ import junit.framework.TestCase;
 // TODO add tests with absolute paths
 public class ModuleUtil_NormalisePathTest extends TestCase
 {
+    /**
+     * <p>Tests that {@link ModuleUtil#normalisePath(String, File)} throws
+     * {@link NullPointerException} if a {@code null} base directory is passed in.</p>
+     */
+    public void testNormalisePath_BaseDirIsCurrentDir_NullBaseDir()
+    {
+        try {
+            ModuleUtil.normalisePath("foo/bar", null);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("baseDir", ex.getMessage());
+        }
+    }
+    
+    /**
+     * <p>Tests that {@link ModuleUtil#normalisePath(String, File)} throws
+     * {@link NullPointerException} if a {@code null} path is passed in.</p>
+     */
     public void testNormalisePath_BaseDirIsCurrentDir_NullPath()
     {
         try {

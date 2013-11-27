@@ -220,6 +220,9 @@ public class ModuleUtil
     // TODO improve performance.
     public static String normalisePath(final String path, final File baseDir)
     {
+        if (baseDir == null) {
+            throw new NullPointerException("baseDir");
+        }
         if (path == null) {
             throw new NullPointerException("path");
         }
