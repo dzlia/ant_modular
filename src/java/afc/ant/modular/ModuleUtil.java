@@ -218,6 +218,7 @@ public class ModuleUtil
     // TODO document me.
     // TODO make this code readable.
     // TODO improve performance.
+    // TODO think how to support correctly . and .. in baseDir.
     public static String normalisePath(final String path, final File baseDir)
     {
         if (baseDir == null) {
