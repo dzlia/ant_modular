@@ -235,6 +235,7 @@ public class ModuleUtil
         }
         
         // TODO initialise baseDirParts lazily.
+        // Base directory path elements in the reverse order.
         final ArrayList<String> baseDirParts = new ArrayList<String>();
         for (File f = baseDir.getAbsoluteFile(); f != null; f = f.getParentFile()) {
             baseDirParts.add(f.getName());
@@ -249,6 +250,12 @@ public class ModuleUtil
             if (part.equals(".")) {
                 continue;
             } else if (part.equals("..")) {
+                if (-(baseDirCommonCursor - 1) == baseDirParts.size()) {
+                    /* There is nothing to do since the root directory is reached and
+                     * the parent of the root directory is the root directory itself.
+                     */
+                    continue;
+                }
                 if (resultParts.isEmpty() || resultParts.get(resultParts.size() - 1).equals("..")) {
                     resultParts.add("..");
                     if (baseDirCommonCursor == depth) {
