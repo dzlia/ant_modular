@@ -247,6 +247,9 @@ public class ModuleUtil
         // Going through path elements from parents to children resolving '.' and '..'.
         final ArrayList<String> resultParts = new ArrayList<String>(parts.size());
         int baseDirCommonCursor = 0;
+        /* Indicates what is the depth of the current path element in the file system hierarchy
+         * given that the depth of the baseDir is zero.
+         */
         int depth = 0;
         for (int i = parts.size() - 1; i >= 0; --i) {
             final String part = parts.get(i);
@@ -260,10 +263,11 @@ public class ModuleUtil
                     continue;
                 }
                 if (resultParts.isEmpty() || resultParts.get(resultParts.size() - 1).equals("..")) {
+                    // The current path element points to the direct or an indirect parent directory of the baseDir.
                     resultParts.add("..");
-                    if (baseDirCommonCursor == depth) {
-                        --baseDirCommonCursor;
-                    }
+                    
+                    // Moving the cursor one level up.
+                    --baseDirCommonCursor;
                 } else {
                     resultParts.remove(resultParts.size() - 1);
                 }
