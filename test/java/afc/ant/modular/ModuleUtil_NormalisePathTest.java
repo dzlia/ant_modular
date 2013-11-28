@@ -4,7 +4,6 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
-// TODO add tests with absolute paths
 public class ModuleUtil_NormalisePathTest extends TestCase
 {
     /**
@@ -162,5 +161,54 @@ public class ModuleUtil_NormalisePathTest extends TestCase
         
         assertEquals("foo/baz", ModuleUtil.normalisePath(
                 "../qwe/../../../hello/world/foo/bar/../baz/./quux/..", baseDir));
+    }
+    
+    public void testNormalisePath_AbsolutePath_PointsToBaseDir_DirectMatch()
+    {
+        final File baseDir = new File("/hello/world");
+        
+        assertEquals(".", ModuleUtil.normalisePath("/hello/world", baseDir));
+    }
+    
+    public void testNormalisePath_AbsolutePath_PointsToBaseDir_DirectMatch_WithSeparator()
+    {
+        final File baseDir = new File("/hello/world");
+        
+        assertEquals(".", ModuleUtil.normalisePath("/hello/world", baseDir));
+    }
+    
+    public void testNormalisePath_AbsolutePath_PointsToBaseDir_GoingBackAndForth()
+    {
+        final File baseDir = new File("/hello/world");
+        
+        assertEquals(".", ModuleUtil.normalisePath("/hello/../../hello/world/foo/..", baseDir));
+    }
+    
+    public void testNormalisePath_AbsolutePath_PointsToParentDir()
+    {
+        final File baseDir = new File("/hello/world");
+        
+        assertEquals("..", ModuleUtil.normalisePath("/hello", baseDir));
+    }
+    
+    public void testNormalisePath_AbsolutePath_PointsToRoot()
+    {
+        final File baseDir = new File("/hello/world");
+        
+        assertEquals("../..", ModuleUtil.normalisePath("/", baseDir));
+    }
+    
+    public void testNormalisePath_AbsolutePath_PointsToSubDir()
+    {
+        final File baseDir = new File("/hello/world");
+        
+        assertEquals("foo", ModuleUtil.normalisePath("/hello/world/foo", baseDir));
+    }
+    
+    public void testNormalisePath_AbsolutePath_PointsToSubSubDir()
+    {
+        final File baseDir = new File("/hello/world");
+        
+        assertEquals("foo/bar", ModuleUtil.normalisePath("/hello/world/foo/./bar/baz/..", baseDir));
     }
 }
