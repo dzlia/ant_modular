@@ -241,7 +241,7 @@ public class ModuleUtil
         // TODO initialise baseDirParts lazily.
         // Base directory path elements in the reverse order.
         final ArrayList<String> baseDirParts = new ArrayList<String>();
-        for (File f = baseDir.getAbsoluteFile(); f != null; f = f.getParentFile()) {
+        for (File f = baseDir.isAbsolute() ? baseDir : baseDir.getAbsoluteFile(); f != null; f = f.getParentFile()) {
             baseDirParts.add(f.getName());
         }
         
