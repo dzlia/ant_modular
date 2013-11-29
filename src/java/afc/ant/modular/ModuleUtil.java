@@ -26,6 +26,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -234,7 +235,8 @@ public class ModuleUtil
         
         // Adding path elements in the reverse order.
         final ArrayList<String> parts = new ArrayList<String>();
-        for (File f = new File(path); f != null; f = f.getParentFile()) {
+        final File pathFile = new File(path);
+        for (File f = pathFile; f != null; f = f.getParentFile()) {
             parts.add(f.getName());
         }
         
@@ -246,12 +248,28 @@ public class ModuleUtil
         }
         
         // Going through path elements from parents to children resolving '.' and '..'.
-        final ArrayList<String> resultParts = new ArrayList<String>(parts.size());
-        int baseDirCommonCursor = 0;
+        final ArrayList<String> resultParts;
+        
         /* Indicates what is the depth of the current path element in the file system hierarchy
          * given that the depth of the baseDir is zero.
          */
         int depth = 0;
+        int baseDirCommonCursor = 0;
+        if (pathFile.isAbsolute()) {
+            /* Initialising the destination path with necessary .. elements to reach
+             * the position 'above' root directory so that the root directory is the
+             * first path element to start resolving with.
+             */
+            final int levelsUp = baseDirParts.size();
+            baseDirCommonCursor = depth = -levelsUp;
+            resultParts = new ArrayList<String>(parts.size() + levelsUp);
+            resultParts.addAll(Collections.nCopies(levelsUp, ".."));
+        } else {
+            // The path is relative. baseDir is a starting point to resolve path elements against.
+            baseDirCommonCursor = depth = 0;
+            resultParts = new ArrayList<String>(parts.size());
+        }
+        
         for (int i = parts.size() - 1; i >= 0; --i) {
             final String part = parts.get(i);
             if (part.equals(".")) {
