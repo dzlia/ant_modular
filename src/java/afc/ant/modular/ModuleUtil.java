@@ -247,7 +247,6 @@ public class ModuleUtil
             baseDirParts.add(f.getName());
         }
         
-        // Going through path elements from parents to children resolving '.' and '..'.
         final ArrayList<String> resultParts;
         
         /* Indicates what is the depth of the current path element in the file system hierarchy
@@ -270,6 +269,7 @@ public class ModuleUtil
             resultParts = new ArrayList<String>(parts.size());
         }
         
+        // Going through path elements from parents to children resolving '.' and '..'.
         for (int i = parts.size() - 1; i >= 0; --i) {
             final String part = parts.get(i);
             if (part.equals(".")) {
