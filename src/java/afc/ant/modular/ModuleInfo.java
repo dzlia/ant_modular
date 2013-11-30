@@ -22,6 +22,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -95,14 +96,20 @@ public final class ModuleInfo
             throw new NullPointerException("moduleLoader");
         }
         this.path = moduleLoader.normalisePath(path);
+        if (this.path == null) {
+            throw new NullPointerException(MessageFormat.format(
+                    "The normalised path that corresponds to the path ''{0}'' is null.", path));
+        }
         this.moduleLoader = moduleLoader;
     }
     
     /**
-     * <p>Returns the path of this {@code ModuleInfo}. It is a path relative to the root directory
-     * of the environment that is associated with this {@code ModuleInfo}.</p>
+     * <p>Returns the {@link ModuleLoader#normalisePath(String) normalised} path of this
+     * {@code ModuleInfo}. It is a path relative to the root directory of the environment
+     * that is associated with this {@code ModuleInfo}.</p>
      * 
-     * @return the module path. It is necessarily non-{@code null}.
+     * @return the module path that is normalised by this {@code ModuleInfo}'s
+     * {@code ModuleLoader}. It is necessarily non-{@code null}.
      */
     public String getPath()
     {
