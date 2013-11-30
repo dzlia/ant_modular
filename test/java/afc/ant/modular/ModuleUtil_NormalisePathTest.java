@@ -211,4 +211,39 @@ public class ModuleUtil_NormalisePathTest extends TestCase
         
         assertEquals("foo/bar", ModuleUtil.normalisePath("/hello/world/foo/./bar/baz/..", baseDir));
     }
+    
+    public void testNormalisePath_NonNormalisedRelativeBaseDir_RelativePath()
+    {
+        final File baseDir = new File("hello/./../world");
+        
+        assertEquals("bar", ModuleUtil.normalisePath("foo/../bar/baz/..", baseDir));
+    }
+    
+    public void testNormalisePath_NonNormalisedAbsoluteBaseDir_RelativePath()
+    {
+        final File baseDir = new File("/hello/./world");
+        
+        assertEquals("foo/bar", ModuleUtil.normalisePath("/hello/world/foo/./bar/baz/..", baseDir));
+    }
+    
+    public void testNormalisePath_NonNormalisedAbsoluteBaseDirThatGoesBeyondRoot()
+    {
+        final File baseDir = new File("/hello/./../../world");
+        
+        assertEquals("foo/bar", ModuleUtil.normalisePath("/hello/world/foo/./bar/baz/..", baseDir));
+    }
+    
+    public void testNormalisePath_NonNormalisedAbsoluteBaseDir_AbsolutePath()
+    {
+        final File baseDir = new File("/hello/./world");
+        
+        assertEquals("foo/bar", ModuleUtil.normalisePath("/hello/world/foo/./bar/baz/..", baseDir));
+    }
+    
+    public void testNormalisePath_BaseDirIsRoot()
+    {
+        final File baseDir = new File("/");
+        
+        assertEquals("baz", ModuleUtil.normalisePath("foo/bar/../../../baz", baseDir));
+    }
 }
