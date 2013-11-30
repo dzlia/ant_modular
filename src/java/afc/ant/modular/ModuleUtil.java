@@ -327,7 +327,18 @@ public class ModuleUtil
         // Base directory path elements in the reverse order.
         final ArrayList<String> baseDirParts = new ArrayList<String>();
         for (File f = baseDir.isAbsolute() ? baseDir : baseDir.getAbsoluteFile(); f != null; f = f.getParentFile()) {
-            baseDirParts.add(f.getName());
+            final String e = f.getName();
+            if (e.equals(".")) {
+                continue;
+            } else if (e.equals("..")) {
+                final int size = baseDirParts.size();
+                // The first element is always the root directory.
+                if (size > 1) {
+                    baseDirParts.remove(size - 1);
+                }
+            } else {
+                baseDirParts.add(e);
+            }
         }
         return baseDirParts;
     }
