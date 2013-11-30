@@ -240,13 +240,6 @@ public class ModuleUtil
             parts.add(f.getName());
         }
         
-        // TODO initialise baseDirParts lazily.
-        // Base directory path elements in the reverse order.
-        final ArrayList<String> baseDirParts = new ArrayList<String>();
-        for (File f = baseDir.isAbsolute() ? baseDir : baseDir.getAbsoluteFile(); f != null; f = f.getParentFile()) {
-            baseDirParts.add(f.getName());
-        }
-        
         final ArrayList<String> resultParts;
         
         /* Indicates what is the depth of the current path element in the file system hierarchy
@@ -254,7 +247,11 @@ public class ModuleUtil
          */
         int depth = 0;
         int baseDirCommonCursor = 0;
+        ArrayList<String> baseDirParts;
+        
         if (pathFile.isAbsolute()) {
+            baseDirParts = baseDirElements(null, baseDir);
+            
             /* Initialising the destination path with necessary .. elements to reach
              * the position 'above' root directory so that the root directory is the
              * first path element to start resolving with.
@@ -264,6 +261,9 @@ public class ModuleUtil
             resultParts = new ArrayList<String>(parts.size() + levelsUp);
             resultParts.addAll(Collections.nCopies(levelsUp, ".."));
         } else {
+            // It is unknown if baseDirParts will be used later so leaving it non-initialised.
+            baseDirParts = null;
+            
             // The path is relative. baseDir is a starting point to resolve path elements against.
             baseDirCommonCursor = depth = 0;
             resultParts = new ArrayList<String>(parts.size());
@@ -275,6 +275,8 @@ public class ModuleUtil
             if (part.equals(".")) {
                 continue;
             } else if (part.equals("..")) {
+                baseDirParts = baseDirElements(baseDirParts, baseDir); // lazy init
+                
                 if (-(baseDirCommonCursor - 1) == baseDirParts.size()) {
                     /* There is nothing to do since the root directory is reached and
                      * the parent of the root directory is the root directory itself.
@@ -292,6 +294,8 @@ public class ModuleUtil
                 }
                 --depth;
             } else {
+                baseDirParts = baseDirElements(baseDirParts, baseDir); // lazy init
+                
                 if (depth < 0 && baseDirCommonCursor == depth && part.equals(baseDirParts.get(-depth - 1))) {
                     ++baseDirCommonCursor;
                     resultParts.remove(resultParts.size() - 1);
@@ -312,5 +316,18 @@ public class ModuleUtil
             buf.append(part).append(File.separatorChar);
         }
         return buf.substring(0, buf.length() - 1);
+    }
+    
+    private static ArrayList<String> baseDirElements(final ArrayList<String> baseDirElements, final File baseDir)
+    {
+        if (baseDirElements != null) {
+            return baseDirElements;
+        }
+        // Base directory path elements in the reverse order.
+        final ArrayList<String> baseDirParts = new ArrayList<String>();
+        for (File f = baseDir.isAbsolute() ? baseDir : baseDir.getAbsoluteFile(); f != null; f = f.getParentFile()) {
+            baseDirParts.add(f.getName());
+        }
+        return baseDirParts;
     }
 }
