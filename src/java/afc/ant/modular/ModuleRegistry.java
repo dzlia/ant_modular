@@ -108,6 +108,11 @@ public class ModuleRegistry
         return resolveModuleFast(moduleLoader.normalisePath(path));
     }
     
+    /* 
+     * Resolves modules as described in #resolveModule(String) but assuming that the module path
+     * passed in is a non-null normalised module path so that no additional path normalisation
+     * is needed.
+     */
     private Module resolveModuleFast(final String normalisedPath) throws ModuleNotLoadedException
     {
         final Object cachedModule = modules.get(normalisedPath);
