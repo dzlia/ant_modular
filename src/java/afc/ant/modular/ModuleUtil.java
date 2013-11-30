@@ -320,6 +320,7 @@ public class ModuleUtil
     
     private static ArrayList<String> baseDirElements(final ArrayList<String> baseDirElements, final File baseDir)
     {
+        // TODO think of moving this if outside the loop to improve performance if this function is not inlined by JIT.
         if (baseDirElements != null) {
             return baseDirElements;
         }
