@@ -59,6 +59,17 @@ public class ModuleInfoTest extends TestCase
         }
     }
     
+    public void testConstructWithNullModuleLoader()
+    {
+        try {
+            new ModuleInfo("foo/bar", null);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("moduleLoader", ex.getMessage());
+        }
+    }
+    
     public void testConstruct_NormalisedPathIsNull()
     {
         moduleLoader.normalisedPaths.put("some/path", null);

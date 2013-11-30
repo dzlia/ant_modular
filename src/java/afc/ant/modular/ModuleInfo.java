@@ -84,8 +84,8 @@ public final class ModuleInfo
      * @param moduleLoader the module loader that creates this {@code ModuleInfo}.
      *      It must be non-{@code null}.
      * 
-     * @throws NullPointerException if either <em>path</em> or <em>moduleLoader</em>
-     *      is {@code null}.
+     * @throws NullPointerException if <em>path</em> or the normalised path or
+     *      <em>moduleLoader</em> is {@code null}.
      */
     public ModuleInfo(final String path, final ModuleLoader moduleLoader)
     {
