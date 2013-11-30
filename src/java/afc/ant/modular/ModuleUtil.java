@@ -249,7 +249,7 @@ public class ModuleUtil
         ArrayList<String> baseDirParts;
         
         if (pathFile.isAbsolute()) {
-            baseDirParts = baseDirElements(null, baseDir);
+            baseDirParts = baseDirElements(baseDir);
             
             /* Initialising the destination path with necessary .. elements to reach
              * the position 'above' root directory so that the root directory is the
@@ -274,7 +274,10 @@ public class ModuleUtil
             if (part.equals(".")) {
                 continue;
             } else if (part.equals("..")) {
-                baseDirParts = baseDirElements(baseDirParts, baseDir); // lazy init
+                if (baseDirParts == null) {
+                    // Lazy init.
+                    baseDirParts = baseDirElements(baseDir);
+                }
                 
                 if (-(baseDirCommonCursor - 1) == baseDirParts.size()) {
                     /* There is nothing to do since the root directory is reached and
@@ -293,14 +296,26 @@ public class ModuleUtil
                 }
                 --depth;
             } else {
-                baseDirParts = baseDirElements(baseDirParts, baseDir); // lazy init
-                
-                if (depth < 0 && baseDirCommonCursor == depth && part.equals(baseDirParts.get(-depth - 1))) {
-                    ++baseDirCommonCursor;
-                    resultParts.remove(resultParts.size() - 1);
-                } else {
-                    resultParts.add(part);
+                if (depth < 0 && baseDirCommonCursor == depth) {
+                    // The current sub-path points to a parent of baseDir.
+                    if (baseDirParts == null) {
+                        // Lazy init.
+                        baseDirParts = baseDirElements(baseDir);
+                    }
+                    
+                    /* If the current path element points to a parent of baseDir then
+                     * just removing the previous '..'.
+                     */
+                    if (part.equals(baseDirParts.get(-depth - 1))) {
+                        assert resultParts.get(resultParts.size() - 1).equals("..");
+                        
+                        resultParts.remove(resultParts.size() - 1);
+                        ++depth;
+                        ++baseDirCommonCursor;
+                        continue;
+                    }
                 }
+                resultParts.add(part);
                 ++depth;
             }
         }
@@ -317,12 +332,8 @@ public class ModuleUtil
         return buf.substring(0, buf.length() - 1);
     }
     
-    private static ArrayList<String> baseDirElements(final ArrayList<String> baseDirElements, final File baseDir)
+    private static ArrayList<String> baseDirElements(final File baseDir)
     {
-        // TODO think of moving this if outside the loop to improve performance if this function is not inlined by JIT.
-        if (baseDirElements != null) {
-            return baseDirElements;
-        }
         // Base directory path elements in the reverse order.
         final ArrayList<String> baseDirParts = new ArrayList<String>();
         for (File f = baseDir.isAbsolute() ? baseDir : baseDir.getAbsoluteFile(); f != null; f = f.getParentFile()) {
