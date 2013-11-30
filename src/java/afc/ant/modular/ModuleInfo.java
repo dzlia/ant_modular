@@ -173,13 +173,15 @@ public final class ModuleInfo
     }
     
     /**
-     * <p>Returns a set of module paths which this module depends upon. The set returned and
-     * the paths it contains are necessarily non-{@code null}. The set returned is unmodifiable.
-     * In addition, any further modification of this {@code ModuleInfo}'s dependencies by means of
-     * the {@link #addDependency(String)} and {@link #setDependencies(Collection)} operations
-     * is immediately visible in the set returned.</p>
+     * <p>Returns a set of {@link ModuleLoader#normalisePath(String) normalised} module paths
+     * which this module depends upon. The set returned and the paths it contains are necessarily
+     * non-{@code null}. The set returned is unmodifiable. In addition, any further modification
+     * of this {@code ModuleInfo}'s dependencies by means of the {@link #addDependency(String)}
+     * and {@link #setDependencies(Collection)} operations is immediately visible in the set
+     * returned.</p>
      * 
-     * @return an unmodifiable set of this module's dependency modules.
+     * @return an unmodifiable set of this module's dependee module paths that are normalised
+     * by this {@code ModuleInfo}'s {@code ModuleLoader}.
      */
     public Set<String> getDependencies()
     {
