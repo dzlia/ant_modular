@@ -298,10 +298,7 @@ public class ModuleUtil
             } else {
                 if (depth < 0 && baseDirCommonCursor == depth) {
                     // The current sub-path points to a parent of baseDir.
-                    if (baseDirParts == null) {
-                        // Lazy init.
-                        baseDirParts = baseDirElements(baseDir);
-                    }
+                    assert baseDirParts != null;
                     
                     /* If the current path element points to a parent of baseDir then
                      * just removing the previous '..'.
