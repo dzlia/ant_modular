@@ -59,6 +59,19 @@ public class ModuleInfoTest extends TestCase
         }
     }
     
+    public void testConstruct_NormalisedPathIsNull()
+    {
+        moduleLoader.normalisedPaths.put("some/path", null);
+        
+        try {
+            new ModuleInfo("some/path", moduleLoader);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("The normalised path that corresponds to the path 'some/path' is null.", ex.getMessage());
+        }
+    }
+    
     public void testConstructWithEmptyPath()
     {
         final ModuleInfo m = new ModuleInfo("", moduleLoader);

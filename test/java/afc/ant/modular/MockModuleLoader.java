@@ -29,6 +29,7 @@ import junit.framework.Assert;
 public class MockModuleLoader implements ModuleLoader
 {
     public final HashMap<String, Object> modules = new HashMap<String, Object>();
+    public final HashMap<String, String> normalisedPaths = new HashMap<String, String>();
     
     public ModuleInfo loadModule(final String path) throws ModuleNotLoadedException
     {
@@ -44,6 +45,9 @@ public class MockModuleLoader implements ModuleLoader
     public String normalisePath(final String path)
     {
         Assert.assertNotNull(path);
+        if (normalisedPaths.containsKey(path)) {
+            return normalisedPaths.get(path);
+        }
         if (path.length() == 0) {
             return "/";
         }
