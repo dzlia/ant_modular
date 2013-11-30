@@ -105,7 +105,11 @@ public class ModuleRegistry
             throw new NullPointerException("path");
         }
         
-        final String normalisedPath = moduleLoader.normalisePath(path);
+        return resolveModuleFast(moduleLoader.normalisePath(path));
+    }
+    
+    private Module resolveModuleFast(final String normalisedPath) throws ModuleNotLoadedException
+    {
         final Object cachedModule = modules.get(normalisedPath);
         if (cachedModule == moduleNotLoaded) {
             throw new ModuleNotLoadedException(normalisedPath);
@@ -125,7 +129,10 @@ public class ModuleRegistry
                module loading in case of cyclic dependencies, which causes stack overflow. */
             modules.put(normalisedPath, module);
             for (final String depPath : moduleInfo.getDependencies()) {
-                module.addDependency(resolveModule(depPath));
+                /* ModuleInfo#getDependencies() returns normalised module paths so it is
+                 * safe to invoke #resolveModuleFast() directly.
+                 */
+                module.addDependency(resolveModuleFast(depPath));
             }
             return module;
         }
