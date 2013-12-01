@@ -118,15 +118,16 @@ public final class ModuleInfo
     
     /**
      * <p>Assigns a given module path as a dependency. The path is normalised before it is
-     * assigned. The given module path in its normalised form must not be equal to the path
-     * of this {@code ModuleInfo}. In addition, it must not be {@code null}. The new dependency
+     * assigned. The given module path in its normalised form must be not equal to the path
+     * of this {@code ModuleInfo}. In addition, it must be non-{@code null}. The new dependency
      * becomes visible immediately via a set returned by {@link #getDependencies()}.</p>
      * 
      * @param dependency the module path to be assigned as a dependency.
-     *      It must not be {@code null}.
+     *      It must be non-{@code null}.
      * 
-     * @throws NullPointerException if <em>dependency</em> is {@code null}.
-     * @throws IllegalArgumentException if <em>dependency</em> in its normalised form is equal
+     * @throws NullPointerException if <em>dependency</em> or the dependency in the normalised
+     *      form is {@code null}.
+     * @throws IllegalArgumentException if <em>dependency</em> in the normalised form is equal
      *      to this {@code ModuleInfo}'s path.
      */
     public void addDependency(final String dependency)
@@ -135,6 +136,10 @@ public final class ModuleInfo
             throw new NullPointerException("dependency");
         }
         final String normalisedDependency = moduleLoader.normalisePath(dependency);
+        if (normalisedDependency == null) {
+            throw new NullPointerException(MessageFormat.format(
+                    "The normalised path that corresponds to the path ''{0}'' is null.", dependency));
+        }
         if (normalisedDependency.equals(path)) {
             throw new IllegalArgumentException("Cannot add itself as a dependency.");
         }
@@ -153,8 +158,9 @@ public final class ModuleInfo
      *      This collection and all its elements are to be non-{@code null}. This collection must not
      *      contain this {@code ModuleInfo}'s path (the normalised paths are compared).
      * 
-     * @throws NullPointerException if <em>dependencies</em> or any its element is {@code null}.
-     *      This {@code ModuleInfo} instance is not modified in this case.
+     * @throws NullPointerException if <em>dependencies</em> or any its element or any dependency
+     *      in the normalised form is {@code null}. This {@code ModuleInfo} instance is not modified
+     *      in this case.
      * @throws IllegalArgumentException if <em>dependencies</em> contains this {@code ModuleInfo}'s path
      *      (normalised or non-normalised). This {@code ModuleInfo} instance is not modified in this case.
      */
@@ -163,19 +169,31 @@ public final class ModuleInfo
         if (dependencies == null) {
             throw new NullPointerException("dependencies");
         }
-        // Iteration is used instead of Collection#contains because not all collections support null elements.
+        
+        /* Normalisation could be an expensive operation. Storing all normalised paths here
+         * to avoid normalising same paths twice.
+         */
+        final String[] normalisedPaths = new String[dependencies.size()];
+        int i = 0;
         for (final String dependency : dependencies) {
             if (dependency == null) {
                 throw new NullPointerException("dependencies contains null dependency.");
             }
             final String normalisedDependency = moduleLoader.normalisePath(dependency);
+            if (normalisedDependency == null) {
+                throw new NullPointerException(MessageFormat.format(
+                        "The normalised path that corresponds to the path ''{0}'' is null.", dependency));
+            }
             if (normalisedDependency.equals(path)) {
                 throw new IllegalArgumentException("Cannot add itself as a dependency.");
             }
+            normalisedPaths[i++] = normalisedDependency;
         }
+        
+        // The new dependencies are valid. Replacing the existing dependencies with the new ones.
         this.dependencies.clear();
-        for (final String dependency : dependencies) {
-            this.dependencies.add(moduleLoader.normalisePath(dependency));
+        for (final String normalisedPath : normalisedPaths) {
+            this.dependencies.add(normalisedPath);
         }
     }
     

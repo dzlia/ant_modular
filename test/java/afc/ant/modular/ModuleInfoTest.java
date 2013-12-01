@@ -258,6 +258,28 @@ public class ModuleInfoTest extends TestCase
         assertEquals(Collections.emptyMap(), m.getAttributes());
     }
     
+    public void testSetDependencies_SomeNormalisedDependencyIsNull()
+    {
+        moduleLoader.normalisedPaths.put("flux", null);
+        
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
+        
+        m.setDependencies(Arrays.asList("bar", "baz/"));
+        assertEquals("foo/", m.getPath());
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
+        
+        try {
+            m.setDependencies(Arrays.asList("quux", "flux"));
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("The normalised path that corresponds to the path 'flux' is null.", ex.getMessage());
+        }
+        assertEquals(TestUtil.set("bar/", "baz/"), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
+    }
+    
     public void testAddDependency_NoOtherDependencies()
     {
         final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
@@ -298,6 +320,29 @@ public class ModuleInfoTest extends TestCase
         }
         catch (NullPointerException ex) {
             assertEquals("dependency", ex.getMessage());
+        }
+        assertEquals("foo/", m.getPath());
+        assertEquals(Collections.singleton("bar/"), m.getDependencies());
+        
+        assertEquals(Collections.emptyMap(), m.getAttributes());
+    }
+    
+    public void testAddDependency_NormalisedDependencyIsNull()
+    {
+        moduleLoader.normalisedPaths.put("baz", null);
+        
+        final ModuleInfo m = new ModuleInfo("foo", moduleLoader);
+        
+        m.setDependencies(Collections.singletonList("bar"));
+        assertEquals("foo/", m.getPath());
+        assertEquals(Collections.singleton("bar/"), m.getDependencies());
+        
+        try {
+            m.addDependency("baz");
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("The normalised path that corresponds to the path 'baz' is null.", ex.getMessage());
         }
         assertEquals("foo/", m.getPath());
         assertEquals(Collections.singleton("bar/"), m.getDependencies());
