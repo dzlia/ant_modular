@@ -44,7 +44,8 @@ import java.util.Set;
  * 
  * <p>The module dependencies is a set of modules which this module depends upon.
  * Typically the dependee modules should be processed before this module can be
- * processed. A {@code ModuleInfo} holds references to its dependee modules by their paths.</p>
+ * processed. A {@code ModuleInfo} holds references to its dependee modules by their
+ * {@link ModuleLoader#normalisePath(String) normalised paths}.</p>
  * 
  * <p>The module attributes are named pieces of data of free format. Attribute names
  * are case-sensitive. The {@code null} name is not allowed. An attribute value can be
