@@ -88,14 +88,14 @@ public class ModuleRegistry
      * <p>For each given normalised path {@link ModuleLoader#loadModule(String)} is invoked
      * at most once.</p>
      * 
-     * @param path the path of the module to be resolved. It must not be {@code null}.
-     *      The module path is normalised, so the path of the module returned could
-     *      differ from this path.
+     * @param path the path of the module to be resolved. It and its normalised form must
+     *      be non-{@code null}. The module path is normalised so the path of the module
+     *      returned could differ from this path.
      * 
      * @return the {@code Module} object that corresponds to the given path.
      *      It is never {@code null}.
      * 
-     * @throws NullPointerException if <em>path</em> is {@code null}.
+     * @throws NullPointerException if <em>path</em> or the normalised path is {@code null}.
      * @throws ModuleNotLoadedException if there is no module associated with the given path
      *      or if the module metadata cannot be loaded.
      */
@@ -105,7 +105,13 @@ public class ModuleRegistry
             throw new NullPointerException("path");
         }
         
-        return resolveModuleFast(moduleLoader.normalisePath(path));
+        final String normalisedPath = moduleLoader.normalisePath(path);
+        if (normalisedPath == null) {
+            throw new NullPointerException(MessageFormat.format(
+                    "The normalised path that corresponds to the path ''{0}'' is null.", path));
+        }
+        
+        return resolveModuleFast(normalisedPath);
     }
     
     /* 

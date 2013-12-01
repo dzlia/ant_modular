@@ -382,6 +382,28 @@ public class ModuleRegistryTest extends TestCase
         assertEquals(Collections.singletonList("foo_norm"), moduleLoader.paths);
     }
     
+    public void testNullNormalisedPath() throws Exception
+    {
+        moduleLoader.nullNormalisedPaths.add("some/path");
+        
+        final ModuleInfo module = new ModuleInfo("foo", moduleLoader);
+        moduleLoader.results.put("foo_norm", module);
+        
+        try {
+            registry.resolveModule("some/path");
+            fail();
+        }
+        catch (NullPointerException ex) {
+            assertEquals("The normalised path that corresponds to the path 'some/path' is null.", ex.getMessage());
+        }
+        
+        final Module m = registry.resolveModule("foo");
+        
+        assertModule(m, "foo_norm");
+        
+        assertEquals(Collections.singletonList("foo_norm"), moduleLoader.paths);
+    }
+    
     public void testCreateResolverWithNullModuleLoader()
     {
         try {
@@ -460,6 +482,7 @@ public class ModuleRegistryTest extends TestCase
     private static class MockModuleLoader implements ModuleLoader
     {
         public final ArrayList<String> paths = new ArrayList<String>();
+        public final HashSet<String> nullNormalisedPaths = new HashSet<String>();
         public final HashMap<String, Object> results = new HashMap<String, Object>();
         
         // Does nothing, just prevents synthetic garbage to be created by a java compiler.
@@ -493,6 +516,9 @@ public class ModuleRegistryTest extends TestCase
         public String normalisePath(final String path)
         {
             assertNotNull(path);
+            if (nullNormalisedPaths.contains(path)) {
+                return null;
+            }
             return path.endsWith("_norm") ? path : path + "_norm";
         }
     }
