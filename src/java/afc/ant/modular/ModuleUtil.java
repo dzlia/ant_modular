@@ -321,12 +321,7 @@ public class ModuleUtil
             return ".";
         }
         // TODO support case normalisation for windows
-        // TODO pre-allocate the buffer;
-        final StringBuilder buf = new StringBuilder();
-        for (final String part : resultParts) {
-            buf.append(part).append(File.separatorChar);
-        }
-        return buf.substring(0, buf.length() - 1);
+        return join(resultParts, File.separatorChar);
     }
     
     private static ArrayList<String> baseDirElements(final File baseDir)
@@ -348,5 +343,26 @@ public class ModuleUtil
             }
         }
         return baseDirParts;
+    }
+    
+    private static String join(final ArrayList<String> parts, final char separator)
+    {
+        // Initialising destination string size with the number of separators.
+        int destSize = parts.size() - 1;
+        for (int i = 0, n = parts.size(); i < n; ++i) {
+            destSize += parts.get(i).length();
+        }
+        
+        // The buffer is created with the necessary capacity.
+        final StringBuilder buf = new StringBuilder(destSize);
+        int i = 0;
+        for (final int n = parts.size() - 1; i < n; ++i) {
+            buf.append(parts.get(i)).append(separator);
+        }
+        buf.append(parts.get(i));
+        
+        assert buf.length() == destSize;
+        
+        return buf.toString();
     }
 }
