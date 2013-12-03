@@ -279,12 +279,15 @@ public class ModuleUtil
                     baseDirParts = baseDirElements(baseDir);
                 }
                 
-                if (-(baseDirCommonCursor - 1) == baseDirParts.size()) {
+                if (depth <= 0 && -(baseDirCommonCursor - 1) == baseDirParts.size()) {
                     /* There is nothing to do since the root directory is reached and
                      * the parent of the root directory is the root directory itself.
+                     * 
+                     * If depth is equal to zero here then baseDir is the root directory.
                      */
                     continue;
                 }
+                
                 if (resultParts.isEmpty() || resultParts.get(resultParts.size() - 1).equals("..")) {
                     // The current path element points to the direct or an indirect parent directory of the baseDir.
                     resultParts.add("..");

@@ -246,4 +246,18 @@ public class ModuleUtil_NormalisePathTest extends TestCase
         
         assertEquals("baz", ModuleUtil.normalisePath("foo/bar/../../../baz", baseDir));
     }
+    
+    public void testNormalisePath_BaseDirIsRoot_PathGoesBeyondRootFromStart()
+    {
+        final File baseDir = new File("/");
+        
+        assertEquals("foo/baz", ModuleUtil.normalisePath("../../../foo/bar/../baz", baseDir));
+    }
+    
+    public void testNormalisePath_BaseDirIsRoot_WholePathGoesBeyondRoot()
+    {
+        final File baseDir = new File("/");
+        
+        assertEquals(".", ModuleUtil.normalisePath("../../..", baseDir));
+    }
 }
