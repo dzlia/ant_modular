@@ -328,6 +328,16 @@ public class ModuleUtil
         return join(resultParts, File.separatorChar);
     }
     
+    /*
+     * Normalises a given file path by removing all '.' elements and resolving
+     * the '..' elements. Symbolic links are not resolved.
+     * 
+     * This function is used by #normalisePath(String) to normalise base directories.
+     * 
+     * @param baseDir the base directory to be normalised. It must be non-null.
+     * 
+     * @return the path elements of the normalised path in the reverse order.
+     */
     private static ArrayList<String> baseDirElements(final File baseDir)
     {
         // Base directory path elements in the reverse order.
@@ -359,6 +369,15 @@ public class ModuleUtil
         return baseDirParts;
     }
     
+    /*
+     * Composes a string out of given strings placing a given separator between them.
+     * For example: join(["foo", "bar", "baz"], '.') produces the string "foo.bar.baz".
+     * 
+     * @param parts the list of the strings to be joined. It must be non-null.
+     * @param separator the separator to be placed between the string elements.
+     * 
+     * @return the string composed. It is never null.
+     */
     private static String join(final ArrayList<String> parts, final char separator)
     {
         // Initialising destination string size with the number of separators.
