@@ -332,7 +332,7 @@ public class ModuleUtil
     {
         // Base directory path elements in the reverse order.
         final ArrayList<String> baseDirParts = new ArrayList<String>();
-        // The number of '..' elements that still can discard some directory path element.
+        // The number of '..' elements that still can discard some directory path elements.
         int parentDirElementCount = 0;
         File parent;
         for (File f = baseDir.isAbsolute() ? baseDir : baseDir.getAbsoluteFile(); f != null; f = parent) {
