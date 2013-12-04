@@ -332,18 +332,28 @@ public class ModuleUtil
     {
         // Base directory path elements in the reverse order.
         final ArrayList<String> baseDirParts = new ArrayList<String>();
-        for (File f = baseDir.isAbsolute() ? baseDir : baseDir.getAbsoluteFile(); f != null; f = f.getParentFile()) {
+        // The number of '..' elements that still can discard some directory path element.
+        int parentDirElementCount = 0;
+        File parent;
+        for (File f = baseDir.isAbsolute() ? baseDir : baseDir.getAbsoluteFile(); f != null; f = parent) {
+            parent = f.getParentFile();
+            
             final String e = f.getName();
             if (e.equals(".")) {
                 continue;
             } else if (e.equals("..")) {
-                final int size = baseDirParts.size();
-                // The first element is always the root directory.
-                if (size > 1) {
-                    baseDirParts.remove(size - 1);
-                }
+                // Remembering this '..' element to discard parent paths that go before.
+                ++parentDirElementCount;
             } else {
-                baseDirParts.add(e);
+                if (parentDirElementCount > 0 && parent != null) {
+                    /* The current element is not the root directory and there is
+                     * a '..' element that discards it. Throwing away both the current
+                     * element and the correspondent '..' element.
+                     */
+                    --parentDirElementCount;
+                } else {
+                    baseDirParts.add(e);
+                }
             }
         }
         return baseDirParts;

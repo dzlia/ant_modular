@@ -207,7 +207,7 @@ public class ModuleUtil_NormalisePathTest extends TestCase
     
     public void testNormalisePath_AbsolutePath_PointsToSubSubDir()
     {
-        final File baseDir = new File("/hello/world");
+        final File baseDir = new File("/hello/world/");
         
         assertEquals("foo/bar", ModuleUtil.normalisePath("/hello/world/foo/./bar/baz/..", baseDir));
     }
@@ -230,7 +230,7 @@ public class ModuleUtil_NormalisePathTest extends TestCase
     {
         final File baseDir = new File("/hello/./../../world");
         
-        assertEquals("foo/bar", ModuleUtil.normalisePath("/hello/world/foo/./bar/baz/..", baseDir));
+        assertEquals("foo/bar", ModuleUtil.normalisePath("/world/foo/./bar/baz/..", baseDir));
     }
     
     public void testNormalisePath_NonNormalisedAbsoluteBaseDir_AbsolutePath()
@@ -259,5 +259,12 @@ public class ModuleUtil_NormalisePathTest extends TestCase
         final File baseDir = new File("/");
         
         assertEquals(".", ModuleUtil.normalisePath("../../..", baseDir));
+    }
+    
+    public void testNormalisePath_BaseDirEndsWithGoToParentElementsAndGoesBeyondRoot()
+    {
+        final File baseDir = new File("/hello/world/../../../");
+        
+        assertEquals("baz", ModuleUtil.normalisePath("foo/bar/../../../baz", baseDir));
     }
 }
