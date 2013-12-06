@@ -267,4 +267,18 @@ public class ModuleUtil_NormalisePathTest extends TestCase
         
         assertEquals("baz", ModuleUtil.normalisePath("foo/bar/../../../baz", baseDir));
     }
+    
+    public void testNormalisePath_PathGoesUpAndDownAndDoesNotRepeatBaseDir()
+    {
+        final File baseDir = new File("/hello/world");
+        
+        assertEquals("../../foo/bar", ModuleUtil.normalisePath("../../foo/bar", baseDir));
+    }
+    
+    public void testNormalisePath_PathGoesUpAndDownAndDoesNotRepeatBaseDir_NamesMatchAtSomeLevel()
+    {
+        final File baseDir = new File("/hello/world/baz");
+        
+        assertEquals("../../../foo/world/baz", ModuleUtil.normalisePath("../../../foo/world/../world/baz", baseDir));
+    }
 }
