@@ -4,6 +4,11 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+/**
+ * <p>Unit tests for {@link ModuleUtil#normalisePath(String, File)}.</p>
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
 public class ModuleUtil_NormalisePathTest extends TestCase
 {
     /**
@@ -36,16 +41,31 @@ public class ModuleUtil_NormalisePathTest extends TestCase
         }
     }
     
+    /**
+     * <p>Tests that {@link ModuleUtil#normalisePath(String, File)} converts
+     * an empty string as a path to '.' that necessarily points to
+     * the base directory.</p>
+     */
     public void testNormalisePath_BaseDirIsCurrentDir_EmptyPath()
     {
         assertEquals(".", ModuleUtil.normalisePath("", new File("")));
     }
     
+    /**
+     * <p>Tests that {@link ModuleUtil#normalisePath(String, File)} normalises
+     * a direct directory within the base directory to itself (without the
+     * tailing separator).</p>
+     */
     public void testNormalisePath_BaseDirIsCurrentDir_DirectChildPathInNormalisedForm()
     {
         assertEquals("foo", ModuleUtil.normalisePath("foo", new File("")));
     }
     
+    /**
+     * <p>Tests that {@link ModuleUtil#normalisePath(String, File)} normalises
+     * a direct directory with tailing path separator within the base directory
+     * to itself but without the tailing separator.</p>
+     */
     public void testNormalisePath_BaseDirIsCurrentDir_DirectChildPathInNonNormalisedForm()
     {
         assertEquals("foo", ModuleUtil.normalisePath("foo/", new File("")));
