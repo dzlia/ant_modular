@@ -301,4 +301,12 @@ public class ModuleUtil_NormalisePathTest extends TestCase
         
         assertEquals("../../../foo/world/baz", ModuleUtil.normalisePath("../../../foo/world/../world/baz", baseDir));
     }
+    
+    public void testNormalisePath_PathWithCharsWithDifferentCase() throws Exception
+    {
+        final File baseDir = new File("/hello/world/");
+        
+        // TODO make this assertion OS-specific (refer to ModuleUtil#isCaseSensitiveFS)
+        assertEquals("fOO/Bar", ModuleUtil.normalisePath("/hello/world/fOO/Bar", baseDir));
+    }
 }

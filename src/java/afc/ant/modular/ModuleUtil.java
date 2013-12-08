@@ -324,8 +324,10 @@ public class ModuleUtil
             // path refers to baseDir.
             return ".";
         }
-        // TODO support case normalisation for windows
-        return join(resultParts, File.separatorChar);
+        
+        final String normalisedPath = join(resultParts, File.separatorChar);
+        // The system default locale is used for casting to the lower case.
+        return isCaseSensitiveFS() ? normalisedPath : normalisedPath.toLowerCase();
     }
     
     /*
@@ -397,5 +399,11 @@ public class ModuleUtil
         assert buf.length() == destSize;
         
         return buf.toString();
+    }
+    
+    private static boolean isCaseSensitiveFS()
+    {
+        // TODO return false for the systems with case-insensitive file systems.
+        return true;
     }
 }
