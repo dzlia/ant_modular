@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.taskdefs.condition.Os;
 
 /**
  * <p>Various utilities that are used primarily to read module meta information
@@ -216,10 +217,31 @@ public class ModuleUtil
         }
     }
     
+    /**
+     * <p>Normalises a given path relative to a given base directory as
+     * {@link #normalisePath(String, File, boolean)} does but necessarily with <em>no</em> path
+     * letter case normalisation.</p>
+     * 
+     * @param path the path to normalise. It must be non-{@code null}. It does not need
+     *      to point to an existing file.
+     * @param baseDir the base directory to normalise the path against. It must be
+     *      non-{@code null}. It does not need to point to an existing directory. If it
+     *      points to an existing file then this file can be a non-directory. Only the path of
+     *      <em>baseDir</em> is used for normalisation.
+     *      
+     * @return the normalised path. It is necessarily non-{@code null}.
+     * 
+     * @throws NullPointerException if either <em>path</em> or <em>baseDir</em> is {@code null}.
+     */
+    public static String normalisePath(final String path, final File baseDir)
+    {
+        return normalisePath(path, baseDir, false);
+    }
+    
     // TODO document me.
     // TODO make this code readable.
     // TODO improve performance.
-    public static String normalisePath(final String path, final File baseDir)
+    public static String normalisePath(final String path, final File baseDir, final boolean normaliseCase)
     {
         if (baseDir == null) {
             throw new NullPointerException("baseDir");
@@ -327,7 +349,7 @@ public class ModuleUtil
         
         final String normalisedPath = join(resultParts, File.separatorChar);
         // The system default locale is used for casting to the lower case.
-        return isCaseSensitiveFS() ? normalisedPath : normalisedPath.toLowerCase();
+        return normaliseCase ? normalisedPath.toLowerCase() : normalisedPath;
     }
     
     /*
@@ -399,11 +421,5 @@ public class ModuleUtil
         assert buf.length() == destSize;
         
         return buf.toString();
-    }
-    
-    private static boolean isCaseSensitiveFS()
-    {
-        // TODO return false for the systems with case-insensitive file systems.
-        return true;
     }
 }
