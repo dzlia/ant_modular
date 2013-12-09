@@ -311,14 +311,15 @@ public class ModuleUtil
                     continue;
                 }
                 
-                if (resultParts.isEmpty() || resultParts.get(resultParts.size() - 1).equals("..")) {
+                final int size = resultParts.size();
+                if (size == 0 || resultParts.get(size - 1).equals("..")) {
                     // The current path element points to the direct or an indirect parent directory of the baseDir.
                     resultParts.add("..");
                     
                     // Moving the cursor one level up.
                     --baseDirCommonCursor;
                 } else {
-                    resultParts.remove(resultParts.size() - 1);
+                    resultParts.remove(size - 1);
                 }
                 --depth;
             } else {
