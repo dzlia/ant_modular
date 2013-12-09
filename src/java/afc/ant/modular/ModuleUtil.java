@@ -405,16 +405,18 @@ public class ModuleUtil
      */
     private static String join(final ArrayList<String> parts, final char separator)
     {
+        final int size = parts.size();
+        
         // Initialising destination string size with the number of separators.
-        int destSize = parts.size() - 1;
-        for (int i = 0, n = parts.size(); i < n; ++i) {
+        int destSize = size - 1;
+        for (int i = 0; i < size; ++i) {
             destSize += parts.get(i).length();
         }
         
         // The buffer is created with the necessary capacity.
         final StringBuilder buf = new StringBuilder(destSize);
         int i = 0;
-        for (final int n = parts.size() - 1; i < n; ++i) {
+        for (final int n = size - 1; i < n; ++i) {
             buf.append(parts.get(i)).append(separator);
         }
         buf.append(parts.get(i));
