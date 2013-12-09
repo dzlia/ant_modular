@@ -266,8 +266,13 @@ public class ModuleUtil
         /* Indicates what is the depth of the current path element in the file system hierarchy
          * given that the depth of the baseDir is zero.
          */
-        int depth = 0;
-        int baseDirCommonCursor = 0;
+        int depth;
+        /* Indicates how many of negative depth repeats baseDir. The following inequality holds:
+         * -(baseDirCommonCursor - 1) <= baseDirParts.size()
+         * When -(baseDirCommonCursor - 1) == baseDirParts.size() then only the root directory is
+         * the common part.
+         */
+        int baseDirCommonCursor;
         ArrayList<String> baseDirParts;
         
         if (pathFile.isAbsolute()) {
