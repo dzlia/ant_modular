@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.taskdefs.condition.Os;
 
 /**
  * <p>Various utilities that are used primarily to read module meta information
