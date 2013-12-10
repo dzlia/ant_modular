@@ -411,7 +411,10 @@ public class ModuleUtil
     {
         final int size = parts.size();
         
-        // Initialising destination string size with the number of separators.
+        /* Calculating the size of the resulting string to avoid redundant buffer re-allocations.
+         * 
+         * destSize is initialised with the number of separators in the resulting string.
+         */
         int destSize = size - 1;
         for (int i = 0; i < size; ++i) {
             destSize += parts.get(i).length();
