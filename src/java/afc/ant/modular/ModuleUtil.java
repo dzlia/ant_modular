@@ -258,7 +258,7 @@ public class ModuleUtil
      *      non-{@code null}. It does not need to point to an existing directory. If it
      *      points to an existing file then this file can be a non-directory. Only the path of
      *      <em>baseDir</em> is used for normalisation.
-     * @param normaliseCase if {@code true} then path letter case needs to be normalised (i.e.
+     * @param normaliseCase if {@code true} then path letter case is normalised (i.e.
      *      casted to lower case); if {@code false} then the path characters are not modified.
      *      
      * @return the normalised path. It is necessarily non-{@code null}.
