@@ -237,7 +237,34 @@ public class ModuleUtil
         return normalisePath(path, baseDir, false);
     }
     
-    // TODO document me.
+    /**
+     * <p>Normalises a given path relative to a given base directory. The following rules
+     * are used:</p>
+     * <ul>
+     *  <li>the path is re-built as a path relative to the base directory</li>
+     *  <li>all '.' and '..' path elements are resolved</li>
+     *  <li>all redundant path separators are removed</li>
+     *  <li>links are <em>not</em> resolved</li>
+     *  <li>if the path points to the base directory then it is normalised to '.'</li>
+     *  <li>if the path attempts to go beyond the root directory then it is normalised
+     *      to point to the root directory</li>
+     *  <li>if path letter case normalisation is configured then the path characters are
+     *      casted to lower case (the default locale is used)</li>
+     * </ul>
+     * 
+     * @param path the path to normalise. It must be non-{@code null}. It does not need
+     *      to point to an existing file.
+     * @param baseDir the base directory to normalise the path against. It must be
+     *      non-{@code null}. It does not need to point to an existing directory. If it
+     *      points to an existing file then this file can be a non-directory. Only the path of
+     *      <em>baseDir</em> is used for normalisation.
+     * @param normaliseCase if {@code true} then path letter case needs to be normalised (i.e.
+     *      casted to lower case); if {@code false} then the path characters are not modified.
+     *      
+     * @return the normalised path. It is necessarily non-{@code null}.
+     * 
+     * @throws NullPointerException if either <em>path</em> or <em>baseDir</em> is {@code null}.
+     */
     // TODO make this code readable.
     // TODO improve performance.
     public static String normalisePath(final String path, final File baseDir, final boolean normaliseCase)
