@@ -47,7 +47,17 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
     
     private static final Pattern listElementPattern = Pattern.compile("\\S+");
     
+    /* The name of the manifest entry to read module metadata from.
+     * If it is null then the main entry is used.
+     */
     private String manifestEntry;
+    
+    /* The name of the entry attributes to be interpreted as classpath attributes.
+     * A classpath attribute is processed as required by the JAR Manifest
+     * specification.
+     * 
+     * The attribute with the name {@value ATTRIB_DEPENDENCIES} (case-insensitive) is ignored.
+     */
     private final ArrayList<ClasspathAttribute> classpathAttributes = new ArrayList<ClasspathAttribute>();
     
     public String normalisePath(final String path)

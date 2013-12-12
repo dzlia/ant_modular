@@ -153,6 +153,30 @@ public class ManifestModuleLoaderTest extends TestCase
         assertPath(moduleInfo.getAttributes().get("Attrib4"), new File(moduleDir, "12345"));
     }
     
+    public void testLoadModule_CustomEntry_ClasspathAttributeNameIsTheNameOfTheDependenciesAttribute() throws Exception
+    {
+        final File moduleDir = new File(baseDir, "WithDeps_WithAttributes");
+        
+        loader.setProject(project);
+        loader.setManifestEntry("Build");
+        loader.createClasspathAttribute().setName("Attrib2");
+        // This attribute is used to read dependencies from and must be ignored.
+        loader.createClasspathAttribute().setName("Depends");
+        
+        final ModuleInfo moduleInfo = loader.loadModule("WithDeps_WithAttributes");
+        
+        assertNotNull(moduleInfo);
+        assertEquals("WithDeps_WithAttributes", moduleInfo.getPath());
+        assertEquals(TestUtil.set("foo", "bar/baz"), moduleInfo.getDependencies());
+        assertEquals(TestUtil.set("Attrib1", "Attrib2", "Attrib3", "aTTRIB4"), moduleInfo.getAttributes().keySet());
+        assertEquals("", moduleInfo.getAttributes().get("Attrib1"));
+        assertEquals("hello, world!", moduleInfo.getAttributes().get("Attrib3"));
+        assertEquals("12345", moduleInfo.getAttributes().get("aTTRIB4"));
+        
+        assertPath(moduleInfo.getAttributes().get("Attrib2"),
+                new File(moduleDir, "a"), new File(moduleDir, "b"), new File(moduleDir, "c c/\u0141/e"));
+    }
+    
     public void testLoadModule_CustomEntry_WithDependencies_WithAttributes_ClasspathAttributeNotFound() throws Exception
     {
         final File moduleDir = new File(baseDir, "WithDeps_WithAttributes");
@@ -372,6 +396,54 @@ public class ManifestModuleLoaderTest extends TestCase
         assertEquals(TestUtil.set("foo", "bar/baz"), moduleInfo.getDependencies());
         assertEquals(TestUtil.map("Attrib1", "", "Attrib2", "a b  c+c/%C5%81/e",
                 "Attrib3", "hello, world!", "aTTRIB4", "12345"), moduleInfo.getAttributes());
+    }
+    
+    public void testLoadModule_MainEntry_WithDependencies_WithAttributes_WithClasspathAttributes() throws Exception
+    {
+        final File moduleDir = new File(baseDir, "MainEntry_WithDeps_WithAttributes");
+        
+        loader.setProject(project);
+        loader.createClasspathAttribute().setName("Attrib2");
+        loader.createClasspathAttribute().setName("Attrib4"); // manifest attribute names are case-insensitive
+        
+        final ModuleInfo moduleInfo = loader.loadModule("MainEntry_WithDeps_WithAttributes");
+        
+        assertNotNull(moduleInfo);
+        assertEquals("MainEntry_WithDeps_WithAttributes", moduleInfo.getPath());
+        assertEquals(TestUtil.set("foo", "bar/baz"), moduleInfo.getDependencies());
+        assertEquals(TestUtil.set("Attrib1", "Attrib2", "Attrib3", "Attrib4"), moduleInfo.getAttributes().keySet());
+        assertEquals("", moduleInfo.getAttributes().get("Attrib1"));
+        assertEquals("hello, world!", moduleInfo.getAttributes().get("Attrib3"));
+        
+        assertPath(moduleInfo.getAttributes().get("Attrib2"),
+                new File(moduleDir, "a"), new File(moduleDir, "b"), new File(moduleDir, "c c/\u0141/e"));
+        
+        assertPath(moduleInfo.getAttributes().get("Attrib4"), new File(moduleDir, "12345"));
+    }
+    
+    public void testLoadModule_MainEntry_TheNameOfClasspathAttributeIsTheNameOfTheDependenciesAttribute_DifferentCase()
+            throws Exception
+    {
+        final File moduleDir = new File(baseDir, "MainEntry_WithDeps_WithAttributes");
+        
+        loader.setProject(project);
+        loader.createClasspathAttribute().setName("Attrib2");
+        loader.createClasspathAttribute().setName("Attrib4"); // manifest attribute names are case-insensitive
+        loader.createClasspathAttribute().setName("dePEnds");
+        
+        final ModuleInfo moduleInfo = loader.loadModule("MainEntry_WithDeps_WithAttributes");
+        
+        assertNotNull(moduleInfo);
+        assertEquals("MainEntry_WithDeps_WithAttributes", moduleInfo.getPath());
+        assertEquals(TestUtil.set("foo", "bar/baz"), moduleInfo.getDependencies());
+        assertEquals(TestUtil.set("Attrib1", "Attrib2", "Attrib3", "Attrib4"), moduleInfo.getAttributes().keySet());
+        assertEquals("", moduleInfo.getAttributes().get("Attrib1"));
+        assertEquals("hello, world!", moduleInfo.getAttributes().get("Attrib3"));
+        
+        assertPath(moduleInfo.getAttributes().get("Attrib2"),
+                new File(moduleDir, "a"), new File(moduleDir, "b"), new File(moduleDir, "c c/\u0141/e"));
+        
+        assertPath(moduleInfo.getAttributes().get("Attrib4"), new File(moduleDir, "12345"));
     }
     
     private static void assertPath(final Object pathObject, final File... expectedElements)
