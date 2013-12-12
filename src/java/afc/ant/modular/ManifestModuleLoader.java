@@ -70,9 +70,17 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         final Attributes attributes = readManifestBuildSection(path);
         final ModuleInfo moduleInfo = new ModuleInfo(path, this);
         
+        /* Both addDependencies and addClasspathAttributes remove the dependencies
+         * they process from the list of the attributes.
+         * 
+         * Dependencies must be processed first to ensure that the attribute "Depends"
+         * is removed before the classpath attributes are processed. The latter can
+         * contain the name "Depends" in some form which must be ignored.
+         */
         addDependencies(attributes, moduleInfo);
         addClasspathAttributes(attributes, moduleInfo);
-        // merging remaining attributes without modification
+        
+        // Merging the remaining attributes without modification.
         for (final Map.Entry<Object, Object> entry : attributes.entrySet()) {
             final Name key = (Name) entry.getKey();
             moduleInfo.addAttribute(key.toString(), entry.getValue());
