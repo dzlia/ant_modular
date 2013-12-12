@@ -47,6 +47,7 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
     
     private static final Pattern listElementPattern = Pattern.compile("\\S+");
     
+    private String manifestEntry;
     private final ArrayList<ClasspathAttribute> classpathAttributes = new ArrayList<ClasspathAttribute>();
     
     public String normalisePath(final String path)
@@ -157,14 +158,17 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
             final FileInputStream in = new FileInputStream(manifestFile);
             try {
                 final Manifest manifest = new Manifest(in);
-                final String buildSectionName = "Build";
-                final Attributes buildAttributes = manifest.getAttributes(buildSectionName);
-                if (buildAttributes == null) {
-                    throw new ModuleNotLoadedException(MessageFormat.format(
-                            "The module ''{0}'' does not have the ''{2}'' section in its manifest (''{1}'').",
-                            path, manifestFile.getAbsolutePath(), buildSectionName));
+                if (manifestEntry == null) {
+                    return manifest.getMainAttributes();
+                } else {
+                    final Attributes buildAttributes = manifest.getAttributes(manifestEntry);
+                    if (buildAttributes == null) {
+                        throw new ModuleNotLoadedException(MessageFormat.format(
+                                "The module ''{0}'' does not have the ''{2}'' section in its manifest (''{1}'').",
+                                path, manifestFile.getAbsolutePath(), manifestEntry));
+                    }
+                    return buildAttributes;
                 }
-                return buildAttributes;
             }
             finally {
                 in.close();
@@ -175,6 +179,11 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
                     "An I/O error is encountered while loading the manifest of the module ''{0}'' (''{1}'').",
                     path, manifestFile.getAbsolutePath()), ex);
         }
+    }
+    
+    public void setManifestEntry(final String entryName)
+    {
+        manifestEntry = entryName;
     }
     
     public static class ClasspathAttribute

@@ -10,6 +10,7 @@ API changes:
 - ModuleInfo: the constructor ModuleInfo(String) is replaced with ModuleInfo(String, ModuleLoader) to make it possible to normalise paths against the module loader passed.
 - SerialDependencyResolver: #moduleProcessed() throws IllegalArgumentException if the module is not null and no module is being processed (was: IllegalStateException).
 - An empty string is considered a defined callTargetForModules/moduleProperty value.
+- ManifestModuleLoader: the attribute manifestEntry is added which defines the name of the manifest entry to load module metadata from. By default the main entry is used (was: the entry "Build").
 
 Other:
 - API documentation is expanded.
