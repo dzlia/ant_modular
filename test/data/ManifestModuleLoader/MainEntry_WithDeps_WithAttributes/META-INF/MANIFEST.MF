@@ -1,0 +1,10 @@
+Depends: foo bar/baz/
+Attrib1: 
+Attrib2: a b  c+c/%C5%81/e
+Attrib3: hello, world!
+aTTRIB4: 12345
+
+Name: Build
+Depends: qwe rty
+Attrib1: zzz
+Attrib2: xxx
