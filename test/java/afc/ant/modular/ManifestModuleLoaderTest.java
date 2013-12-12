@@ -31,7 +31,6 @@ import org.apache.tools.ant.types.Path;
 
 import junit.framework.TestCase;
 
-// TODO add more tests
 public class ManifestModuleLoaderTest extends TestCase
 {
     private Project project;
@@ -345,6 +344,34 @@ public class ManifestModuleLoaderTest extends TestCase
             assertEquals("Unable to load the module 'WithInvalidDependeeModulePath'. " +
                     "This dependee module path is an invalid URL: 'foo%'.", ex.getMessage());
         }
+    }
+    
+    public void testMainEntry_CannotLoadModule_InvalidClasspathAttribute() throws Exception
+    {
+        loader.setProject(project);
+        loader.createClasspathAttribute().setName("Attrib1");
+        
+        try {
+            loader.loadModule("MainEntry_WithInvalidClasspathAttribute");
+            fail();
+        }
+        catch (ModuleNotLoadedException ex) {
+            assertEquals("Unable to load the module 'MainEntry_WithInvalidClasspathAttribute'. " +
+                    "The classpath attribute 'Attrib1' contains an invalid URL element: 'c+c/%'.", ex.getMessage());
+        }
+    }
+    
+    public void testLoadModule_MainEntry_WithDependencies_WithAttributes_NoClasspathAttributes() throws Exception
+    {
+        loader.setProject(project);
+        
+        final ModuleInfo moduleInfo = loader.loadModule("MainEntry_WithDeps_WithAttributes");
+        
+        assertNotNull(moduleInfo);
+        assertEquals("MainEntry_WithDeps_WithAttributes", moduleInfo.getPath());
+        assertEquals(TestUtil.set("foo", "bar/baz"), moduleInfo.getDependencies());
+        assertEquals(TestUtil.map("Attrib1", "", "Attrib2", "a b  c+c/%C5%81/e",
+                "Attrib3", "hello, world!", "aTTRIB4", "12345"), moduleInfo.getAttributes());
     }
     
     private static void assertPath(final Object pathObject, final File... expectedElements)
