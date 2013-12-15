@@ -57,7 +57,7 @@ public interface ModuleLoader
      * 
      * @param path the module path. It is a path relative to the directory that is the root
      *      for all modules (generally an Ant project base directory). This path is allowed
-     *      to be a non-normalised module path but must not be {@code null}.
+     *      to be a non-normalised module path but must be not {@code null}.
      * 
      * @return a {@link afc.ant.modular.ModuleInfo} object that is initialised
      *      with the module path, dependencies and attributes. It is never {@code null}
@@ -73,13 +73,13 @@ public interface ModuleLoader
      * <p>Returns the normalised path that corresponds to a given module path. Each module
      * path has exactly one normalised path, even if the module with this path does not
      * exist. Moreover, all paths that point to the same module w.r.t. this
-     * {@code ModuleLoader} have the same normalised path. A normalised path must not
-     * be {@code null}.</p>
+     * {@code ModuleLoader} have the same normalised path. A normalised path must be not
+     * {@code null}.</p>
      * 
      * <p>Each implementation of {@link #loadModule(String)} should use this function
      * to get the module path to be used to load the module requested.</p>
      * 
-     * @param path the module path to be normalised. It must not be {@code null}.
+     * @param path the module path to be normalised. It must be not {@code null}.
      * 
      * @return the normalised path that corresponds to the given module path.
      *      It is never {@code null}.
