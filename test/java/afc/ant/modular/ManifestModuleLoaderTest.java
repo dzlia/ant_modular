@@ -44,6 +44,7 @@ public class ManifestModuleLoaderTest extends TestCase
         project = new Project();
         project.setBaseDir(baseDir);
         loader = new ManifestModuleLoader();
+        loader.setProject(project);
     }
     
     @Override
@@ -54,9 +55,34 @@ public class ManifestModuleLoaderTest extends TestCase
         baseDir = null;
     }
     
+    public void testNormalisePath_NullPath()
+    {
+        try {
+            loader.normalisePath(null);
+            fail();
+        }
+        catch (NullPointerException ex) {
+            // expected
+        }
+    }
+    
+    public void testNormalisePath_EmptyPath()
+    {
+        assertEquals(".", loader.normalisePath(""));
+    }
+    
+    public void testNormalisePath_PathPointsToBaseDir()
+    {
+        assertEquals(".", loader.normalisePath("foo/.."));
+    }
+    
+    public void testNormalisePath_SomeModulePath()
+    {
+        assertEquals("foo/bar", loader.normalisePath("foo/bar/"));
+    }
+    
     public void testLoadModule_CustomEntry_NoDependencies_NoAttributes() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         
         final ModuleInfo moduleInfo = loader.loadModule("NoDeps_NoAttributes");
@@ -69,7 +95,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testLoadModule_CustomEntry_EmptyDependencies_NoAttributes() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         
         final ModuleInfo moduleInfo = loader.loadModule("EmptyDeps_NoAttributes/");
@@ -82,7 +107,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testLoadModule_CustomEntry_WithDependencies_NoAttributes() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         
         final ModuleInfo moduleInfo = loader.loadModule("WithDeps_NoAttributes");
@@ -95,7 +119,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testLoadModule_CustomEntry_WithDependencies_WithAttributes_NoClasspathAttributes() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         
         final ModuleInfo moduleInfo = loader.loadModule("WithDeps_WithAttributes");
@@ -111,7 +134,6 @@ public class ManifestModuleLoaderTest extends TestCase
     {
         final File moduleDir = new File(baseDir, "WithDeps_WithAttributes");
         
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         loader.createClasspathAttribute().setName("ATTRIB2"); // manifest attribute names are case-insensitive
         
@@ -133,7 +155,6 @@ public class ManifestModuleLoaderTest extends TestCase
     {
         final File moduleDir = new File(baseDir, "WithDeps_WithAttributes");
         
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         loader.createClasspathAttribute().setName("Attrib2");
         loader.createClasspathAttribute().setName("Attrib4"); // manifest attribute names are case-insensitive
@@ -157,7 +178,6 @@ public class ManifestModuleLoaderTest extends TestCase
     {
         final File moduleDir = new File(baseDir, "WithDeps_WithAttributes");
         
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         loader.createClasspathAttribute().setName("Attrib2");
         // This attribute is used to read dependencies from and must be ignored.
@@ -181,7 +201,6 @@ public class ManifestModuleLoaderTest extends TestCase
     {
         final File moduleDir = new File(baseDir, "WithDeps_WithAttributes");
         
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         loader.createClasspathAttribute().setName("Attrib2");
         loader.createClasspathAttribute().setName("NoSuchAttribute");
@@ -202,7 +221,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testLoadModule_CustomEntry_ClasspathAttributeHasNoName() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         loader.createClasspathAttribute().setName("Attrib2");
         
@@ -219,7 +237,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testCannotLoadModule_ModuleDoesNotExist() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         
         try {
@@ -235,7 +252,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testCannotLoadModule_ModuleDoesNotHaveManifest() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         
         try {
@@ -252,7 +268,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testCannotLoadModule_ModuleDoesNotHaveMETAINFDirectory() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         
         try {
@@ -269,7 +284,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testCannotLoadModule_ModuleManifestIsNotAFile() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         
         try {
@@ -286,7 +300,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testCannotLoadModule_ModuleManifestIsMalformed() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         
         try {
@@ -306,7 +319,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testCannotLoadModule_ModuleManifestDoesNotHaveBuildSection() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         
         try {
@@ -323,7 +335,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testCannotLoadModule_ModulePathIsNotADirectory() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         
         try {
@@ -340,7 +351,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testCannotLoadModule_InvalidClasspathAttribute() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         loader.createClasspathAttribute().setName("Attrib1");
         
@@ -356,7 +366,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testCannotLoadModule_InvalidDependeeModulePath() throws Exception
     {
-        loader.setProject(project);
         loader.setManifestEntry("Build");
         loader.createClasspathAttribute().setName("Attrib1");
         
@@ -372,7 +381,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testMainEntry_CannotLoadModule_InvalidClasspathAttribute() throws Exception
     {
-        loader.setProject(project);
         loader.createClasspathAttribute().setName("Attrib1");
         
         try {
@@ -387,8 +395,6 @@ public class ManifestModuleLoaderTest extends TestCase
     
     public void testLoadModule_MainEntry_WithDependencies_WithAttributes_NoClasspathAttributes() throws Exception
     {
-        loader.setProject(project);
-        
         final ModuleInfo moduleInfo = loader.loadModule("MainEntry_WithDeps_WithAttributes");
         
         assertNotNull(moduleInfo);
@@ -402,7 +408,6 @@ public class ManifestModuleLoaderTest extends TestCase
     {
         final File moduleDir = new File(baseDir, "MainEntry_WithDeps_WithAttributes");
         
-        loader.setProject(project);
         loader.createClasspathAttribute().setName("Attrib2");
         loader.createClasspathAttribute().setName("Attrib4"); // manifest attribute names are case-insensitive
         
@@ -426,7 +431,6 @@ public class ManifestModuleLoaderTest extends TestCase
     {
         final File moduleDir = new File(baseDir, "MainEntry_WithDeps_WithAttributes");
         
-        loader.setProject(project);
         loader.createClasspathAttribute().setName("Attrib2");
         loader.createClasspathAttribute().setName("Attrib4"); // manifest attribute names are case-insensitive
         loader.createClasspathAttribute().setName("dePEnds");
