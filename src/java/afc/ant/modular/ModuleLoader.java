@@ -81,7 +81,7 @@ public interface ModuleLoader
      * 
      * @param path the module path to be normalised. It must not be {@code null}.
      * 
-     * @return the normalised path the corresponds to the given module path.
+     * @return the normalised path that corresponds to the given module path.
      *      It is never {@code null}.
      * 
      * @throws NullPointerException if <em>path</em> is {@code null}.
