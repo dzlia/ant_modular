@@ -60,6 +60,25 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
      */
     private final ArrayList<ClasspathAttribute> classpathAttributes = new ArrayList<ClasspathAttribute>();
     
+    /**
+     * <p>Returns the normalised path that corresponds to a given module path. Each module
+     * path has exactly one normalised path, even if the module with this path does not
+     * exist. Moreover, all paths that point to the same module w.r.t. this
+     * {@code ModuleLoader} have the same normalised path. A normalised path is never
+     * {@code null}.</p>
+     * 
+     * <p>{@link ModuleUtil#normalisePath(String, File)} is used to normalise module
+     * paths. They are normalised against the Ant project base directory.</p>
+     * 
+     * @param path the module path to be normalised. It must be not {@code null}.
+     * 
+     * @return the normalised path that corresponds to the given module path.
+     *      It is never {@code null}.
+     * 
+     * @throws NullPointerException if <em>path</em> is {@code null}.
+     * 
+     * @see ModuleUtil#normalisePath(String, java.io.File)
+     */
     public String normalisePath(final String path)
     {
         return ModuleUtil.normalisePath(path, getProject().getBaseDir());
