@@ -84,6 +84,24 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         return ModuleUtil.normalisePath(path, getProject().getBaseDir());
     }
     
+    /**
+     * <p>Loads metadata of the module with a given path, not necessarily normalised.
+     * If the module metadata cannot be loaded then a {@link ModuleNotLoadedException}
+     * is thrown.</p>
+     * 
+     * <p>Refer to the {@link ManifestModuleLoader class description} for the details about
+     * how metadata is stored for a module.</p>
+     * 
+     * @param path the module path. It is a path relative to the Ant project base directory.
+     *      This path is allowed to be a non-normalised module path but must be not {@code null}.
+     * 
+     * @return a {@link afc.ant.modular.ModuleInfo} object that is initialised
+     *      with the module path, dependencies and attributes. It is never {@code null}
+     *      and is initialised with the {@link #normalisePath(String) normalised module path}.
+     * 
+     * @throws NullPointerException if <em>path</em> is {@code null}.
+     * @throws ModuleNotLoadedException if the module meta information cannot be loaded.
+     */
     public ModuleInfo loadModule(final String path) throws ModuleNotLoadedException
     {
         final Attributes attributes = readManifestBuildSection(path);
