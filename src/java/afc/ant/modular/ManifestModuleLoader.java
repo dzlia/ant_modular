@@ -236,6 +236,17 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         }
     }
     
+    /**
+     * <p>Sets the name of the entry in the JAR Manifest file that contains module metadata.
+     * The same entry name is used for all modules loaded by this {@code ManifestModuleLoader}.
+     * If the entry name is not set or is {@code null} then the main entry is used.
+     * The entry with this name must exist in the manifest file of a module. Otherwise
+     * {@link #loadModule(String)} throws a {@code ModuleNotLoadedException} for such a
+     * module.</p>
+     * 
+     * @param entryName the name of the manifest entry to be set. If {@code null} is passed in
+     *      then the main manifest entry is used by this {@code ManifestModuleLoader}.
+     */
     public void setManifestEntry(final String entryName)
     {
         manifestEntry = entryName;
