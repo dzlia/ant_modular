@@ -219,7 +219,7 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
                     final Attributes buildAttributes = manifest.getAttributes(manifestEntry);
                     if (buildAttributes == null) {
                         throw new ModuleNotLoadedException(MessageFormat.format(
-                                "The module ''{0}'' does not have the ''{2}'' section in its manifest (''{1}'').",
+                                "The module ''{0}'' does not have the entry ''{2}'' in the manifest (''{1}'').",
                                 path, manifestFile.getAbsolutePath(), manifestEntry));
                     }
                     return buildAttributes;

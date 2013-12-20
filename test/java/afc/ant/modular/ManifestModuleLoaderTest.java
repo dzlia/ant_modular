@@ -327,7 +327,7 @@ public class ManifestModuleLoaderTest extends TestCase
             fail();
         }
         catch (ModuleNotLoadedException ex) {
-            assertEquals("The module 'NoBuildSection' does not have the 'Build' section in its manifest ('" +
+            assertEquals("The module 'NoBuildSection' does not have the entry 'Build' in the manifest ('" +
                     new File(baseDir, "NoBuildSection/META-INF/MANIFEST.MF").getAbsolutePath() + "').",
                     ex.getMessage());
         }
