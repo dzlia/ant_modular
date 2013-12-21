@@ -35,6 +35,11 @@ import java.util.TreeMap;
 
 import junit.framework.TestCase;
 
+/**
+ * <p>Unit tests for {@link Module}.</p>
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
 public class ModuleTest extends TestCase
 {
     public void testConstructWithNullPath()
