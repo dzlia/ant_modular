@@ -262,6 +262,35 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         }
     }
     
+    /**
+     * <p>Creates a new {@link ClasspathAttribute ClasspathAttribute} container that backs the
+     * nested element {@code <classpathAttribute>} of this {@code <manifestModuleLoader>} type
+     * instance. Multiple nested {@code <classpathAttribute>} elements are allowed.</p>
+     * 
+     * <p>This element defines the name of the entry attribute of the module manifest file
+     * that needs to be interpreted as a JAR Manifest classpath attribute (refer to the JAR
+     * specification for the details). The attribute's path elements are stored wrapped into a
+     * {@link Path org.apache.tools.ant.types.Path} instance to the module attribute with the
+     * name defined by this element (even if the manifest attribute name is in a different case). If the manifest entry
+     * attribute with the given name is undefined in the manifest file then the module attribute
+     * is not set. Relative path elements are resolved against the Ant project base
+     * directory.</p>
+     * 
+     * <p>The name of the manifest entry is defined by the
+     * {@link #setManifestEntry(String) &quot;manifestEntry&quot;} attribute. This classpath
+     * attribute is not processed as an ordinary attribute. If the name of the classpath
+     * attribute refers to the module dependencies attribute, &quot;{@code Depends}&quot;, then
+     * this element is ignored.</p>
+     * 
+     * <p>The classpath attributes are useful to define module context-specific classpaths
+     * (e.g. a runtime or build or test classpath) in a declarative manner. These classpaths
+     * could be processed easily using the built-in Ant facilities in a module-independent
+     * way.</p>
+     * 
+     * @return the {@code ClasspathAttribute} created. It is never {@code null}.
+     * 
+     * @see GetModuleClasspath
+     */
     public ClasspathAttribute createClasspathAttribute()
     {
         final ClasspathAttribute val = new ClasspathAttribute();
