@@ -271,10 +271,10 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
      * that needs to be interpreted as a JAR Manifest classpath attribute (refer to the JAR
      * specification for the details). The attribute's path elements are stored wrapped into a
      * {@link Path org.apache.tools.ant.types.Path} instance to the module attribute with the
-     * name defined by this element (even if the manifest attribute name is in a different case). If the manifest entry
-     * attribute with the given name is undefined in the manifest file then the module attribute
-     * is not set. Relative path elements are resolved against the Ant project base
-     * directory.</p>
+     * name defined by this element (even if the manifest attribute name is in a different case).
+     * If the manifest entry attribute with the given name is undefined in the manifest file
+     * then the module attribute is not set. Relative path elements are resolved against the Ant
+     * project base directory.</p>
      * 
      * <p>The name of the manifest entry is defined by the
      * {@link #setManifestEntry(String) &quot;manifestEntry&quot;} attribute. This classpath
