@@ -252,10 +252,44 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
         manifestEntry = entryName;
     }
     
+    /**
+     * <p>Serves as the nested element {@code <classpathAttribute>} of the task
+     * {@link ManifestModuleLoader &lt;manifestModuleLoader&gt;}. This element defines an
+     * entry attribute in the module manifest file that is to be interpreted as a classpath
+     * attribute. The attribute name is defined by the element attribute
+     * {@link #setName(String) &quot;name&quot;}.</p>
+     * 
+     * <p>The name of the manifest entry that contains module metadata is defined by
+     * {@code <manifestModuleLoader>} itself.</p>
+     * 
+     * <h3>Attributes</h3>
+     * <table border="1">
+     * <thead>
+     *  <tr><th>Attribute</th>
+     *      <th>Required?</th>
+     *      <th>Description</th></tr>
+     * </thead>
+     * <tbody>
+     *  <tr><td>name</td>
+     *      <td>yes</td>
+     *      <td>The name of the attribute that is to be interpreted as a classpath attribute.
+     *          Refer to the JAR specification for the details about manifest classpath
+     *          attributes.</td></tr>
+     * </tbody>
+     * </table>
+     */
     public static class ClasspathAttribute
     {
         private String name;
         
+        /**
+         * <p>Sets the name of the attribute that is to be interpreted as a classpath
+         * attribute. Refer to the JAR specification for the details about manifest
+         * classpath attributes.</p>
+         * 
+         * @param name the name to be set. It must be not {@code null}. The parent
+         *      {@link ManifestModuleLoader} throws a {@link NullPointerException} otherwise.
+         */
         public void setName(final String name)
         {
             this.name = name;
