@@ -114,7 +114,7 @@ public class GetModulePath extends Task
         if (path == null) { // null path indicates that this module is invalid.
             throw new BuildException("The module path is undefined.");
         }
-        propHelper.setNewProperty("", outputProperty, path);
+        propHelper.setNewProperty((String) null, outputProperty, path);
     }
     
     /**

@@ -121,7 +121,7 @@ public class GetModuleAttribute extends Task
         
         final Object value = ModuleUtil.getAttributes(moduleObject).get(name);
         if (value != null) { // null value must not be passed to #setNewProperty.
-            propHelper.setNewProperty("", outputProperty, value);
+            propHelper.setNewProperty((String) null, outputProperty, value);
         }
     }
     
