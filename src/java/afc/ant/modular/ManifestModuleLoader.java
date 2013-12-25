@@ -41,6 +41,55 @@ import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Path.PathElement;
 
+/**
+ * <p>Serves as the nested element {@code <manifestModuleLoader>} of the task
+ * {@link CallTargetForModules &lt;callTargetForModules&gt;}. This element defines a
+ * {@link ModuleLoader} that is to be used by the parent task
+ * {@code CallTargetForModules}.</p>
+ * 
+ * <p>{@code ManifestModuleLoader} uses JAR Manifest files to load module metadata from.
+ * All metadata is contained within a single manifest entry. The following types of attribute
+ * are supported:</p>
+ * <ul>
+ *  <li>the attribute &quot;{@code Depends}&quot; &mdash; contains a space-separated list of
+ *      module paths the given module depends upon</li>
+ *  <li>{@link #createClasspathAttribute() classpath attributes} &mdash; the attributes that
+ *      have the format of JAR Manifest classpath attributes and define the classpath entries
+ *      associated with the given module. They are copied to module attributes as
+ *      {@link Path org.apache.tools.ant.types.Path} objects</li>
+ *  <li>other attributes. All they are read without modification as module attributes</li>
+ * </ul>
+ * 
+ * <p>The manifest file for each module is located within the module directory as the file
+ * {@code META-INF/MANIFEST.MF}. This file must be present for each module that is loaded by
+ * this {@code ManifestModuleLoader}.</p>
+ * 
+ * <h3>Attributes</h3>
+ * <table border="1">
+ * <thead>
+ *  <tr><th>Attribute</th>
+ *      <th>Required?</th>
+ *      <th>Description</th></tr>
+ * </thead>
+ * <tbody>
+ *  <tr><td>{@link  #setManifestEntry(String) manifestEntry}</td>
+ *      <td>no</td>
+ *      <td>Defines the name of the entry in the module manifest file that contains module
+ *          metadata. If unspecified then the main entry is used.</td></tr>
+ *  <tr><td>{@link  #createClasspathAttribute() classpathAttribute} (nested element, can be
+ *          used multiple times)</td>
+ *      <td>no</td>
+ *      <td>Defines the name of a manifest entry attribute that is to be interpreted as a
+ *          classpath attribute stored in the format of JAR Manifest classpath attributes.
+ *          These attributes, if present, are copied to module attributes as
+ *          {@link Path org.apache.tools.ant.types.Path} objects.</td></tr>
+ * </tbody>
+ * </table>
+ * 
+ * @see CallTargetForModules
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
 public class ManifestModuleLoader extends ProjectComponent implements ModuleLoader
 {
     private static final Name ATTRIB_DEPENDENCIES = new Name("Depends");
