@@ -137,10 +137,44 @@ public class GetModuleClasspath extends Task
         return o;
     }
     
+    /**
+     * <p>Serves as the nested element {@code <classpathAttribute>} or the attribute
+     * {@code "classpathAttribute"} of the task
+     * {@link GetModuleClasspath &lt;getModuleClasspath&gt;}. This element defines a
+     * module attribute that is to be used (probably, with other classpath attributes) to
+     * build up the resulting classpath. The name of the classpath attribute is defined
+     * by the element attribute {@link #setName(String) &quot;name&quot;}.</p>
+     * 
+     * <p>The classpath attribute value must be either {@code null} or an instance of
+     * {@link Path org.apache.tools.ant.types.Path}. The parent task
+     * {@code GetModuleClasspath} throws a
+     * {@link BuildException org.apache.tools.ant.BuildException} otherwise.</p>
+     * 
+     * <h3>Attributes</h3>
+     * <table border="1">
+     * <thead>
+     *  <tr><th>Attribute</th>
+     *      <th>Required?</th>
+     *      <th>Description</th></tr>
+     * </thead>
+     * <tbody>
+     *  <tr><td>name</td>
+     *      <td>yes</td>
+     *      <td>The name of the classpath attribute.</td></tr>
+     * </tbody>
+     * </table>
+     */
     public static class ClasspathAttribute
     {
         private String name;
         
+        /**
+         * <p>Sets the name of the classpath attribute to be used to build up the resulting
+         * classpath.</p>
+         * 
+         * @param name the name to be set. It must be not {@code null}. The parent
+         *      {@link GetModuleClasspath} throws a {@link BuildException} otherwise.
+         */
         public void setName(final String name)
         {
             this.name = name;
