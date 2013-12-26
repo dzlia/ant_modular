@@ -52,9 +52,9 @@ public class GetModuleClasspath extends Task
         if (outputProperty == null) {
             throw new BuildException("The attribute 'outputProperty' is undefined.");
         }
-        for (final ClasspathAttribute sourceAttribute : classpathAttributes) {
-            if (sourceAttribute.name == null) {
-                throw new BuildException("A source attribute with undefined name is specified.");
+        for (final ClasspathAttribute classpathAttribute : classpathAttributes) {
+            if (classpathAttribute.name == null) {
+                throw new BuildException("A classpath attribute with undefined name is specified.");
             }
         }
         final Project project = getProject();
@@ -106,15 +106,15 @@ public class GetModuleClasspath extends Task
     private void appendElements(final Object /*Module*/ module, final Path classpath)
     {
         final Map<String, Object> attributes = ModuleUtil.getAttributes(module);
-        for (final ClasspathAttribute sourceAttribute : classpathAttributes) {
-            final Object o = attributes.get(sourceAttribute.name);
+        for (final ClasspathAttribute classpathAttribute : classpathAttributes) {
+            final Object o = attributes.get(classpathAttribute.name);
             if (o == null) {
                 continue;
             }
             if (!(o instanceof Path)) {
                 throw new BuildException(MessageFormat.format(
                         "The attribute ''{0}'' of the module ''{1}'' is not an Ant path.",
-                        sourceAttribute.name, ModuleUtil.getPath(module)));
+                        classpathAttribute.name, ModuleUtil.getPath(module)));
             }
             classpath.add((Path) o);
         }

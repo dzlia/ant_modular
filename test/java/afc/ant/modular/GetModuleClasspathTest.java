@@ -130,7 +130,7 @@ public class GetModuleClasspathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("A source attribute with undefined name is specified.", ex.getMessage());
+            assertEquals("A classpath attribute with undefined name is specified.", ex.getMessage());
         }
         
         assertEquals(null, PropertyHelper.getProperty(project, "out"));
@@ -155,7 +155,7 @@ public class GetModuleClasspathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("A source attribute with undefined name is specified.", ex.getMessage());
+            assertEquals("A classpath attribute with undefined name is specified.", ex.getMessage());
         }
         
         assertEquals(null, PropertyHelper.getProperty(project, "out"));
@@ -624,7 +624,7 @@ public class GetModuleClasspathTest extends TestCase
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
     }
     
-    public void testClasspathAttributeAndElement_SingleModule_RepeatedSourceAttribute()
+    public void testClasspathAttributeAndElement_SingleModule_RepeatedClasspathAttribute()
     {
         final Path path1 = new Path(project);
         path1.createPathElement().setPath("b");
