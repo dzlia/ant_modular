@@ -57,7 +57,7 @@ public class GetModuleClasspathTest extends TestCase
     public void testNoModuleProperty()
     {
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         try {
             task.execute();
@@ -77,7 +77,7 @@ public class GetModuleClasspathTest extends TestCase
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         try {
             task.execute();
@@ -106,7 +106,7 @@ public class GetModuleClasspathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("Source attributes are not defined.", ex.getMessage());
+            assertEquals("Classpath attributes are not defined.", ex.getMessage());
         }
         
         assertEquals(null, PropertyHelper.getProperty(project, "out"));
@@ -119,7 +119,7 @@ public class GetModuleClasspathTest extends TestCase
         final Module module = new Module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
-        task.setSourceAttribute(null);
+        task.setClasspathAttribute(null);
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
@@ -143,8 +143,8 @@ public class GetModuleClasspathTest extends TestCase
         final Module module = new Module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
-        task.createSourceAttribute().setName("foo");
-        task.createSourceAttribute().setName(null);
+        task.createClasspathAttribute().setName("foo");
+        task.createClasspathAttribute().setName(null);
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
@@ -167,7 +167,7 @@ public class GetModuleClasspathTest extends TestCase
     {
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         try {
             task.execute();
@@ -189,7 +189,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         try {
             task.execute();
@@ -213,7 +213,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         try {
             task.execute();
@@ -239,7 +239,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         task.setIncludeDependencies(true);
         
         try {
@@ -267,7 +267,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         task.execute();
         
@@ -289,7 +289,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         task.execute();
         
@@ -313,7 +313,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         task.execute();
         
@@ -336,7 +336,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         task.execute();
         
@@ -366,7 +366,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         task.execute();
         
@@ -394,7 +394,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         task.execute();
         
@@ -426,7 +426,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         task.setIncludeDependencies(true);
         
         task.execute();
@@ -461,7 +461,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         task.setIncludeDependencies(false);
         
         task.execute();
@@ -495,7 +495,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         
         task.execute();
         
@@ -528,7 +528,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         task.setIncludeDependencies(true);
         
         task.execute();
@@ -576,7 +576,7 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
+        task.setClasspathAttribute("cp");
         task.setIncludeDependencies(true);
         
         task.execute();
@@ -610,8 +610,8 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
-        task.createSourceAttribute().setName("cp3");
+        task.setClasspathAttribute("cp");
+        task.createClasspathAttribute().setName("cp3");
         
         task.execute();
         
@@ -641,9 +641,9 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.setSourceAttribute("cp");
-        task.createSourceAttribute().setName("cp3");
-        task.createSourceAttribute().setName("cp"); // repeated
+        task.setClasspathAttribute("cp");
+        task.createClasspathAttribute().setName("cp3");
+        task.createClasspathAttribute().setName("cp"); // repeated
         
         task.execute();
         
@@ -673,8 +673,8 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.createSourceAttribute().setName("cp");
-        task.createSourceAttribute().setName("cp3");
+        task.createClasspathAttribute().setName("cp");
+        task.createClasspathAttribute().setName("cp3");
         
         task.execute();
         
@@ -701,8 +701,8 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.createSourceAttribute().setName("cp");
-        task.createSourceAttribute().setName("cp3");
+        task.createClasspathAttribute().setName("cp");
+        task.createClasspathAttribute().setName("cp3");
         
         task.execute();
         
@@ -726,8 +726,8 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.createSourceAttribute().setName("cp");
-        task.createSourceAttribute().setName("cp3");
+        task.createClasspathAttribute().setName("cp");
+        task.createClasspathAttribute().setName("cp3");
         
         task.execute();
         
@@ -768,8 +768,8 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.createSourceAttribute().setName("cp");
-        task.createSourceAttribute().setName("cp3");
+        task.createClasspathAttribute().setName("cp");
+        task.createClasspathAttribute().setName("cp3");
         task.setIncludeDependencies(true);
         
         task.execute();
@@ -812,8 +812,8 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.createSourceAttribute().setName("cp");
-        task.createSourceAttribute().setName("cp3");
+        task.createClasspathAttribute().setName("cp");
+        task.createClasspathAttribute().setName("cp3");
         task.setIncludeDependencies(false);
         
         task.execute();
@@ -856,8 +856,8 @@ public class GetModuleClasspathTest extends TestCase
         
         task.setModuleProperty("in");
         task.setOutputProperty("out");
-        task.createSourceAttribute().setName("cp");
-        task.createSourceAttribute().setName("cp3");
+        task.createClasspathAttribute().setName("cp");
+        task.createClasspathAttribute().setName("cp3");
         
         task.execute();
         

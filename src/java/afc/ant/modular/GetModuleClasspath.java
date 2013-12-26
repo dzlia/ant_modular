@@ -36,7 +36,7 @@ import org.apache.tools.ant.types.Path;
 public class GetModuleClasspath extends Task
 {
     private String moduleProperty;
-    private final ArrayList<SourceAttribute> sourceAttributes = new ArrayList<SourceAttribute>();
+    private final ArrayList<ClasspathAttribute> classpathAttributes = new ArrayList<ClasspathAttribute>();
     private String outputProperty;
     private boolean includeDependencies = false;
     
@@ -46,13 +46,13 @@ public class GetModuleClasspath extends Task
         if (moduleProperty == null) {
             throw new BuildException("The attribute 'moduleProperty' is undefined.");
         }
-        if (sourceAttributes.isEmpty()) {
-            throw new BuildException("Source attributes are not defined.");
+        if (classpathAttributes.isEmpty()) {
+            throw new BuildException("Classpath attributes are not defined.");
         }
         if (outputProperty == null) {
             throw new BuildException("The attribute 'outputProperty' is undefined.");
         }
-        for (final SourceAttribute sourceAttribute : sourceAttributes) {
+        for (final ClasspathAttribute sourceAttribute : classpathAttributes) {
             if (sourceAttribute.name == null) {
                 throw new BuildException("A source attribute with undefined name is specified.");
             }
@@ -106,7 +106,7 @@ public class GetModuleClasspath extends Task
     private void appendElements(final Object /*Module*/ module, final Path classpath)
     {
         final Map<String, Object> attributes = ModuleUtil.getAttributes(module);
-        for (final SourceAttribute sourceAttribute : sourceAttributes) {
+        for (final ClasspathAttribute sourceAttribute : classpathAttributes) {
             final Object o = attributes.get(sourceAttribute.name);
             if (o == null) {
                 continue;
@@ -125,19 +125,19 @@ public class GetModuleClasspath extends Task
         this.moduleProperty = moduleProperty;
     }
     
-    public void setSourceAttribute(final String name)
+    public void setClasspathAttribute(final String name)
     {
-        createSourceAttribute().setName(name);
+        createClasspathAttribute().setName(name);
     }
     
-    public SourceAttribute createSourceAttribute()
+    public ClasspathAttribute createClasspathAttribute()
     {
-        final SourceAttribute o = new SourceAttribute();
-        sourceAttributes.add(o);
+        final ClasspathAttribute o = new ClasspathAttribute();
+        classpathAttributes.add(o);
         return o;
     }
     
-    public static class SourceAttribute
+    public static class ClasspathAttribute
     {
         private String name;
         
