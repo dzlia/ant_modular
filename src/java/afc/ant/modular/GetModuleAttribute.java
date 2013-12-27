@@ -31,7 +31,7 @@ import org.apache.tools.ant.Task;
 
 /**
  * <p>An Ant task that sets an {@link Module#getAttributes() attribute} of a {@link Module} object
- * as a {@link Project project} property. The attribute is resolved by its name. If the attribute
+ * as an Ant {@link Project project} property. The attribute is resolved by its name. If the attribute
  * with the given name is undefined for this {@code Module} or set to {@code null} then the property
  * is not set. If the property is already created then it is <em>not</em> updated.</p>
  * 
@@ -128,8 +128,9 @@ public class GetModuleAttribute extends Task
     /**
      * <p>Sets the name of the property which holds the module whose attribute is to be obtained.</p>
      * 
-     * @param moduleProperty the name of the property. It must not be {@code null}.
-     *      Otherwise a {@link BuildException} will be thrown by {@link #execute()}.
+     * @param moduleProperty the name of the property. It must be not {@code null}.
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      thrown by {@link #execute()}.
      */
     public void setModuleProperty(final String moduleProperty)
     {
@@ -140,21 +141,23 @@ public class GetModuleAttribute extends Task
      * <p>Sets the name of the property to which the module's attribute is to be set. This property
      * should be undefined. Otherwise this task will not assign the new value to it.</p>
      * 
-     * @param outputProperty the name of the property. It must not be {@code null}.
-     *      Otherwise a {@link BuildException} will be thrown by {@link #execute()}.
+     * @param propertyName the name of the output property. It must be not {@code null}.
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      thrown by {@link #execute()}.
      */
-    public void setOutputProperty(final String outputProperty)
+    public void setOutputProperty(final String propertyName)
     {
-        this.outputProperty = outputProperty;
+        outputProperty = propertyName;
     }
     
     /**
-     * <p>Sets the name of the module's attribute which is to be set as a {@code Project}
-     * property. The attribute with the given name must be defined and not set to {@code null}
-     * for this task to have effect.</p>
+     * <p>Sets the name of the module's attribute which is to be set as an Ant
+     * {@link Project project} property. The attribute with the given name must be defined and
+     * not set to {@code null} for this task to have effect.</p>
      * 
-     * @param name the name of the attribute. It must not be {@code null}.
-     *      Otherwise a {@link BuildException} will be thrown by {@link #execute()}.
+     * @param name the name of the attribute. It must be not {@code null}.
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      thrown by {@link #execute()}.
      */
     public void setName(final String name)
     {

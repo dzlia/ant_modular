@@ -194,13 +194,13 @@ public class GetModuleClasspath extends Task
      * {@link Path  org.apache.tools.ant.types.Path}) is to be set. This property should be
      * undefined. Otherwise this task will not assign the new value to it.</p>
      * 
-     * @param outputProperty the name of the property. It must be not {@code null}.
+     * @param propertyName the name of the output property. It must be not {@code null}.
      *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
      *      thrown by {@link #execute()}.
      */
-    public void setOutputProperty(final String outputProperty)
+    public void setOutputProperty(final String propertyName)
     {
-        this.outputProperty = outputProperty;
+        outputProperty = propertyName;
     }
     
     public void setIncludeDependencies(final boolean option)

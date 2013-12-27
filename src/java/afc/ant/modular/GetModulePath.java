@@ -28,10 +28,11 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.Path;
 
 /**
  * <p>An Ant task that sets the {@link Module#getPath() path} of a {@link Module} object
- * as a {@link Project} property. If the property is already created then
+ * as an Ant {@link Project project} property. If the property is already created then
  * it is <em>not</em> updated.</p>
  * 
  * <p>This task works with {@code Module} objects that are loaded by any class loader.
@@ -120,8 +121,9 @@ public class GetModulePath extends Task
     /**
      * <p>Sets the name of the property which holds the module whose path is to be obtained.</p>
      * 
-     * @param moduleProperty the name of the property. It must not be {@code null}.
-     *      Otherwise a {@link BuildException} will be thrown by {@link #execute()}.
+     * @param moduleProperty the name of the property. It must be not {@code null}.
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      thrown by {@link #execute()}.
      */
     public void setModuleProperty(final String moduleProperty)
     {
@@ -132,11 +134,12 @@ public class GetModulePath extends Task
      * <p>Sets the name of the property to which the module path is to be set. This property
      * should be undefined. Otherwise this task will not assign the new value to it.</p>
      * 
-     * @param outputProperty the name of the property. It must not be {@code null}.
-     *      Otherwise a {@link BuildException} will be thrown by {@link #execute()}.
+     * @param propertyName the name of the output property. It must be not {@code null}.
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      thrown by {@link #execute()}.
      */
-    public void setOutputProperty(final String outputProperty)
+    public void setOutputProperty(final String propertyName)
     {
-        this.outputProperty = outputProperty;
+        outputProperty = propertyName;
     }
 }
