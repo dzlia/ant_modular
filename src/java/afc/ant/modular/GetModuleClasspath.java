@@ -120,6 +120,14 @@ public class GetModuleClasspath extends Task
         }
     }
     
+    /**
+     * <p>Sets the name of the property which holds the module whose classpath is to be
+     * calculated.</p>
+     * 
+     * @param moduleProperty the name of the property. It must be not {@code null}.
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      thrown by {@link #execute()}.
+     */
     public void setModuleProperty(final String moduleProperty)
     {
         this.moduleProperty = moduleProperty;
@@ -181,9 +189,18 @@ public class GetModuleClasspath extends Task
         }
     }
     
-    public void setOutputProperty(final String name)
+    /**
+     * <p>Sets the name of the property to which the classpath calculated (an instance of
+     * {@link Path  org.apache.tools.ant.types.Path}) is to be set. This property should be
+     * undefined. Otherwise this task will not assign the new value to it.</p>
+     * 
+     * @param outputProperty the name of the property. It must be not {@code null}.
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      thrown by {@link #execute()}.
+     */
+    public void setOutputProperty(final String outputProperty)
     {
-        outputProperty = name;
+        this.outputProperty = outputProperty;
     }
     
     public void setIncludeDependencies(final boolean option)
