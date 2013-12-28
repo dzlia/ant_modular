@@ -40,6 +40,13 @@ public class GetModuleClasspath extends Task
     private String outputProperty;
     private boolean includeDependencies = false;
     
+    /**
+     * <p>Executes this task. See the {@link GetModuleClasspath class description} for the
+     * details.</p>
+     * 
+     * @throws BuildException if the task is configured incorrectly or if the module object
+     *      specified is not a well-formed {@link Module} instance.
+     */
     @Override
     public void execute()
     {
