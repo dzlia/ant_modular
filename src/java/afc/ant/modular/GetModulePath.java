@@ -76,10 +76,10 @@ public class GetModulePath extends Task
     private String outputProperty;
     
     /**
-     * <p>Executes the task. See the {@link GetModulePath class description} for the details.</p>
+     * <p>Executes this task. See the {@link GetModulePath class description} for the details.</p>
      * 
-     * @throws BuildException if the task is configured incorrectly or if the module
-     *      object specified is not a well-formed {@link Module} instance.
+     * @throws BuildException if the task is configured incorrectly or if the module object
+     *      specified is not a well-formed {@link Module} instance.
      */
     @Override
     public void execute()
