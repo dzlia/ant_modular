@@ -210,8 +210,22 @@ public class GetModuleClasspath extends Task
         outputProperty = propertyName;
     }
     
-    public void setIncludeDependencies(final boolean option)
+    /**
+     * <p>Sets the flag whether or not the classpath elements of the dependee modules
+     * (direct and indirect) of the {@link #setModuleProperty(String) primary module} are to
+     * be included into the resulting classpath. If {@code true} is set then the dependee
+     * modules are taken into account; if {@code false} is set then they are ignored. The
+     * latter case is default. The classpath attributes that are used for the dependee modules
+     * are defined by the {@code classpathAttribute} elements/attribute, which is the same as
+     * for the primary module.</p>
+     * 
+     * <p>It is guaranteed that the dependee modules' classpath elements are placed after
+     * all classpath elements of the primary module. Their relative order is undefined.</p>
+     * 
+     * @param flag the flag value to be set.
+     */
+    public void setIncludeDependencies(final boolean flag)
     {
-        includeDependencies = option;
+        includeDependencies = flag;
     }
 }
