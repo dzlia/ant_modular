@@ -57,11 +57,11 @@ public class GetModuleClasspath extends Task
             throw new BuildException("The attribute 'outputProperty' is undefined.");
         }
         if (classpathAttributes.isEmpty()) {
-            throw new BuildException("Classpath attributes are not defined.");
+            throw new BuildException("No classpath attributes are defined.");
         }
         for (final ClasspathAttribute classpathAttribute : classpathAttributes) {
             if (classpathAttribute.name == null) {
-                throw new BuildException("A classpath attribute with undefined name is specified.");
+                throw new BuildException("A classpath attribute with the undefined name is specified.");
             }
         }
         final Project project = getProject();

@@ -106,7 +106,7 @@ public class GetModuleClasspathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("Classpath attributes are not defined.", ex.getMessage());
+            assertEquals("No classpath attributes are defined.", ex.getMessage());
         }
         
         assertEquals(null, PropertyHelper.getProperty(project, "out"));
@@ -130,7 +130,7 @@ public class GetModuleClasspathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("A classpath attribute with undefined name is specified.", ex.getMessage());
+            assertEquals("A classpath attribute with the undefined name is specified.", ex.getMessage());
         }
         
         assertEquals(null, PropertyHelper.getProperty(project, "out"));
@@ -155,7 +155,7 @@ public class GetModuleClasspathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("A classpath attribute with undefined name is specified.", ex.getMessage());
+            assertEquals("A classpath attribute with the undefined name is specified.", ex.getMessage());
         }
         
         assertEquals(null, PropertyHelper.getProperty(project, "out"));
