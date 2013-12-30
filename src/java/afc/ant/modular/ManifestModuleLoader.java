@@ -337,7 +337,8 @@ public class ManifestModuleLoader extends ProjectComponent implements ModuleLoad
          * classpath attributes.</p>
          * 
          * @param name the name to be set. It must be not {@code null}. The parent
-         *      {@link ManifestModuleLoader} throws a {@link NullPointerException} otherwise.
+         *      {@link ManifestModuleLoader} throws an
+         *      {@link BuildException org.apache.tools.ant.BuildException} otherwise.
          */
         public void setName(final String name)
         {
