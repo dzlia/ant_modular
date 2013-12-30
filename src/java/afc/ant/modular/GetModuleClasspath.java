@@ -239,7 +239,8 @@ public class GetModuleClasspath extends Task
      * for the primary module.</p>
      * 
      * <p>It is guaranteed that the dependee modules' classpath elements are placed after
-     * all classpath elements of the primary module. Their relative order is undefined.</p>
+     * all classpath elements of the primary module. However, the relative order of the
+     * classpath elements of the dependee modules is undefined.</p>
      * 
      * @param flag the flag value to be set.
      */
