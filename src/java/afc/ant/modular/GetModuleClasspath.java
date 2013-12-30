@@ -148,6 +148,13 @@ public class GetModuleClasspath extends Task
      * then the attribute with the given name of each dependee module will be used as a
      * contributor to the resulting classpath.</p>
      * 
+     * <p>Multiple classpath attributes could be added by using the elements
+     * {@link #createClasspathAttribute() &lt;classpathAttribute&gt;}. The attribute and
+     * the elements {@code classpathAttribute} can be used simultaneously. At least one
+     * classpath attribute must be defined. Otherwise an
+     * {@link BuildException org.apache.tools.ant.BuildException} will be thrown by
+     * {@link #execute()}.</p>
+     * 
      * @param name the name of the module attribute. It must be not {@code null}.
      *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
      *      thrown by {@link #execute()}.
