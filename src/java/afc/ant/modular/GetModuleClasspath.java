@@ -140,6 +140,18 @@ public class GetModuleClasspath extends Task
         this.moduleProperty = moduleProperty;
     }
     
+    /**
+     * <p>Sets the name of a module attribute that is to be used (probably, with other
+     * classpath attributes) to build up the resulting classpath. If the attribute with the
+     * given name is undefined for a module then it is ignored. If the attribute
+     * {@link #setIncludeDependencies(boolean) includeDependencies} is set to {@code true}
+     * then the attribute with the given name of each dependee module will be used as a
+     * contributor to the resulting classpath.</p>
+     * 
+     * @param name the name of the module attribute. It must be not {@code null}.
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      thrown by {@link #execute()}.
+     */
     public void setClasspathAttribute(final String name)
     {
         createClasspathAttribute().setName(name);
