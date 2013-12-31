@@ -145,18 +145,18 @@ public class GetModuleClasspath extends Task
      * classpath attributes) to build up the resulting classpath. If the attribute with the
      * given name is undefined for a module then it is ignored. If the attribute
      * {@link #setIncludeDependencies(boolean) includeDependencies} is set to {@code true}
-     * then the attribute with the given name of each dependee module will be used as a
+     * then the attribute with the given name of each dependee module is used as a
      * contributor to the resulting classpath.</p>
      * 
      * <p>Multiple classpath attributes could be added by using the elements
      * {@link #createClasspathAttribute() &lt;classpathAttribute&gt;}. The attribute and
      * the elements {@code classpathAttribute} can be used simultaneously. At least one
      * classpath attribute must be defined. Otherwise an
-     * {@link BuildException org.apache.tools.ant.BuildException} will be thrown by
+     * {@link BuildException org.apache.tools.ant.BuildException} is thrown by
      * {@link #execute()}.</p>
      * 
      * @param name the name of the module attribute. It must be not {@code null}.
-     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is
      *      thrown by {@link #execute()}.
      */
     public void setClasspathAttribute(final String name)
@@ -164,6 +164,27 @@ public class GetModuleClasspath extends Task
         createClasspathAttribute().setName(name);
     }
     
+    /**
+     * <p>Creates a new {@link ClasspathAttribute ClasspathAttribute} container that backs
+     * the nested element {@code <classpathAttribute>} of this {@code <getModuleClasspath>}
+     * task.</p>
+     * 
+     * <p>This element defines the name of a module attribute that is to be used (probably,
+     * with other classpath attributes) to build up the resulting classpath. If the attribute
+     * with the given name is undefined for a module then it is ignored. If the attribute
+     * {@link #setIncludeDependencies(boolean) includeDependencies} is set to {@code true}
+     * then the attribute with the given name of each dependee module is used as a contributor
+     * to the resulting classpath.</p>
+     * 
+     * <p>Multiple nested {@code <classpathAttribute>} elements are allowed. The
+     * {@link #setClasspathAttribute(String) attribute} and the elements
+     * {@code classpathAttribute} can be used simultaneously. At least one classpath
+     * attribute must be defined. Otherwise an
+     * {@link BuildException org.apache.tools.ant.BuildException} is thrown by
+     * {@link #execute()}.</p>
+     * 
+     * @return the {@code ClasspathAttribute} created. It is never {@code null}.
+     */
     public ClasspathAttribute createClasspathAttribute()
     {
         final ClasspathAttribute o = new ClasspathAttribute();
