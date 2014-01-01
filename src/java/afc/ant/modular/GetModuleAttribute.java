@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2014, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -130,7 +130,7 @@ public class GetModuleAttribute extends Task
      * <p>Sets the name of the property which holds the module whose attribute is to be obtained.</p>
      * 
      * @param moduleProperty the name of the property. It must be not {@code null}.
-     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is
      *      thrown by {@link #execute()}.
      */
     public void setModuleProperty(final String moduleProperty)
@@ -143,7 +143,7 @@ public class GetModuleAttribute extends Task
      * should be undefined. Otherwise this task will not assign the new value to it.</p>
      * 
      * @param propertyName the name of the output property. It must be not {@code null}.
-     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is
      *      thrown by {@link #execute()}.
      */
     public void setOutputProperty(final String propertyName)
@@ -157,7 +157,7 @@ public class GetModuleAttribute extends Task
      * not set to {@code null} for this task to have effect.</p>
      * 
      * @param name the name of the attribute. It must be not {@code null}.
-     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is
      *      thrown by {@link #execute()}.
      */
     public void setName(final String name)

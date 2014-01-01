@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2014, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,6 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.types.Path;
 
 /**
  * <p>An Ant task that sets the {@link Module#getPath() path} of a {@link Module} object
@@ -122,7 +121,7 @@ public class GetModulePath extends Task
      * <p>Sets the name of the property which holds the module whose path is to be obtained.</p>
      * 
      * @param moduleProperty the name of the property. It must be not {@code null}.
-     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is
      *      thrown by {@link #execute()}.
      */
     public void setModuleProperty(final String moduleProperty)
@@ -135,7 +134,7 @@ public class GetModulePath extends Task
      * should be undefined. Otherwise this task will not assign the new value to it.</p>
      * 
      * @param propertyName the name of the output property. It must be not {@code null}.
-     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
+     *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is
      *      thrown by {@link #execute()}.
      */
     public void setOutputProperty(final String propertyName)
