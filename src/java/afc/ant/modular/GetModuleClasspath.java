@@ -33,6 +33,101 @@ import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Path;
 
+/**
+ * <p>An Ant task that generates a classpath for a given {@link Module module} and sets it as
+ * an {@link Path org.apache.tools.ant.types.Path} instance as an Ant {@link Project project}
+ * property. If the property is already created then it is <em>not</em> updated.</p>
+ * 
+ * <p>The resulting classpath is built from the module attributes that are specified by
+ * the {@link #setClasspathAttribute(String) attribute}/{@link #createClasspathAttribute() elements}
+ * {@code classpathAttribute}. If the attribute with the given name is undefined for a module
+ * then it is ignored. If the attribute
+ * {@link #setIncludeDependencies(boolean) includeDependencies} is set to {@code true} then
+ * the attribute with the given name of each dependee module is used as a contributor to
+ * the resulting classpath.</p>
+ * 
+ * <p>At least one {@code classpathAttribute} attribute/element must be defined. Each classpath
+ * attribute, if defined, must be an instance of {@link Path org.apache.tools.ant.types.Path}.
+ * Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is thrown by
+ * {@link #execute()}.</p>
+ * 
+ * <p>The resulting classpath is built as follows:</p>
+ * <ol type="1">
+ *  <li>An empty resulting {@code Path} is created relative to the Ant project of this task.</li>
+ *  <li>The attributes of the {@link #setModuleProperty(String) primary module} are iterated
+ *      through in the order they are declared and the {@code Path} objects stored are appended
+ *      to the resulting {@code Path}. The attribute {@code classpathAttribute}, if defined,
+ *      always precedes the elements {@code classpathAttribute}, if any.</li>
+ *  <li>If {@code includeDependencies} is set to {@code true} then the step {@code 2} is repeated
+ *      for each dependee module (direct and indirect). The order in which the dependee modules
+ *      are processed is undefined.</li>
+ * </ol>
+ * 
+ * <p>This task works with {@code Module} objects that are loaded by any class loader.
+ * It is only required that the class name of the object is exactly {@code afc.ant.modular.Module}
+ * and it has the public member function {@link Module#getAttributes()} that returns a {@link Map}.
+ * Incompatible module objects passed cause an exception raised by this task.</p>
+ * 
+ * <h3>Task input</h3>
+ * <h4>Attributes</h4>
+ * <table border="1">
+ * <thead>
+ *  <tr><th>Attribute</th>
+ *      <th>Required?</th>
+ *      <th>Description</th></tr>
+ * </thead>
+ * <tbody>
+ *  <tr><td>moduleProperty</td>
+ *      <td>yes</td>
+ *      <td>The name of the property which holds the module object.</td></tr>
+ *  <tr><td>outputProperty (an attribute)</td>
+ *      <td>yes</td>
+ *      <td>The name of the property where the module's path is to be set.</td></tr>
+ *  <tr><td>classpathAttribute</td>
+ *      <td>no (at least one {@code classpathAttribute} attribute/element must be defined)</td>
+ *      <td>The name of a module attribute that is to be used (probably, with other classpath
+ *          attributes) to build up the resulting classpath.</td></tr>
+ *  <tr><td>includeDependencies</td>
+ *      <td>no</td>
+ *      <td>The flag whether or not the classpath elements of the dependee modules (direct and
+ *          indirect) of the primary module are to be included into the resulting classpath.
+ *          If {@code true} is set then the dependee modules are taken into account;
+ *          if {@code false} is set then they are ignored. {@code false} is the default value.</td></tr>
+ * </tbody>
+ * </table>
+ * <h4>Elements</h4>
+ * <h5>classpathAttribute</h5>
+ * <p>Defines the name of a module attribute that is to be used (probably, with other classpath
+ * attributes) to build up the resulting classpath. This element is optional, but can be used
+ * multiple times. At least one {@code classpathAttribute} attribute/element must be defined.</p>
+ * <table border="1">
+ * <thead>
+ *  <tr><th>Attribute</th>
+ *      <th>Required?</th>
+ *      <th>Description</th></tr>
+ * </thead>
+ * <tbody>
+ *  <tr><td>name</td>
+ *      <td>yes</td>
+ *      <td>The name of the module classpath attribute.</td></tr>
+ * </tbody>
+ * </table>
+ * 
+ * <h3>Usage example</h3>
+ * <pre> {@literal <getModuleClasspath moduleProperty="project.module" outputProperty="project.module.classpath" classpathAttribute="testClasspath">
+ *      <classpathAttribute name="runtimeClasspath"/>
+ *      <classpathAttribute name="compileClasspath"/>
+ * </getModuleClasspath>}</pre>
+ * 
+ * <p>Here, the module is expected to be set to the property named <em>project.module</em>.
+ * The resulting classpath is built up from the classpath attributes {@code testClasspath},
+ * {@code runtimeClasspath}, {@code compileClasspath}, exactly in this order. After the task
+ * executes the resulting classpath is assigned to the property named
+ * <em>project.module.classpath</em>. Note that the latter property must be undefined. Otherwise
+ * the task does not assign the new value to this property.</p>
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
 public class GetModuleClasspath extends Task
 {
     private String moduleProperty;
@@ -44,8 +139,18 @@ public class GetModuleClasspath extends Task
      * <p>Executes this task. See the {@link GetModuleClasspath class description} for the
      * details.</p>
      * 
-     * @throws BuildException if the task is configured incorrectly or if the module object
-     *      specified is not a well-formed {@link Module} instance.
+     * 
+     * @throws BuildException in any of these cases:
+     *      <ul>
+     *          <li>this task is configured incorrectly</li>
+     *          <li>the {@link #setModuleProperty(String) module object} specified is not a
+     *              well-formed {@link Module} instance</li>
+     *          <li>{@link #setIncludeDependencies(boolean) includeDependencies} is set to
+     *              {@code true} and any of the dependee modules is not a well-formed
+     *              {@link Module} instance</li>
+     *          <li>some classpath attribute configured is not an instance of
+     *              {@link Path org.apache.tools.ant.types.Path} for some module</li>
+     *      </ul>
      */
     @Override
     public void execute()
@@ -148,10 +253,15 @@ public class GetModuleClasspath extends Task
      * then the attribute with the given name of each dependee module is used as a
      * contributor to the resulting classpath.</p>
      * 
+     * <p>This classpath attribute, if defined, must be an instance of
+     * {@link Path org.apache.tools.ant.types.Path}. Otherwise an
+     * {@link BuildException org.apache.tools.ant.BuildException} is thrown by
+     * {@link #execute()}.</p>
+     * 
      * <p>Multiple classpath attributes could be added by using the elements
      * {@link #createClasspathAttribute() &lt;classpathAttribute&gt;}. The attribute and
      * the elements {@code classpathAttribute} can be used simultaneously. At least one
-     * classpath attribute must be defined. Otherwise an
+     * {@code classpathAttribute} attribute/element must be defined. Otherwise an
      * {@link BuildException org.apache.tools.ant.BuildException} is thrown by
      * {@link #execute()}.</p>
      * 
@@ -176,10 +286,15 @@ public class GetModuleClasspath extends Task
      * then the attribute with the given name of each dependee module is used as a contributor
      * to the resulting classpath.</p>
      * 
+     * <p>This classpath attribute, if defined, must be an instance of
+     * {@link Path org.apache.tools.ant.types.Path}. Otherwise an
+     * {@link BuildException org.apache.tools.ant.BuildException} is thrown by
+     * {@link #execute()}.</p>
+     * 
      * <p>Multiple nested {@code <classpathAttribute>} elements are allowed. The
      * {@link #setClasspathAttribute(String) attribute} and the elements
-     * {@code classpathAttribute} can be used simultaneously. At least one classpath
-     * attribute must be defined. Otherwise an
+     * {@code classpathAttribute} can be used simultaneously. At least one
+     * {@code classpathAttribute} attribute/element must be defined. Otherwise an
      * {@link BuildException org.apache.tools.ant.BuildException} is thrown by
      * {@link #execute()}.</p>
      * 
@@ -256,7 +371,7 @@ public class GetModuleClasspath extends Task
      * be included into the resulting classpath. If {@code true} is set then the dependee
      * modules are taken into account; if {@code false} is set then they are ignored. The
      * latter case is default. The classpath attributes that are used for the dependee modules
-     * are defined by the {@code classpathAttribute} elements/attribute, which is the same as
+     * are defined by the {@code classpathAttribute} attribute/elements, which is the same as
      * for the primary module.</p>
      * 
      * <p>It is guaranteed that the dependee modules' classpath elements are placed after
