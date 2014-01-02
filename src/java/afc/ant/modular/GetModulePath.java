@@ -40,6 +40,7 @@ import org.apache.tools.ant.Task;
  * passed cause an exception raised by this task.</p>
  * 
  * <h3>Task input</h3>
+ * <h4>Attributes</h4>
  * <table border="1">
  * <thead>
  *  <tr><th>Attribute</th>
@@ -57,10 +58,9 @@ import org.apache.tools.ant.Task;
  * </table>
  * 
  * <h3>Usage example</h3>
- * <p>
  * <pre>{@literal <getModulePath moduleProperty="project.module" outputProperty="project.module.path"/>}</pre>
  * 
- * Here, the module is expected to be set to the property named <em>project.module</em>. After
+ * <p>Here, the module is expected to be set to the property named <em>project.module</em>. After
  * the task executes the module path is assigned to the property named <em>project.module.path</em>.
  * Note that the latter property must be undefined. Otherwise the task does not assign the new
  * value to this property.</p>
