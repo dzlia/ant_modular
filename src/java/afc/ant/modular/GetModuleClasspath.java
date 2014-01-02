@@ -271,7 +271,15 @@ public class GetModuleClasspath extends Task
      */
     public void setClasspathAttribute(final String name)
     {
-        createClasspathAttribute().setName(name);
+        final ClasspathAttribute o = new ClasspathAttribute();
+        o.setName(name);
+        
+        /* The attribute 'classpathAttribute' precedes the elements with the same name.
+         * 
+         * This implementation is not optimal: it costs O(n). This is fine since the total
+         * number of the elements 'classpathAttribute' is unlikely to be large.
+         */
+        classpathAttributes.add(0, o);
     }
     
     /**

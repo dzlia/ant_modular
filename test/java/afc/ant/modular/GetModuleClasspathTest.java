@@ -23,8 +23,11 @@
 package afc.ant.modular;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
@@ -617,7 +620,7 @@ public class GetModuleClasspathTest extends TestCase
         
         final Object outObject = PropertyHelper.getProperty(project, "out");
         assertTrue(outObject instanceof Path);
-        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+        assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet()); 
         
         assertSame(module, PropertyHelper.getProperty(project, "in"));
@@ -649,7 +652,44 @@ public class GetModuleClasspathTest extends TestCase
         
         final Object outObject = PropertyHelper.getProperty(project, "out");
         assertTrue(outObject instanceof Path);
-        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+        assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
+                new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet()); 
+        
+        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
+    }
+    
+    /**
+     * <p>Tests that the attribute {@code classpathAttribute} precedes the elements
+     * {@code classpathAttribute} of the task {@code GetModuleClasspath} in resolving of
+     * the resulting classpath even if they are assigned in the reverse order.</p>
+     */
+    public void testClasspathAttributeAndElement_DefinedInTheReverseOrder()
+    {
+        final Path path1 = new Path(project);
+        path1.createPathElement().setPath("b");
+        path1.createPathElement().setPath("a");
+        path1.createPathElement().setPath("c/d/e");
+        
+        final Path path2 = new Path(project);
+        path2.createPathElement().setPath("88/ee");
+        
+        final Module module = new Module("foo");
+        module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
+        
+        PropertyHelper.setProperty(project, "in", module);
+        
+        task.setModuleProperty("in");
+        task.setOutputProperty("out");
+        // createClasspathAttribute() must go before setClasspathAttribute() to test the reverse order.
+        task.createClasspathAttribute().setName("cp3");
+        task.setClasspathAttribute("cp");
+        
+        task.execute();
+        
+        final Object outObject = PropertyHelper.getProperty(project, "out");
+        assertTrue(outObject instanceof Path);
+        assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet()); 
         
         assertSame(module, PropertyHelper.getProperty(project, "in"));
@@ -680,7 +720,7 @@ public class GetModuleClasspathTest extends TestCase
         
         final Object outObject = PropertyHelper.getProperty(project, "out");
         assertTrue(outObject instanceof Path);
-        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+        assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet()); 
         
         assertSame(module, PropertyHelper.getProperty(project, "in"));
@@ -708,7 +748,7 @@ public class GetModuleClasspathTest extends TestCase
         
         final Object outObject = PropertyHelper.getProperty(project, "out");
         assertTrue(outObject instanceof Path);
-        assertClasspath((Path) outObject, Collections.singleton(new File("88/ee")), Collections.<File>emptySet()); 
+        assertClasspath((Path) outObject, Collections.singletonList(new File("88/ee")), Collections.<File>emptySet()); 
         
         assertSame(module, PropertyHelper.getProperty(project, "in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
@@ -733,7 +773,7 @@ public class GetModuleClasspathTest extends TestCase
         
         final Object outObject = PropertyHelper.getProperty(project, "out");
         assertTrue(outObject instanceof Path);
-        assertClasspath((Path) outObject, Collections.<File>emptySet(), Collections.<File>emptySet()); 
+        assertClasspath((Path) outObject, Collections.<File>emptyList(), Collections.<File>emptySet()); 
         
         assertSame(module, PropertyHelper.getProperty(project, "in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
@@ -776,7 +816,7 @@ public class GetModuleClasspathTest extends TestCase
         
         final Object outObject = PropertyHelper.getProperty(project, "out");
         assertTrue(outObject instanceof Path);
-        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+        assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), TestUtil.set(new File("111"), new File("222")));
         
         assertSame(module, PropertyHelper.getProperty(project, "in"));
@@ -820,7 +860,7 @@ public class GetModuleClasspathTest extends TestCase
         
         final Object outObject = PropertyHelper.getProperty(project, "out");
         assertTrue(outObject instanceof Path);
-        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+        assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet());
         
         assertSame(module, PropertyHelper.getProperty(project, "in"));
@@ -863,7 +903,7 @@ public class GetModuleClasspathTest extends TestCase
         
         final Object outObject = PropertyHelper.getProperty(project, "out");
         assertTrue(outObject instanceof Path);
-        assertClasspath((Path) outObject, TestUtil.set(new File("b"), new File("a"),
+        assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet());
         
         assertSame(module, PropertyHelper.getProperty(project, "in"));
@@ -900,18 +940,22 @@ public class GetModuleClasspathTest extends TestCase
     }
     
     // Primary elements are the paths defined in the main module. Other elements are the other paths.
-    private void assertClasspath(final Path classpath, final Set<File> primaryElements, final Set<File> otherElements)
+    private void assertClasspath(final Path classpath, final List<File> primaryElements, final Set<File> otherElements)
     {
         assertNotNull(classpath);
         final String[] locations = classpath.list();
         assertEquals(primaryElements.size() + otherElements.size(), locations.length);
-        final HashSet<String> actualPrimaryElements = new HashSet<String>();
+        
+        final ArrayList<String> actualPrimaryElements = new ArrayList<String>();
         for (int i = 0, n = primaryElements.size(); i < n; ++i) {
             actualPrimaryElements.add(locations[i]);
         }
+        final ArrayList<String> primaryElementsAsStrings = new ArrayList<String>();
         for (final File f : primaryElements) {
-            assertTrue(actualPrimaryElements.contains(f.getAbsolutePath()));
+            primaryElementsAsStrings.add(f.getAbsolutePath());
         }
+        assertEquals(actualPrimaryElements, primaryElementsAsStrings);
+        
         final HashSet<String> actualOtherElements = new HashSet<String>();
         for (int i = primaryElements.size(); i < locations.length; ++i) {
             actualOtherElements.add(locations[i]);

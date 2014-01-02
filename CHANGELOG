@@ -19,6 +19,7 @@ Other:
 - CallTargetForModules#setModuleProperty() overrides properties defined by #createParam().
 - CallTargetForModules#addConfigured(ModuleLoader) throws NullPointerException if null module loader is passed.
 - ModuleUtil#normalisePath(String, File) is added to support ModuleLoader#normalisePath(String).
+- GetModuleClasspath: it is guaranteed that the attribute 'classpathAttribute' precedes the elements 'classpathAttribute' w.r.t. building the module classpath. In addition, it is guaranteed that the elements 'classpathAttribute' are iterated through in the order they are defined within the task.
 
 0.4.0
 -----
