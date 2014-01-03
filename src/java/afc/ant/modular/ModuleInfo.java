@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2014, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -110,7 +110,7 @@ public final class ModuleInfo
      * that is associated with this {@code ModuleInfo}.</p>
      * 
      * @return the module path that is normalised by this {@code ModuleInfo}'s
-     * {@code ModuleLoader}. It is necessarily non-{@code null}.
+     *      {@code ModuleLoader}. It is necessarily non-{@code null}.
      */
     public String getPath()
     {
@@ -156,14 +156,15 @@ public final class ModuleInfo
      * passed to this {@code ModuleInfo}.</p>
      * 
      * @param dependencies module paths that this {@code ModuleInfo} is to depend upon.
-     *      This collection and all its elements are to be non-{@code null}. This collection must not
-     *      contain this {@code ModuleInfo}'s path (the normalised paths are compared).
+     *      This collection and all its elements are to be non-{@code null}. This collection
+     *      must not contain this {@code ModuleInfo}'s path (the normalised paths are compared).
      * 
      * @throws NullPointerException if <em>dependencies</em> or any its element or any dependency
-     *      in the normalised form is {@code null}. This {@code ModuleInfo} instance is not modified
+     *      in the normalised form is {@code null}. This {@code ModuleInfo} instance is not
+     *      modified in this case.
+     * @throws IllegalArgumentException if <em>dependencies</em> contains this {@code ModuleInfo}'s
+     *      path (normalised or non-normalised). This {@code ModuleInfo} instance is not modified
      *      in this case.
-     * @throws IllegalArgumentException if <em>dependencies</em> contains this {@code ModuleInfo}'s path
-     *      (normalised or non-normalised). This {@code ModuleInfo} instance is not modified in this case.
      */
     public void setDependencies(final Collection<String> dependencies)
     {
@@ -207,7 +208,7 @@ public final class ModuleInfo
      * returned.</p>
      * 
      * @return an unmodifiable set of this module's dependee module paths that are normalised
-     * by this {@code ModuleInfo}'s {@code ModuleLoader}.
+     *      by this {@code ModuleInfo}'s {@code ModuleLoader}.
      */
     public Set<String> getDependencies()
     {
@@ -237,7 +238,7 @@ public final class ModuleInfo
     /**
      * <p>Replaces the attributes of this {@code ModuleInfo} with given attributes.
      * The new attributes become visible immediately via a set returned by
-     * <tt>{@link #getAttributes()}</tt>.</p>
+     * {@link #getAttributes()}.</p>
      * 
      * <p>The input map is not modified by this function and ownership over it is not
      * passed to this {@code ModuleInfo}.</p>
@@ -245,7 +246,7 @@ public final class ModuleInfo
      * @param attributes the new attributes to be assigned to this {@code ModuleInfo}.
      *      This map must be non-{@code null}.
      * 
-     * @throws NullPointerException if <i>attributes</i> is {@code null}.
+     * @throws NullPointerException if <em>attributes</em> is {@code null}.
      *      This {@code ModuleInfo} instance is not modified in this case.
      */
     public void setAttributes(final Map<String, Object> attributes)
@@ -264,9 +265,9 @@ public final class ModuleInfo
     }
     
     /**
-     * <p>Returns this module's attributes. The map returned is necessarily non-{@code null} and unmodifiable.
-     * In addition, any further modification of this {@code ModuleInfo}'s attributes by means of
-     * the <tt>{@link #addAttribute(String, Object)}</tt> and <tt>{@link #setAttributes(Map)}</tt>
+     * <p>Returns this module's attributes. The map returned is necessarily non-{@code null} and
+     * unmodifiable. In addition, any further modification of this {@code ModuleInfo}'s attributes
+     * by means of the {@link #addAttribute(String, Object)} and {@link #setAttributes(Map)}
      * operations is immediately visible in the map returned.</p>
      * 
      * @return an unmodifiable map of this module's attributes.
