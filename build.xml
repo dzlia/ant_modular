@@ -48,7 +48,7 @@
 				<fileset dir="${ant.library.dir}"/>
 			</classpath>
 			<footer>Ant Modular</footer>
-			<bottom>Copyright &#169; 2013, D&#378;mitry La&#365;&#269;uk. All rights reserved.</bottom>
+			<bottom>Copyright &#169; 2013-2014, D&#378;mitry La&#365;&#269;uk. All rights reserved.</bottom>
 		</javadoc>
 	</target>
 	
