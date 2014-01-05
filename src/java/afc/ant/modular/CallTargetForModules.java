@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2014, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -32,11 +32,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Location;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.CallTarget;
 import org.apache.tools.ant.taskdefs.Property;
-import org.apache.tools.ant.taskdefs.Ant.Reference;
+import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PropertySet;
 
@@ -49,7 +50,7 @@ public class CallTargetForModules extends Task
     
     private String target;
     private final ArrayList<ParamElement> params = new ArrayList<ParamElement>();
-    private final ArrayList<Reference> references = new ArrayList<Reference>();
+    private final ArrayList<Ant.Reference> references = new ArrayList<Ant.Reference>();
     private final PropertySet propertySet = new PropertySet();
     
     // Default values match antcall's defaults.
@@ -464,6 +465,10 @@ public class CallTargetForModules extends Task
      * then all the references are passed to each module-specific Ant project. If {@code false}
      * is set then the references are not passed. {@code false} is the default value.</p>
      * 
+     * <p>The references defined in the module-specific Ant project are not overridden by
+     * the current project's references even if <em>inheritRefs</em> is set to {@code true}.
+     * Use the {@link #addReference(Ant.Reference) &lt;reference&gt;} nested element for this.</p>
+     * 
      * @param inheritRefs the flag value to be set.
      */
     public void setInheritRefs(final boolean inheritRefs)
@@ -495,7 +500,7 @@ public class CallTargetForModules extends Task
         return param;
     }
     
-    public void addReference(final Reference reference)
+    public void addReference(final Ant.Reference reference)
     {
         references.add(reference);
     }
@@ -570,9 +575,9 @@ public class CallTargetForModules extends Task
         private String resource;
         private Path classpathAttribute;
         private Path classpath;
-        private Reference classpathRef;
+        private Ant.Reference classpathRef;
         private String environment;
-        private Reference reference;
+        private Ant.Reference reference;
         private String prefix;
         // relative and basedir introduced in Ant 1.8.0 are not available because Ant 1.6+ is supported.
         // prefixValues introduced in Ant 1.8.2 is not available because Ant 1.6+ is supported.
@@ -640,7 +645,7 @@ public class CallTargetForModules extends Task
             }
         }
         
-        public void setClasspathRef(final Reference reference)
+        public void setClasspathRef(final Ant.Reference reference)
         {
             classpathRef = reference;
             classpathRefSet = true;
@@ -652,7 +657,7 @@ public class CallTargetForModules extends Task
             environmentSet = true;
         }
         
-        public void setRefid(final Reference reference)
+        public void setRefid(final Ant.Reference reference)
         {
             this.reference = reference;
             referenceSet = true;
