@@ -457,6 +457,15 @@ public class CallTargetForModules extends Task
         this.inheritAll = inheritAll;
     }
     
+    /**
+     * <p>Sets the flag whether or not the references of the Ant
+     * {@link Project project} of this {@code <callTargetForModules>} task are to be passed
+     * to the Ant projects created to process {@link Module modules}. If {@code true} is set
+     * then all the references are passed to each module-specific Ant project. If {@code false}
+     * is set then the references are not passed. {@code false} is the default value.</p>
+     * 
+     * @param inheritRefs the flag value to be set.
+     */
     public void setInheritRefs(final boolean inheritRefs)
     {
         this.inheritRefs = inheritRefs;
