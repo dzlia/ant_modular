@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2014, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,20 @@ import java.util.Set;
 import org.apache.tools.ant.BuildException;
 
 /**
- * <p>Various utilities that are used primarily to read module meta information
- * by Ant tasks that are used in targets invoked for a specific module.</p>
+ * <p>Various utilities that are used to handle {@link Module modules} and their metadata.
+ * The following functionality is provided:</p>
+ * <ul>
+ *  <li>{@link #getPath(Object)}, {@link #getDependencies(Object)},
+ *      {@link #getAttributes(Object)} &mdash; used to access module path, dependee modules,
+ *      and attributes, respectively, even if the module passed is loaded by a different
+ *      class loader. These functions are used primarily to read module metadata by Ant tasks
+ *      that are used in targets invoked for a specific module.</li>
+ *  <li>{@link #normalisePath(String, File)}, {@link #normalisePath(String, File, boolean)}
+ *      &mdash; used as a possible implementation of the path normalisation algorithm that
+ *      could is used by a specific implementation of
+ *      {@link ModuleLoader#normalisePath(String)} to provide consistent path
+ *      normalisation.</li>
+ * </ul>
  *
  * @author D&#378;mitry La&#365;&#269;uk
  */
