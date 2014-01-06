@@ -500,6 +500,24 @@ public class CallTargetForModules extends Task
         return param;
     }
     
+    /**
+     * <p>Adds a new {@link org.apache.tools.ant.taskdefs.Ant.Reference org.apache.tools.ant.taskdefs.Ant.Reference}
+     * container that backs the nested element {@code <reference>} of this
+     * {@code <callTargetForModules>} task. Multiple nested {@code <reference>} elements are
+     * allowed.</p>
+     * 
+     * <p>This element defines a reference to be inherited by the Ant {@link Project projects}
+     * created to process {@link Module modules}. If there is a reference with the ID requested
+     * defined in the module-specific Ant project then it is overridden by this reference.
+     * However, a reference with the ID requested defined within a target is not overridden.</p>
+     * 
+     * <p>Use the task attribute {@link #setInheritRefs(boolean) inheritRefs} set to {@code true}
+     * to pass all references defined within the Ant project of this {@code <callTargetForModules>}
+     * to the module-specific projects. Note that no references are overridden in this case except
+     * those that are specified by the {@code <reference>} elements.</p>
+     * 
+     * @param reference the {@code <reference>} element to be added. It must be not {@code null}.
+     */
     public void addReference(final Ant.Reference reference)
     {
         references.add(reference);
