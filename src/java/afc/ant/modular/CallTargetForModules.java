@@ -453,17 +453,31 @@ public class CallTargetForModules extends Task
         this.target = target;
     }
     
+    /**
+     * <p>Sets the flag whether or not the properties of the current Ant {@link Project project}
+     * are to be passed to the Ant projects created to process {@link Module modules}.
+     * If {@code true} is set then all the properties from the current project are passed to
+     * each module-specific Ant project. If {@code false} is set then only the user properties
+     * (i.e. the properties defined in the command line) and the properties defined by the elements
+     * {@link #createParam() &lt;param&gt;} and {@link #addPropertyset(PropertySet) &lt;propertyset&gt;}
+     * are passed. {@code true} is the default value.</p>
+     * 
+     * <p>In either case the properties defined within the module-specific project are overridden
+     * by the correspondent properties passed from the current project.</p>
+     * 
+     * @param inheritAll the flag value to be set.
+     */
     public void setInheritAll(final boolean inheritAll)
     {
         this.inheritAll = inheritAll;
     }
     
     /**
-     * <p>Sets the flag whether or not the references of the Ant
-     * {@link Project project} of this {@code <callTargetForModules>} task are to be passed
-     * to the Ant projects created to process {@link Module modules}. If {@code true} is set
-     * then all the references are passed to each module-specific Ant project. If {@code false}
-     * is set then the references are not passed. {@code false} is the default value.</p>
+     * <p>Sets the flag whether or not the references of the current Ant {@link Project project}
+     * are to be passed to the Ant projects created to process {@link Module modules}. If
+     * {@code true} is set then all the references are passed to each module-specific Ant project.
+     * If {@code false} is set then the references are not passed. {@code false} is the default
+     * value.</p>
      * 
      * <p>The references defined in the module-specific Ant project are not overridden by
      * the current project's references even if <em>inheritRefs</em> is set to {@code true}.
