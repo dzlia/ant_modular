@@ -537,6 +537,25 @@ public class CallTargetForModules extends Task
         references.add(reference);
     }
     
+    /**
+     * <p>Adds a new {@link PropertySet org.apache.tools.ant.types.PropertySet}
+     * container that backs the nested element {@code <propertyset>} of this
+     * {@code <callTargetForModules>} task. Multiple nested {@code <propertyset>} elements are
+     * allowed.</p>
+     * 
+     * <p>This element defines a set of Ant project properties that are to be passed to the Ant
+     * {@link Project projects} created to process {@link Module modules}. Each of these properties
+     * overrides the property with the same name defined in a module-specific project. However,
+     * these properties are overridden by the user-defined properties (i.e. those passed with
+     * the command line) and {@link #createParam() params}.</p>
+     * 
+     * <p>Use the task attribute {@link #setInheritAll(boolean) inheritAll} set to {@code true}
+     * to pass all properties defined within the current Ant project to the module-specific
+     * projects.</p>
+     * 
+     * @param propertySet the {@code <propertyset>} element to be added. It must be
+     *      not {@code null}.
+     */
     public void addPropertyset(final PropertySet propertySet)
     {
         this.propertySet.addPropertyset(propertySet);
