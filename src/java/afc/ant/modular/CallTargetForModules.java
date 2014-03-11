@@ -616,6 +616,19 @@ public class CallTargetForModules extends Task
         }
     }
     
+    /**
+     * <p>Serves as the nested element {@code <param>} of the task
+     * {@link CallTargetForModules &lt;callTargetForModules&gt;} and defines the parameters to be
+     * passed to the module-specific Ant projects. Refer to
+     * {@link CallTargetForModules#createParam()} for more details.</p>
+     * 
+     * <h3>Attributes</h3>
+     * <p>The attributes and nested elements defined by {@code ParamElement} have the same
+     * semantics as the correspondent attributes and nested elements of the task
+     * {@link org.apache.tools.ant.taskdefs.Property &lt;property&gt;} have.</p>
+     * 
+     * @see Property org.apache.tools.ant.taskdefs.Property
+     */
     public static class ParamElement extends ProjectComponent
     {
         private String name;
@@ -645,48 +658,96 @@ public class CallTargetForModules extends Task
         private boolean referenceSet;
         private boolean prefixSet;
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#setName(String)} have.</p>
+         * 
+         * @param name the value to be set.
+         */
         public void setName(final String name)
         {
             this.name = name;
             nameSet = true;
         }
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#setValue(String)} have.</p>
+         * 
+         * @param value the value to be set.
+         */
         public void setValue(final String value)
         {
             this.value = value;
             valueSet = true;
         }
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#setLocation(File)} have.</p>
+         * 
+         * @param location the value to be set.
+         */
         public void setLocation(final File location)
         {
             this.location = location;
             locationSet = true;
         }
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#setFile(File)} have.</p>
+         * 
+         * @param file the value to be set.
+         */
         public void setFile(final File file)
         {
             this.file = file;
             fileSet = true;
         }
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#setUrl(URL)} have.</p>
+         * 
+         * @param url the value to be set.
+         */
         public void setUrl(final URL url)
         {
             this.url = url;
             urlSet = true;
         }
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#setResource(String)} have.</p>
+         * 
+         * @param resource the value to be set.
+         */
         public void setResource(final String resource)
         {
             this.resource = resource;
             resourceSet = true;
         }
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#setClasspath(Path)} have.</p>
+         * 
+         * @param classpath the value to be set.
+         */
         public void setClasspath(final Path classpath)
         {
             classpathAttribute = classpath;
             classpathAttributeSet = true;
         }
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#createClasspath()} have.</p>
+         * 
+         * @return the element created. It is never {@code null}.
+         */
         public Path createClasspath()
         {
             if (classpath == null) {
@@ -696,24 +757,50 @@ public class CallTargetForModules extends Task
             }
         }
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#setClasspathRef(
+         * org.apache.tools.ant.types.Reference)} have.</p>
+         * 
+         * @param reference the value to be set.
+         */
         public void setClasspathRef(final Ant.Reference reference)
         {
             classpathRef = reference;
             classpathRefSet = true;
         }
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#setEnvironment(String)} have.</p>
+         * 
+         * @param environment the value to be set.
+         */
         public void setEnvironment(final String environment)
         {
             this.environment = environment;
             environmentSet = true;
         }
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#setRefid(
+         * org.apache.tools.ant.types.Reference)} have.</p>
+         * 
+         * @param reference the value to be set.
+         */
         public void setRefid(final Ant.Reference reference)
         {
             this.reference = reference;
             referenceSet = true;
         }
         
+        /**
+         * <p>Has the same semantics as
+         * {@link org.apache.tools.ant.taskdefs.Property#setPrefix(String)} have.</p>
+         * 
+         * @param prefix the value to be set.
+         */
         public void setPrefix(final String prefix)
         {
             this.prefix = prefix;
