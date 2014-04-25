@@ -88,13 +88,14 @@ public final class Module
      * <p>Creates a {@code Module} with a given path. The {@code Module} instance
      * created has neither dependencies nor attributes.</p>
      * 
-     * @param path the module path. It is assumed to end with '/'.
+     * <p>It is expected to be invoked from {@link ModuleRegistry#resolveModule(String)} only.</p>
+     * 
+     * @param path the module path. It is assumed to be {@link ModuleLoader#normalisePath(String)
+     *      normalised} by the {@code ModuleLoader} this module is being resolved with.
      */
     Module(final String path)
     {
-        if (path == null) {
-            throw new NullPointerException("path");
-        }
+        assert path != null;
         this.path = path;
     }
     

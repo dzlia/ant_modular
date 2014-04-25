@@ -42,17 +42,6 @@ import junit.framework.TestCase;
  */
 public class ModuleTest extends TestCase
 {
-    public void testConstructWithNullPath()
-    {
-        try {
-            new Module(null);
-            fail();
-        }
-        catch (NullPointerException ex) {
-            assertEquals("path", ex.getMessage());
-        }
-    }
-    
     public void testConstructWithEmptyPath()
     {
         final Module m = new Module("");
