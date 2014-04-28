@@ -47,9 +47,14 @@ import java.util.HashMap;
  */
 public class ModuleRegistry
 {
+    /* Put instead of the module into the module registry to indicate that an error
+     * is encountered while resolving this module or any of its dependee modules.
+     */
     private static final Object moduleNotLoaded = new Object();
     
-    private final HashMap<String, Object> modules; // values are either ModuleInfo instances of 'moduleNotLoaded'
+    // Values are either ModuleInfo instances or 'moduleNotLoaded'.
+    private final HashMap<String, Object> modules;
+    // The module loader that is used to resolve modules.
     private final ModuleLoader moduleLoader;
     
     /**
