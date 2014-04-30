@@ -40,7 +40,7 @@ package afc.ant.modular;
  * 
  * <p>Additional notes:<p>
  * <ul>
- *  <li>{@code ModuleLoader} instances are used in the single threaded execution model</li>
+ *  <li>{@code ModuleLoader} instances are used in the single-threaded execution model</li>
  *  <li>no caching of metadata is generally needed. Each module is loaded only once</li>
  *  <li>implementations of this interface are used by the task {@link CallTargetForModules}
  *      as pluggable components to define a way in which module metadata is to be loaded</li>
