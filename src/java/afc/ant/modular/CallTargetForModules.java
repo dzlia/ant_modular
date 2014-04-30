@@ -69,9 +69,95 @@ import org.apache.tools.ant.types.PropertySet;
  * another. The number of threads to be used is defined by the attribute
  * {@link #setThreadCount(int) threadCount}.</p>
  * 
+ * <h3>Task input</h3>
+ * <h4>Attributes</h4>
+ * <table border="1">
+ * <thead>
+ *  <tr><th>Attribute</th>
+ *      <th>Required?</th>
+ *      <th>Description</th>
+ *      <th>Default value</th></tr>
+ * </thead>
+ * <tbody>
+ *  <tr><td>{@link #setTarget(String) target}</td>
+ *      <td>yes</td>
+ *      <td>The name of the target to be invoked by this {@code <callTargetForModules>} for modules
+ *          involved in the build process by default. The target is expected to be defined in
+ *          the current Ant project. If at least one module uses this target and the target itself
+ *          is undefined in the current Ant project then the build fails.</td>
+ *      <td>N/A</td></tr>
+ *  <tr><td>{@link #setModuleProperty(String) moduleProperty}</td>
+ *      <td>no</td>
+ *      <td>The name of the property that holds the {@link Module} object within
+ *          the module-specific project. No {@code Module} is passed if <em>moduleProperty</em>
+ *          is undefined.</td>
+ *      <td>N/A</td></tr>
+ *  <tr><td>{@link #setThreadCount(int) threadCount}</td>
+ *      <td>no</td>
+ *      <td>The number of threads to be used by this {@code <callTargetForModules>} task to build
+ *          independent modules in parallel. If <em>1</em> is passed then modules are built
+ *          sequentally. It must be a positive value.</td>
+ *      <td>{@code 1}</td></tr>
+ *  <tr><td>{@link #setInheritAll(boolean) inheritAll}</td>
+ *      <td>no</td>
+ *      <td>Indicates whether or not the properties of the current Ant project are to be passed
+ *          to the module-specific Ant projects. If {@code true} is set then all the properties
+ *          from the current project are passed to each module-specific Ant project. If
+ *          {@code false} is set then only the user properties and the properties defined by
+ *          the elements {@link #createParam() &lt;param&gt;} and
+ *          {@link #addPropertyset(PropertySet) &lt;propertyset&gt;} are passed.</td>
+ *      <td>{@code true}</td></tr>
+ *  <tr><td>{@link #setInheritRefs(boolean) inheritRefs}</td>
+ *      <td>no</td>
+ *      <td>Indicates whether or not the references of the current Ant {@link Project project} are
+ *          to be passed to the module-specific Ant projects. If {@code true} is set then all
+ *          the references are passed to each module-specific Ant project. If {@code false} is set
+ *          then the references are not passed.</td>
+ *      <td>{@code false}</td></tr>
+ * </tbody>
+ * </table>
+ * <h4>Elements</h4>
+ * <h5>{@link #createModule() module}</h5>
+ * <p>The module this element refers to will be built by this {@code <callTargetForModules>} along
+ * with all modules it depends upon (directly or indirectly). At least one {@code <module>} element
+ * must be specified. Multiple nested elements are allowed.</p>
+ * <p>Refer to {@link ModuleElement} for the attribute/element description.</p>
+ * 
+ * <h5>{@link #addConfigured(ModuleLoader) moduleLoaderElement}</h5>
+ * <p>Defines a {@link ModuleLoader} that is to be used by this task. One and only one module
+ * loader must be defined. The name of the nested element is defined by the name of the Ant type
+ * used to pass this instance of {@code ModuleLoader}.</p>
+ * 
+ * <h5>{@link #createParam() param}</h5>
+ * <p>Represents a property set that is passed to the Ant project created for each module or any
+ * project created in that project regardless of what is set to {@link #setInheritAll(boolean)
+ * inheritAll}. This property set overrides the properties with the same name defined in
+ * the project it is passed to. However, it does not override the user-defined properties with
+ * the same name. Nor it overrides the property defined by the attribute
+ * {@link #setModuleProperty(String) moduleProperty}. It is an optional element. Multiple nested
+ * elements are allowed.</p>
+ * <p>Refer to {@link ParamElement} for the attribute/element description.</p>
+ * 
+ * <h5>{@link #addPropertyset(PropertySet) propertyset}</h5>
+ * <p>Defines a set of Ant project properties that are to be passed to the module-specific Ant
+ * projects. Each of these properties overrides the property with the same name defined in
+ * a module-specific project. However, these properties are overridden by the user-defined
+ * properties and {@link #createParam() params}. It is an optional element. Multiple nested
+ * elements are allowed.</p>
+ * <p>Refer to the Ant task {@link PropertySet &lt;propertyset&gt;} for the attribute/element
+ * description.</p>
+ * 
+ * <h5>{@link #addReference(org.apache.tools.ant.taskdefs.Ant.Reference) reference}</h5>
+ * <p>Defines a reference to be inherited by the module-specific Ant projects. If there is
+ * a reference with the ID requested defined in the module-specific Ant project then it is
+ * overridden by this reference. However, a reference with the ID requested defined within
+ * a target is not overridden. It is an optional element. Multiple nested elements are allowed.</p>
+ * <p>Refer to the Ant task {@link org.apache.tools.ant.taskdefs.Ant.Reference &lt;reference&gt;}
+ * for the attribute/element description.</p>
+ * 
  * @author D&#378;mitry La&#365;&#269;uk
  */
-// TODO document task input and usage example.
+// TODO document usage example.
 public class CallTargetForModules extends Task
 {
     private ArrayList<ModuleElement> moduleElements = new ArrayList<ModuleElement>();
