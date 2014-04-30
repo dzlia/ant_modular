@@ -152,8 +152,8 @@ import org.apache.tools.ant.types.PropertySet;
  * a reference with the ID requested defined in the module-specific Ant project then it is
  * overridden by this reference. However, a reference with the ID requested defined within
  * a target is not overridden. It is an optional element. Multiple nested elements are allowed.</p>
- * <p>Refer to the Ant task {@link org.apache.tools.ant.taskdefs.Ant.Reference &lt;reference&gt;}
- * for the attribute/element description.</p>
+ * <p>Refer to the Ant type {@link org.apache.tools.ant.taskdefs.Ant.Reference} for
+ * the attribute/element description.</p>
  * 
  * @author D&#378;mitry La&#365;&#269;uk
  */
