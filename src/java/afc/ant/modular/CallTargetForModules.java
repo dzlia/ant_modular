@@ -155,14 +155,39 @@ import org.apache.tools.ant.types.PropertySet;
  * <p>Refer to the Ant type {@link org.apache.tools.ant.taskdefs.Ant.Reference} for
  * the attribute/element description.</p>
  * 
+ * <h3>Usage example</h3>
+ * <pre>{@literal
+ * <am:callTargetForModules target="moduleTarget" moduleProperty="module" inheritAll="false" inheritRefs="false">
+ *     <module path="foo/bar"/>
+ *     <module path="baz" target="otherTarget"/>
+ *     <am:manifestModuleLoader>
+ *         <classpathAttribute name="Class-Path"/>
+ *     </am:manifestModuleLoader>
+ *     <reference refid="xxx"/>
+ *     <param name="qwerty" value="bar"/>
+ * </am:callTargetForModules>}</pre>
+ * 
+ * <p>Here, the task {@code <callTargetForModules>} processes the modules with paths
+ * <em>foo/bar</em> and <em>baz</em>, and all their dependee modules, if any. An instance of
+ * {@link ManifestModuleLoader} is used to load module metadata. The target <em>moduleTarget</em>
+ * is invoked to process each module but the module <em>baz</em>. For the latter the target
+ * <em>otherTarget</em> is invoked. Each target is executed within its own Ant project. This
+ * project inherits neither properties nor references from the project it is exected from. However,
+ * it is parameterised with the property <em>querty</em> set to <em>bar</em>, the property
+ * <em>module</em> set assigned with the {@code Module} for which it is invoked, and
+ * the reference <em>xxx</em>, if the latter is defined. If the module <em>foo/bar</em> depends
+ * upon the module <em>buzz</em> then it is guaranteed that <em>buzz</em> is processed before
+ * <em>foo/bar</em>. All modules involved are processed sequentally.</p>
+ * 
  * @author D&#378;mitry La&#365;&#269;uk
  */
-// TODO document usage example.
 public class CallTargetForModules extends Task
 {
     private ArrayList<ModuleElement> moduleElements = new ArrayList<ModuleElement>();
     private ModuleLoader moduleLoader;
-    // If defined then the correspondent Module object is set to this property for each module being processed.
+    /* If defined then the correspondent Module object is set to this property for each module
+     * being processed.
+     */
     private String moduleProperty;
     
     private String target;
