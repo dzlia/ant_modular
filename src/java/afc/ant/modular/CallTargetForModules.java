@@ -41,6 +41,37 @@ import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PropertySet;
 
+/**
+ * <p>An Ant task that executes a target for each module specified and all their dependee modules.
+ * An order in which the modules' targets are executed is such that for each module all
+ * the dependee modules are processed before this module is processed. An order in which
+ * independent modules are executed is undefined.</p>
+ * 
+ * <p>To provide isolation, the target invoked to process the module is executed in its own
+ * Ant {@link Project project}. However, there is a way to pass data from the parent Ant project to
+ * the module-specific project. The attributes {@link #setInheritAll(boolean) inheritAll},
+ * {@link #setInheritRefs(boolean) inheritRefs}, and the nested elements {@link #createParam()
+ * &lt;createParam&gt;}, {@link #addPropertyset(PropertySet) &lt;propertyset&gt;},
+ * {@link #addReference(org.apache.tools.ant.taskdefs.Ant.Reference) &lt;reference&gt;} can be used
+ * for this. If the attribute {@link #setModuleProperty(String) moduleProperty} is defined
+ * then a {@link Module} instance that contains module metadata is passed to the module-specific
+ * project with the given property. In addition, all user-defined properties (i.e. the properties
+ * defined by the command line) are passed to each module-specific project. Note that there is no
+ * explicit way to pass data between module-specific Ant projects.</p>
+ * 
+ * <p>Module metadata are loaded by a {@link ModuleLoader} specified by the nested element
+ * whose type is a descendant of {@code ModuleLoader}. One and only one such element must
+ * be specified.</p>
+ * 
+ * <p>For the sake of performance, modules could be processed in parallel. That is, independent
+ * modules could be processed simultaneously, each within its own thread. There is no way to
+ * perform parallel processing of modules that are dependent, directly or indirectly, one upon
+ * another. The number of threads to be used is defined by the attribute
+ * {@link #setThreadCount(int) threadCount}.</p>
+ * 
+ * @author D&#378;mitry La&#365;&#269;uk
+ */
+// TODO document task input and usage example.
 public class CallTargetForModules extends Task
 {
     private ArrayList<ModuleElement> moduleElements = new ArrayList<ModuleElement>();
