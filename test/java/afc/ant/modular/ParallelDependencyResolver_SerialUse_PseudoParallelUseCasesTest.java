@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -54,8 +54,8 @@ public class ParallelDependencyResolver_SerialUse_PseudoParallelUseCasesTest ext
     
     public void testTwoUnrelatedModules() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
         
         resolver.init(Arrays.asList(module1, module2));
         
@@ -73,11 +73,11 @@ public class ParallelDependencyResolver_SerialUse_PseudoParallelUseCasesTest ext
     
     public void testThreeModules_TwoDependUponOne() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module1.addDependency(module2);
-        module3.addDependency(module2);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module1.setDependencies(new Module[]{module2});
+        module3.setDependencies(new Module[]{module2});
         
         resolver.init(Arrays.asList(module1, module2, module3));
         
@@ -99,11 +99,10 @@ public class ParallelDependencyResolver_SerialUse_PseudoParallelUseCasesTest ext
     
     public void testThreeModules_OneDependsUponTwo() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module2.addDependency(module1);
-        module2.addDependency(module3);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module2.setDependencies(new Module[]{module1, module3});
         
         resolver.init(Arrays.asList(module1, module2, module3));
 
@@ -125,11 +124,10 @@ public class ParallelDependencyResolver_SerialUse_PseudoParallelUseCasesTest ext
     
     public void testThreeModules_OneDependsUponTwo_ReleaseNonAquiredModule() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module2.addDependency(module1);
-        module2.addDependency(module3);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module2.setDependencies(new Module[]{module1, module3});
         
         resolver.init(Arrays.asList(module1, module2, module3));
 
@@ -160,11 +158,11 @@ public class ParallelDependencyResolver_SerialUse_PseudoParallelUseCasesTest ext
     
     public void testThreeModules_AbortInTheMiddle() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module1.addDependency(module2);
-        module2.addDependency(module3);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module1.setDependencies(new Module[]{module2});
+        module2.setDependencies(new Module[]{module3});
         
         resolver.init(Arrays.asList(module1));
         
@@ -185,11 +183,10 @@ public class ParallelDependencyResolver_SerialUse_PseudoParallelUseCasesTest ext
     
     public void testThreeModules_MultipleAbortInTheMiddle() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module2.addDependency(module1);
-        module2.addDependency(module3);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module2.setDependencies(new Module[]{module1, module3});
         
         resolver.init(Arrays.asList(module2));
 
@@ -233,11 +230,10 @@ public class ParallelDependencyResolver_SerialUse_PseudoParallelUseCasesTest ext
             public void run()
             {
                 try {
-                    final Module module1 = new Module("foo");
-                    final Module module2 = new Module("bar");
-                    final Module module3 = new Module("baz");
-                    module2.addDependency(module1);
-                    module2.addDependency(module3);
+                    final Module module1 = module("foo");
+                    final Module module2 = module("bar");
+                    final Module module3 = module("baz");
+                    module2.setDependencies(new Module[]{module1, module3});
                     
                     resolver.init(Arrays.asList(module2));
                     resolver.getFreeModule();
@@ -292,11 +288,10 @@ public class ParallelDependencyResolver_SerialUse_PseudoParallelUseCasesTest ext
             public void run()
             {
                 try {
-                    final Module module1 = new Module("foo");
-                    final Module module2 = new Module("bar");
-                    final Module module3 = new Module("baz");
-                    module2.addDependency(module1);
-                    module2.addDependency(module3);
+                    final Module module1 = module("foo");
+                    final Module module2 = module("bar");
+                    final Module module3 = module("baz");
+                    module2.setDependencies(new Module[]{module1, module3});
                     
                     resolver.init(Arrays.asList(module2));
                     resolver.getFreeModule();
@@ -334,5 +329,12 @@ public class ParallelDependencyResolver_SerialUse_PseudoParallelUseCasesTest ext
         if (testFailureCause.get() != null) {
             throw testFailureCause.get();
         }
+    }
+    
+    private Module module(final String path)
+    {
+        final Module result = new Module(path);
+        result.setDependencies(new Module[0]);
+        return result;
     }
 }

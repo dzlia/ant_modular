@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -23,7 +23,7 @@
 package afc.ant.modular;
 
 import java.util.AbstractSet;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,8 +73,8 @@ public final class Module
      * This field has the package-level access. This is used by dependency resolvers to avoid
      * overhead associated with iterators (virtual function call, longer dereference chain, etc.).
      */
-    final ArrayList<Module> dependencies = new ArrayList<Module>();
-    private final Set<Module> dependenciesView = Collections.unmodifiableSet(new ArrayListSet<Module>(dependencies));
+    Module[] dependencies;
+    private Set<Module> dependenciesView;
     
     private final HashMap<String, Object> attributes = new HashMap<String, Object>();
     
@@ -113,28 +113,31 @@ public final class Module
     }
     
     /**
-     * <p>Assigns a given {@code Module} as a dependency. It is assumed that the {@code Module}
-     * passed is not identical to this {@code Module} and is not contained already in
-     * this module's dependencies. In addition it is expected to be non-{@code null}.</p>
+     * <p>Assigns given {@code Module}s as dependencies. It is assumed that each {@code Module}
+     * passed is not identical to this {@code Module} and is containes in the given array only once.
+     * In addition it is expected to be non-{@code null}.</p>
      * 
      * <p>To preserve thread-safety, this operation cannot be used after
      * {@link ModuleRegistry#resolveModule(String)} has initialised this {@code Module}.</p>
      * 
-     * @param dependency the dependee module to be assigned.
+     * @param dependencies the dependee modules to be assigned. This array is used directly.
+     *      No copy is created.
      */
-    void addDependency(final Module dependency)
+    void setDependencies(final Module[] dependencies)
     {
         /* Add dependency is not public/protected. The package developer is responsible
            for passing valid dependencies. */
-        assert dependency != null;
-        assert dependency != this;
+        assert dependencies != null;
+        
         /* No synchronisation is needed because dependencies are assigned before any thread
          * is started by CallTargetForModules in which the client sees this Module instance
          * (there is 'happens-before' relation) and because the client cannot modify
          * these dependencies.
          */
-        assert !dependencies.contains(dependency);
-        dependencies.add(dependency);
+        this.dependencies = dependencies;
+        
+        dependenciesView = Collections.unmodifiableSet(new ArraySet<Module>(dependencies));
+        assert !dependenciesView.contains(this);
     }
     
     /**
@@ -150,6 +153,7 @@ public final class Module
      */
     public Set<Module> getDependencies()
     {
+        assert dependencies != null;
         return dependenciesView;
     }
     
@@ -245,36 +249,41 @@ public final class Module
         return attributesView;
     }
     
-    /* An adaptor from ArrayList to Set. Lists without duplicate elements are supported only.
+    /* An adaptor from an array to Set. Array without duplicate elements are supported only.
      * It must be used with an unmodifiable wrapper.
      */
-    private static class ArrayListSet<T> extends AbstractSet<T>
+    private static class ArraySet<T> extends AbstractSet<T>
     {
-        private final ArrayList<T> list;
+        private final T[] data;
         
-        public ArrayListSet(final ArrayList<T> list)
+        public ArraySet(final T[] data)
         {
-            assert list != null;
-            assert new HashSet<T>(list).size() == list.size();
-            this.list = list;
+            assert data != null;
+            assert new HashSet<T>(Arrays.asList(data)).size() == data.length;
+            this.data = data;
         }
 
         @Override
         public Iterator<T> iterator()
         {
-            return list.iterator();
+            return Arrays.asList(data).iterator();
         }
         
         @Override
         public int size()
         {
-            return list.size();
+            return data.length;
         }
         
         @Override
         public boolean contains(final Object o)
         {
-            return list.contains(o);
+            for (Object val : data) {
+                if (val.equals(o)) {
+                	return true;
+                }
+            }
+            return false;
         }
     }
 }

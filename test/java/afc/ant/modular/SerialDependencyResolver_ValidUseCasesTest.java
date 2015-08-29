@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testSingleModule() throws Exception
     {
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         
         resolver.init(Collections.singleton(module));
         
@@ -66,9 +66,9 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testTwoLinkedModules() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        module1.addDependency(module2);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        module1.setDependencies(new Module[]{module2});
         
         resolver.init(Arrays.asList(module1, module2));
         
@@ -81,8 +81,8 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testTwoUnrelatedModules() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
         
         resolver.init(Arrays.asList(module1, module2));
         
@@ -100,11 +100,11 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testThreeModules_Chain() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module1.addDependency(module2);
-        module3.addDependency(module1);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module1.setDependencies(new Module[]{module2});
+        module3.setDependencies(new Module[]{module1});
         
         resolver.init(Collections.singletonList(module3));
         
@@ -119,11 +119,11 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testThreeModules_Chain_AllModulesAreRoot() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module1.addDependency(module2);
-        module3.addDependency(module1);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module1.setDependencies(new Module[]{module2});
+        module3.setDependencies(new Module[]{module1});
         
         resolver.init(Arrays.asList(module1, module2, module3));
         
@@ -138,11 +138,11 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testThreeModules_TwoDependUponOne() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module1.addDependency(module2);
-        module3.addDependency(module2);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module1.setDependencies(new Module[]{module2});
+        module3.setDependencies(new Module[]{module2});
         
         resolver.init(Arrays.asList(module1, module2, module3));
 
@@ -156,11 +156,10 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testThreeModules_OneDependsUponTwo() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module2.addDependency(module1);
-        module2.addDependency(module3);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module2.setDependencies(new Module[]{module1, module3});
         
         resolver.init(Arrays.asList(module1, module2, module3));
 
@@ -174,14 +173,13 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testFourModules_Diamond() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        module2.addDependency(module1);
-        module2.addDependency(module3);
-        module1.addDependency(module4);
-        module3.addDependency(module4);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        module2.setDependencies(new Module[]{module1, module3});
+        module1.setDependencies(new Module[]{module4});
+        module3.setDependencies(new Module[]{module4});
         
         resolver.init(Arrays.asList(module1, module2, module3, module4));
 
@@ -198,13 +196,12 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testFourModules_Branch() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        module3.addDependency(module1);
-        module3.addDependency(module2);
-        module2.addDependency(module4);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        module3.setDependencies(new Module[]{module1, module2});
+        module2.setDependencies(new Module[]{module4});
         
         resolver.init(Arrays.asList(module1, module2, module3, module4));
 
@@ -220,12 +217,11 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testFourModules_ThreeAndSingle() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        module3.addDependency(module1);
-        module3.addDependency(module2);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        module3.setDependencies(new Module[]{module1, module2});
         
         resolver.init(Arrays.asList(module1, module2, module3, module4));
 
@@ -240,10 +236,10 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testLoop_TwoModules()
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        module1.addDependency(module2);
-        module2.addDependency(module1);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        module1.setDependencies(new Module[]{module2});
+        module2.setDependencies(new Module[]{module1});
         
         try {
             resolver.init(Arrays.asList(module1, module2));
@@ -257,12 +253,12 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testLoop_ThreeModules_AllInLoop()
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module1.addDependency(module3);
-        module3.addDependency(module2);
-        module2.addDependency(module1);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module1.setDependencies(new Module[]{module3});
+        module3.setDependencies(new Module[]{module2});
+        module2.setDependencies(new Module[]{module1});
         
         try {
             resolver.init(Arrays.asList(module1, module2, module3));
@@ -278,11 +274,11 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testLoop_ThreeModules_TwoInLoop()
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module1.addDependency(module3);
-        module3.addDependency(module1);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module1.setDependencies(new Module[]{module3});
+        module3.setDependencies(new Module[]{module1});
         
         try {
             resolver.init(Arrays.asList(module1, module2, module3));
@@ -297,14 +293,14 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testLoop_FourModules_AllInLoop()
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        module1.addDependency(module3);
-        module3.addDependency(module2);
-        module2.addDependency(module4);
-        module4.addDependency(module1);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        module1.setDependencies(new Module[]{module3});
+        module3.setDependencies(new Module[]{module2});
+        module2.setDependencies(new Module[]{module4});
+        module4.setDependencies(new Module[]{module1});
         
         try {
             resolver.init(Arrays.asList(module1, module2, module3, module4));
@@ -321,13 +317,13 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testLoop_FourModules_ThreeInLoop()
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        module1.addDependency(module3);
-        module3.addDependency(module2);
-        module2.addDependency(module1);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        module1.setDependencies(new Module[]{module3});
+        module3.setDependencies(new Module[]{module2});
+        module2.setDependencies(new Module[]{module1});
         
         try {
             resolver.init(Arrays.asList(module1, module2, module3, module4));
@@ -343,14 +339,14 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testLoop_FourModules_TwoLoops()
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        module1.addDependency(module3);
-        module3.addDependency(module1);
-        module2.addDependency(module4);
-        module4.addDependency(module2);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        module1.setDependencies(new Module[]{module3});
+        module3.setDependencies(new Module[]{module1});
+        module2.setDependencies(new Module[]{module4});
+        module4.setDependencies(new Module[]{module2});
         
         try {
             resolver.init(Arrays.asList(module1, module2, module3, module4));
@@ -367,16 +363,14 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testNonRootModulesInDependencies_NoLoops() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        final Module module5 = new Module("flux");
-        module3.addDependency(module1);
-        module3.addDependency(module2);
-        module2.addDependency(module4);
-        module4.addDependency(module5);
-        
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        final Module module5 = module("flux");
+        module3.setDependencies(new Module[]{module1, module2});
+        module2.setDependencies(new Module[]{module4});
+        module4.setDependencies(new Module[]{module5});
         
         resolver.init(Arrays.asList(module1, module3, module4));
 
@@ -394,17 +388,15 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testNonRootModulesInDependencies_Loop() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        final Module module5 = new Module("flux");
-        module3.addDependency(module1);
-        module3.addDependency(module2);
-        module2.addDependency(module4);
-        module4.addDependency(module5);
-        module5.addDependency(module2);
-        
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        final Module module5 = module("flux");
+        module3.setDependencies(new Module[]{module1, module2});
+        module2.setDependencies(new Module[]{module4});
+        module4.setDependencies(new Module[]{module5});
+        module5.setDependencies(new Module[]{module2});
         
         try {
             resolver.init(Arrays.asList(module1, module2, module3, module4));
@@ -424,16 +416,14 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
      */
     public void testDifferentModulesWithTheSamePath_NoLoops() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("bar");
-        final Module module4 = new Module("bar");
-        final Module module5 = new Module("flux");
-        module3.addDependency(module1);
-        module3.addDependency(module2);
-        module2.addDependency(module4);
-        module4.addDependency(module5);
-        
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("bar");
+        final Module module4 = module("bar");
+        final Module module5 = module("flux");
+        module3.setDependencies(new Module[]{module1, module2});
+        module2.setDependencies(new Module[]{module4});
+        module4.setDependencies(new Module[]{module5});
         
         resolver.init(Arrays.asList(module1, module3, module4));
 
@@ -455,17 +445,15 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
      */
     public void testDifferentModulesWithTheSamePath_Loop() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("bar");
-        final Module module4 = new Module("bar");
-        final Module module5 = new Module("flux");
-        module3.addDependency(module1);
-        module3.addDependency(module2);
-        module2.addDependency(module4);
-        module4.addDependency(module5);
-        module5.addDependency(module2);
-        
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("bar");
+        final Module module4 = module("bar");
+        final Module module5 = module("flux");
+        module3.setDependencies(new Module[]{module1, module2});
+        module2.setDependencies(new Module[]{module4});
+        module4.setDependencies(new Module[]{module5});
+        module5.setDependencies(new Module[]{module2});
         
         try {
             resolver.init(Arrays.asList(module1, module2, module3, module4));
@@ -481,18 +469,18 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testReInit_InTheMiddle_ModuleNotAcquired() throws Exception
     {
-        final Module module1 = new Module("foo/");
-        final Module module2 = new Module("bar/");
-        module1.addDependency(module2);
+        final Module module1 = module("foo/");
+        final Module module2 = module("bar/");
+        module1.setDependencies(new Module[]{module2});
         
         resolver.init(Arrays.asList(module1, module2));
         
         assertSame(module2, resolver.getFreeModule());
         resolver.moduleProcessed(module2);
         
-        final Module module3 = new Module("baz/");
-        final Module module4 = new Module("quux/");
-        module3.addDependency(module4);
+        final Module module3 = module("baz/");
+        final Module module4 = module("quux/");
+        module3.setDependencies(new Module[]{module4});
         
         resolver.init(Arrays.asList(module3, module4));
         
@@ -514,17 +502,17 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testReInit_InTheMiddle_ModuleAcquired() throws Exception
     {
-        final Module module1 = new Module("foo/");
-        final Module module2 = new Module("bar/");
-        module1.addDependency(module2);
+        final Module module1 = module("foo/");
+        final Module module2 = module("bar/");
+        module1.setDependencies(new Module[]{module2});
         
         resolver.init(Arrays.asList(module1, module2));
         
         assertSame(module2, resolver.getFreeModule());
         
-        final Module module3 = new Module("baz/");
-        final Module module4 = new Module("quux/");
-        module3.addDependency(module4);
+        final Module module3 = module("baz/");
+        final Module module4 = module("quux/");
+        module3.setDependencies(new Module[]{module4});
         
         resolver.init(Arrays.asList(module3, module4));
         
@@ -546,9 +534,9 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testReInit_InTheEnd_ModuleAcquired() throws Exception
     {
-        final Module module1 = new Module("foo/");
-        final Module module2 = new Module("bar/");
-        module1.addDependency(module2);
+        final Module module1 = module("foo/");
+        final Module module2 = module("bar/");
+        module1.setDependencies(new Module[]{module2});
         
         resolver.init(Arrays.asList(module1, module2));
         
@@ -557,9 +545,9 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         assertSame(module1, resolver.getFreeModule());
         resolver.moduleProcessed(module1);
         
-        final Module module3 = new Module("baz/");
-        final Module module4 = new Module("quux/");
-        module3.addDependency(module4);
+        final Module module3 = module("baz/");
+        final Module module4 = module("quux/");
+        module3.setDependencies(new Module[]{module4});
         
         resolver.init(Arrays.asList(module3, module4));
         
@@ -581,19 +569,19 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testReInitFailed_InTheMiddle_ModuleNotAcquired() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        module1.addDependency(module2);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        module1.setDependencies(new Module[]{module2});
         
         resolver.init(Arrays.asList(module1, module2));
         
         assertSame(module2, resolver.getFreeModule());
         resolver.moduleProcessed(module2);
         
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        module3.addDependency(module4);
-        module4.addDependency(module3);
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        module3.setDependencies(new Module[]{module4});
+        module4.setDependencies(new Module[]{module3});
         
         try {
             resolver.init(Arrays.asList(module3, module4));
@@ -612,18 +600,18 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testReInitFailed_InTheMiddle_ModuleAcquired() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        module1.addDependency(module2);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        module1.setDependencies(new Module[]{module2});
         
         resolver.init(Arrays.asList(module1, module2));
         
         assertSame(module2, resolver.getFreeModule());
         
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        module3.addDependency(module4);
-        module4.addDependency(module3);
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        module3.setDependencies(new Module[]{module4});
+        module4.setDependencies(new Module[]{module3});
         
         try {
             resolver.init(Arrays.asList(module3, module4));
@@ -651,18 +639,18 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testReInitDueToNullModule_InTheMiddle_ModuleAcquired() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        module1.addDependency(module2);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        module1.setDependencies(new Module[]{module2});
         
         resolver.init(Arrays.asList(module1, module2));
         
         assertSame(module2, resolver.getFreeModule());
         
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        module3.addDependency(module4);
-        module4.addDependency(module3);
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        module3.setDependencies(new Module[]{module4});
+        module4.setDependencies(new Module[]{module3});
         
         try {
             resolver.init(Arrays.asList(module3, null));
@@ -688,9 +676,9 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testReInitDueToNullRootModules_InTheMiddle_ModuleAcquired() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        module1.addDependency(module2);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        module1.setDependencies(new Module[]{module2});
         
         resolver.init(Arrays.asList(module1, module2));
         
@@ -720,9 +708,9 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testReInitFailed_InTheEnd_ModuleAcquired() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        module1.addDependency(module2);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        module1.setDependencies(new Module[]{module2});
         
         resolver.init(Arrays.asList(module1, module2));
         
@@ -731,10 +719,10 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         assertSame(module1, resolver.getFreeModule());
         resolver.moduleProcessed(module1);
         
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        module3.addDependency(module4);
-        module4.addDependency(module3);
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        module3.setDependencies(new Module[]{module4});
+        module4.setDependencies(new Module[]{module3});
         
         try {
             resolver.init(Arrays.asList(module3, module4));
@@ -750,14 +738,14 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
     
     public void testLoop_RootModuleIsNotIncluded()
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        final Module module4 = new Module("quux");
-        module1.addDependency(module2);
-        module2.addDependency(module3);
-        module3.addDependency(module4);
-        module4.addDependency(module3);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        final Module module4 = module("quux");
+        module1.setDependencies(new Module[]{module2});
+        module2.setDependencies(new Module[]{module3});
+        module3.setDependencies(new Module[]{module4});
+        module4.setDependencies(new Module[]{module3});
         
         try {
             resolver.init(Arrays.asList(module1));
@@ -780,6 +768,13 @@ public class SerialDependencyResolver_ValidUseCasesTest extends TestCase
         }
         assertSame(null, resolver.getFreeModule());
         assertEquals(moduleCount, result.size());
+        return result;
+    }
+    
+    private Module module(final String path)
+    {
+        final Module result = new Module(path);
+        result.setDependencies(new Module[0]);
         return result;
     }
 }

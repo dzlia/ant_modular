@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ public class ModuleTest extends TestCase
 {
     public void testConstructWithEmptyPath()
     {
-        final Module m = new Module("");
+        final Module m = module("");
         
         assertSame("", m.getPath());
         assertEquals(Collections.emptySet(), m.getDependencies());
@@ -52,7 +52,7 @@ public class ModuleTest extends TestCase
     
     public void testConstructWithNonEmptyPath()
     {
-        final Module m = new Module("a/b/c");
+        final Module m = module("a/b/c");
         
         assertSame("a/b/c", m.getPath());
         assertEquals(Collections.emptySet(), m.getDependencies());
@@ -60,17 +60,16 @@ public class ModuleTest extends TestCase
     
     public void testSetValidDependencies()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("baz");
         final ArrayList<Module> deps = new ArrayList<Module>();
         deps.add(m2);
         deps.add(m3);
-        m2.addDependency(m3);
+        m2.setDependencies(new Module[]{m3});
         
         final HashSet<Module> expectedDeps = TestUtil.set(m2, m3);
-        m.addDependency(m2);
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertSame("foo", m.getPath());
         assertEquals(expectedDeps, m.getDependencies());
         assertEquals(Arrays.asList(m2, m3), deps);
@@ -85,9 +84,9 @@ public class ModuleTest extends TestCase
     
     public void testSetValidDependencies_InputCollectionDoesNotSupportNullElements()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("baz");
         final List<Module> deps = new AbstractList<Module>() {
             private final ArrayList<Module> list = new ArrayList<Module>();
             
@@ -123,11 +122,10 @@ public class ModuleTest extends TestCase
         };
         deps.add(m2);
         deps.add(m3);
-        m2.addDependency(m3);
+        m2.setDependencies(new Module[]{m3});
         
         final HashSet<Module> expectedDeps = TestUtil.set(m2, m3);
-        m.addDependency(m2);
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertSame("foo", m.getPath());
         assertEquals(expectedDeps, m.getDependencies());
         assertEquals(Arrays.asList(m2, m3), deps);
@@ -142,16 +140,15 @@ public class ModuleTest extends TestCase
     
     public void testTryAddDependencyViaGetter()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("baz");
         
-        m.addDependency(m2);
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
-            m.getDependencies().add(new Module("quux"));
+            m.getDependencies().add(module("quux"));
             fail();
         }
         catch (UnsupportedOperationException ex) {
@@ -162,12 +159,11 @@ public class ModuleTest extends TestCase
     
     public void testTryAddNullDependencyViaGetter()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("baz");
         
-        m.addDependency(m2);
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -182,12 +178,11 @@ public class ModuleTest extends TestCase
     
     public void testTryClearDependenciesViaGetter()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("baz");
         
-        m.addDependency(m2);
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -202,12 +197,11 @@ public class ModuleTest extends TestCase
     
     public void testTryRemoveADependencyViaGetter()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("baz");
         
-        m.addDependency(m2);
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -222,12 +216,11 @@ public class ModuleTest extends TestCase
     
     public void testTryRemoveAllViaGetter()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("baz");
         
-        m.addDependency(m2);
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -242,12 +235,11 @@ public class ModuleTest extends TestCase
     
     public void testTryRemoveAllViaGetter_InputCollectionSizeGreaterThanDependencyCount()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("baz");
         
-        m.addDependency(m2);
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -262,12 +254,11 @@ public class ModuleTest extends TestCase
     
     public void testTryRetainAllViaGetter()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("baz");
         
-        m.addDependency(m2);
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
@@ -282,16 +273,15 @@ public class ModuleTest extends TestCase
     
     public void testTryAddACollectionOfDependenciesViaGetter()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("baz");
         
-        m.addDependency(m2);
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         try {
-            m.getDependencies().addAll(Arrays.asList(new Module("quux")));
+            m.getDependencies().addAll(Arrays.asList(module("quux")));
             fail();
         }
         catch (UnsupportedOperationException ex) {
@@ -302,12 +292,11 @@ public class ModuleTest extends TestCase
     
     public void testTryRemoveADependencyViaIterator()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("baz");
         
-        m.addDependency(m2);
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         
         final Iterator<Module> i = m.getDependencies().iterator();
@@ -325,29 +314,14 @@ public class ModuleTest extends TestCase
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
     }
     
-    public void testAddDependency_NoOtherDependencies()
+    public void testSetDependencies_NoOtherDependencies()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
         
-        m.addDependency(m2);
+        m.setDependencies(new Module[]{m2});
         assertSame("foo", m.getPath());
         assertEquals(Collections.singleton(m2), m.getDependencies());
-    }
-    
-    public void testAddDependency_ToExistingDependencies()
-    {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("baz");
-        
-        m.addDependency(m2);
-        assertSame("foo", m.getPath());
-        assertEquals(Collections.singleton(m2), m.getDependencies());
-        
-        m.addDependency(m3);
-        assertSame("foo", m.getPath());
-        assertEquals(TestUtil.set(m2, m3), m.getDependencies());
     }
     
     /**
@@ -356,15 +330,11 @@ public class ModuleTest extends TestCase
      */
     public void testAddDependency_AddModuleWithTheSamePathAsDependency()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("foo");
+        final Module m = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("foo");
         
-        m.addDependency(m2);
-        assertSame("foo", m.getPath());
-        assertEquals(Collections.singleton(m2), m.getDependencies());
-        
-        m.addDependency(m3);
+        m.setDependencies(new Module[]{m2, m3});
         assertSame("foo", m.getPath());
         assertEquals(TestUtil.set(m2, m3), m.getDependencies());
         assertEquals(Collections.emptySet(), m3.getDependencies());
@@ -376,9 +346,9 @@ public class ModuleTest extends TestCase
      */
     public void testEquals()
     {
-        final Module m1 = new Module("foo");
-        final Module m2 = new Module("bar");
-        final Module m3 = new Module("foo");
+        final Module m1 = module("foo");
+        final Module m2 = module("bar");
+        final Module m3 = module("foo");
         
         assertFalse(m1.equals(null));
         assertFalse(m1.equals(new Object()));
@@ -386,13 +356,13 @@ public class ModuleTest extends TestCase
         assertFalse(m1.equals(m2));
         assertFalse(m1.equals(m3));
         
-        m1.addDependency(m2);
+        m1.setDependencies(new Module[]{m2});
         assertTrue(m1.equals(m1));
     }
     
     public void testSetAttributes()
     {
-        final Module m = new Module("foo");
+        final Module m = module("foo");
         final HashMap<String, Object> attributes = new HashMap<String, Object>();
         attributes.put("bar", new Object());
         attributes.put("baz", Integer.valueOf(2000));
@@ -413,7 +383,7 @@ public class ModuleTest extends TestCase
     
     public void testReSetAttributes()
     {
-        final Module m = new Module("foo");
+        final Module m = module("foo");
         final HashMap<String, Object> attributes = new HashMap<String, Object>();
         final Object o = new Object();
         attributes.put("bar", o);
@@ -439,9 +409,9 @@ public class ModuleTest extends TestCase
     
     public void testReSetAttributes_WithNullAttributeName_InputMapSupportsNullKeys()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("zoo");
-        m.addDependency(m2);
+        final Module m = module("foo");
+        final Module m2 = module("zoo");
+        m.setDependencies(new Module[]{m2});
         
         final HashMap<String, Object> attributes = new HashMap<String, Object>();
         final Object o = new Object();
@@ -472,9 +442,9 @@ public class ModuleTest extends TestCase
     
     public void testSetAttributes_InputMapDoesNotSupportNullKeys()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("zoo");
-        m.addDependency(m2);
+        final Module m = module("foo");
+        final Module m2 = module("zoo");
+        m.setDependencies(new Module[]{m2});
         
         final TreeMap<String, Object> attributes = new TreeMap<String, Object>();
         final Object o = new Object();
@@ -491,7 +461,7 @@ public class ModuleTest extends TestCase
     
     public void testTryAddAttributeViaGetter()
     {
-        final Module m = new Module("foo");
+        final Module m = module("foo");
         
         m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
         assertEquals(Collections.singletonMap("bar", "baz"), m.getAttributes());
@@ -510,7 +480,7 @@ public class ModuleTest extends TestCase
     
     public void testTryClearAttributesViaGetter()
     {
-        final Module m = new Module("foo");
+        final Module m = module("foo");
         
         m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
         assertEquals(Collections.singletonMap("bar", "baz"), m.getAttributes());
@@ -529,7 +499,7 @@ public class ModuleTest extends TestCase
     
     public void testSetNullAttributes()
     {
-        final Module m = new Module("foo");
+        final Module m = module("foo");
         
         m.setAttributes(Collections.<String, Object>singletonMap("bar", "baz"));
         
@@ -547,7 +517,7 @@ public class ModuleTest extends TestCase
     
     public void testAddAttribute_NoOtherAttributes()
     {
-        final Module m = new Module("foo");
+        final Module m = module("foo");
         final Object val = new Object();
         
         m.addAttribute("bar", val);
@@ -559,9 +529,9 @@ public class ModuleTest extends TestCase
     
     public void testAddAttribute_ToExistingAttributes()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("zoo");
-        m.addDependency(m2);
+        final Module m = module("foo");
+        final Module m2 = module("zoo");
+        m.setDependencies(new Module[]{m2});
         
         final Object val = new Object();
         
@@ -582,9 +552,9 @@ public class ModuleTest extends TestCase
     
     public void testAddAttribute_NullAttribute()
     {
-        final Module m = new Module("foo");
-        final Module m2 = new Module("quux");
-        m.addDependency(m2);
+        final Module m = module("foo");
+        final Module m2 = module("quux");
+        m.setDependencies(new Module[]{m2});
         
         final Object val = new Object();
         
@@ -607,12 +577,11 @@ public class ModuleTest extends TestCase
     
     public void testGetDependencies_BasicOperations()
     {
-        final Module m1 = new Module("foo/");
-        final Module m2 = new Module("bar/");
-        final Module m3 = new Module("baz/");
-        final Module m4 = new Module("quux/");
-        m1.addDependency(m2);
-        m1.addDependency(m3);
+        final Module m1 = module("foo/");
+        final Module m2 = module("bar/");
+        final Module m3 = module("baz/");
+        final Module m4 = module("quux/");
+        m1.setDependencies(new Module[]{m2, m3});
         
         final Set<Module> deps = m1.getDependencies();
         
@@ -635,5 +604,12 @@ public class ModuleTest extends TestCase
         assertFalse(deps2.contains(m3));
         assertFalse(deps2.contains(m4));
         assertEquals(Collections.emptySet(), deps2);
+    }
+    
+    private Module module(final String path)
+    {
+        final Module result = new Module(path);
+        result.setDependencies(new Module[0]);
+        return result;
     }
 }

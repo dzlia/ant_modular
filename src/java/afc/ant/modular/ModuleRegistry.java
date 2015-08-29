@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -24,6 +24,7 @@ package afc.ant.modular;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * <p>Manages {@link Module} instances in scope of a single {@link CallTargetForModules}
@@ -144,12 +145,16 @@ public class ModuleRegistry
             /* The module under construction is put into the registry to prevent infinite
                module loading in case of cyclic dependencies, which causes stack overflow. */
             modules.put(normalisedPath, module);
-            for (final String depPath : moduleInfo.getDependencies()) {
+            final Set<String> depPaths = moduleInfo.getDependencies();
+            final Module[] deps = new Module[depPaths.size()];
+            int i = 0;
+            for (final String depPath : depPaths) {
                 /* ModuleInfo#getDependencies() returns normalised module paths so it is
                  * safe to invoke #resolveModuleFast() directly.
                  */
-                module.addDependency(resolveModuleFast(depPath));
+                deps[i++] = resolveModuleFast(depPath);
             }
+            module.setDependencies(deps);
             return module;
         }
         catch (ModuleNotLoadedException ex) {

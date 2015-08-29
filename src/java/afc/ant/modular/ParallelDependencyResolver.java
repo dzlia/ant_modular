@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -270,13 +270,13 @@ public class ParallelDependencyResolver implements DependencyResolver
         if (path.add(module)) {
             node = new Node(module);
             
-            final ArrayList<Module> deps = module.dependencies;
-            if (deps.isEmpty()) {
+            final Module[] deps = module.dependencies;
+            if (deps.length == 0) {
                 shortlist.add(node);
             } else {
                 // inverted dependencies are assigned
-                for (int i = 0, n = deps.size(); i < n; ++i) {
-                    final Module dep = deps.get(i);
+                for (int i = 0, n = deps.length; i < n; ++i) {
+                    final Module dep = deps[i];
                     final Node depNode = addNodeDeep(dep, shortlist, registry, path);
                     depNode.dependencyOf.add(node);
                 }

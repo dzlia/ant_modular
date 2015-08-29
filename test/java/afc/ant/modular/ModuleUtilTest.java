@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -146,8 +147,7 @@ public class ModuleUtilTest extends TestCase
         final Module module = new Module("foo/");
         final Module dep1 = new Module("bar/");
         final Module dep2 = new Module("baz/");
-        module.addDependency(dep1);
-        module.addDependency(dep2);
+        module.setDependencies(new Module[]{dep1, dep2});
         
         assertSame(module.getDependencies(), ModuleUtil.getDependencies(module));
         assertEquals(TestUtil.set(dep1, dep2), ModuleUtil.getDependencies(module));
@@ -158,10 +158,13 @@ public class ModuleUtilTest extends TestCase
         final ModuleClassLoader classLoader = new ModuleClassLoader();
         final Object module = createModuleWithDifferentClassLoader("foo/", classLoader);
         final Object dep = createModuleWithDifferentClassLoader("bar/", classLoader);
-        // invoking module.addDependency(dep) via reflection
-        final Method addDependency = module.getClass().getDeclaredMethod("addDependency", module.getClass());
-        addDependency.setAccessible(true);
-        addDependency.invoke(module, dep);
+        final Object depArray = createModuleArrayWithDifferentClassLoader(1, classLoader);
+        Array.set(depArray, 0, dep);
+        
+        // invoking module.setDependencies(depArray) via reflection
+        final Method setDependencies = module.getClass().getDeclaredMethod("setDependencies", depArray.getClass());
+        setDependencies.setAccessible(true);
+        setDependencies.invoke(module, depArray);
         
         assertEquals(Collections.singleton(dep), ModuleUtil.getDependencies(module));
     }
@@ -234,6 +237,15 @@ public class ModuleUtilTest extends TestCase
         return constructor.newInstance(path);
     }
     
+    private static Object createModuleArrayWithDifferentClassLoader(final int size, final ClassLoader cl) throws Exception
+    {
+        final Class<?> c = cl.loadClass(Module.class.getName());
+        
+        assertNotSame(c, Module.class);
+        
+        return Array.newInstance(c, size);
+    }
+    
     private static class ModuleClassLoader extends ClassLoader
     {
         public ModuleClassLoader() throws IOException
@@ -244,7 +256,7 @@ public class ModuleUtilTest extends TestCase
              */ 
             defineClass(Module.class.getName());
             // This code is consistent: the binary name of the class ArrayListSet is used.
-            defineClass(Module.class.getName() + "$ArrayListSet");
+            defineClass(Module.class.getName() + "$ArraySet");
         }
         
         private void defineClass(final String className) throws IOException

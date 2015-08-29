@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -65,7 +65,7 @@ public class ParallelDependencyResolver_ParalleUseTest extends TestCase
         
         for (int i = 0; i < n; ++i) {
             final Module m = new Module("does_not_matter");
-            m.dependencies.addAll(modules);
+            m.setDependencies(modules.toArray(new Module[i]));
             modules.add(m);
         }
         
@@ -91,9 +91,11 @@ public class ParallelDependencyResolver_ParalleUseTest extends TestCase
         for (int i = 0; i < n; ++i) {
             final Module m = new Module("does_not_matter");
             // j is assigned with some pseudo-random value so that different modules are used as dependencies.
+            final ArrayList<Module> deps = new ArrayList<Module>();
             for (int s = modules.size(), j = Math.min(s, rand.nextInt(10)); j < s; j += 5) {
-                m.dependencies.add(modules.get(j));
+                deps.add(modules.get(j));
             }
+            m.setDependencies(deps.toArray(new Module[deps.size()]));
             modules.add(m);
         }
         

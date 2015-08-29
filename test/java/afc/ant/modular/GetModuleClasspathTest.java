@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -76,7 +76,7 @@ public class GetModuleClasspathTest extends TestCase
     
     public void testNoOutputProperty()
     {
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -96,7 +96,7 @@ public class GetModuleClasspathTest extends TestCase
     
     public void testNoClasspathAttributes()
     {
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
         
@@ -119,7 +119,7 @@ public class GetModuleClasspathTest extends TestCase
     
     public void testClasspathAttributeWithUndefinedName_SingleAttribute()
     {
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
         task.setClasspathAttribute(null);
@@ -143,7 +143,7 @@ public class GetModuleClasspathTest extends TestCase
     
     public void testClasspathAttributeWithUndefinedName_MultipleAttributes()
     {
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
         task.createClasspathAttribute().setName("foo");
@@ -210,7 +210,7 @@ public class GetModuleClasspathTest extends TestCase
     
     public void testSingleClasspathAttribute_ClasspathPropertyWithWrongType()
     {
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", "12345"));
         PropertyHelper.setProperty(project, "in", module);
         
@@ -233,11 +233,11 @@ public class GetModuleClasspathTest extends TestCase
     
     public void testSingleClasspathAttribute_DependeeModuleWithCPPropertyWithWrongType()
     {
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        final Module dep = new Module("bar");
+        final Module dep = module("bar");
         dep.setAttributes(TestUtil.<String, Object>map("cp", Integer.valueOf(2)));
-        module.addDependency(dep);
+        module.setDependencies(new Module[]{dep});
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -261,11 +261,11 @@ public class GetModuleClasspathTest extends TestCase
     
     public void testSingleClasspathAttribute_DependeeModuleWithCPPropertyWithWrongType_DepsNotIncludedImplicitly()
     {
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        final Module dep = new Module("bar");
+        final Module dep = module("bar");
         dep.setAttributes(TestUtil.<String, Object>map("cp", Integer.valueOf(2)));
-        module.addDependency(dep);
+        module.setDependencies(new Module[]{dep});
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -286,7 +286,7 @@ public class GetModuleClasspathTest extends TestCase
     
     public void testSingleClasspathAttribute_NoClasspathProperty_NoDependencies()
     {
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
         
@@ -310,7 +310,7 @@ public class GetModuleClasspathTest extends TestCase
         final Object value = new Object();
         PropertyHelper.setProperty(project, "out", value);
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
         PropertyHelper.setProperty(project, "in", module);
         
@@ -327,14 +327,13 @@ public class GetModuleClasspathTest extends TestCase
     
     public void testSingleClasspathAttribute_NoClasspathProperty_WithDependencies()
     {
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        final Module dep1 = new Module("bar");
+        final Module dep1 = module("bar");
         dep1.setAttributes(TestUtil.<String, Object>map("x", "y"));
-        module.addDependency(dep1);
-        final Module dep2 = new Module("bar");
+        final Module dep2 = module("bar");
         dep2.setAttributes(TestUtil.<String, Object>map("b", "c"));
-        module.addDependency(dep2);
+        module.setDependencies(new Module[]{dep1, dep2});
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -356,15 +355,15 @@ public class GetModuleClasspathTest extends TestCase
     
     public void testSingleClasspathAttribute_NoClasspathProperty_DependencyLoop()
     {
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        final Module dep1 = new Module("bar");
+        final Module dep1 = module("bar");
         dep1.setAttributes(TestUtil.<String, Object>map("x", "y"));
-        module.addDependency(dep1);
-        final Module dep2 = new Module("bar");
+        final Module dep2 = module("bar");
         dep2.setAttributes(TestUtil.<String, Object>map("b", "c"));
-        dep1.addDependency(dep2);
-        dep2.addDependency(module);
+        module.setDependencies(new Module[]{dep1});
+        dep1.setDependencies(new Module[]{dep2});
+        dep2.setDependencies(new Module[]{module});
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -391,7 +390,7 @@ public class GetModuleClasspathTest extends TestCase
         path.createPathElement().setPath("b");
         path.createPathElement().setPath("c/d/e");
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", path));
         PropertyHelper.setProperty(project, "in", module);
         
@@ -420,11 +419,11 @@ public class GetModuleClasspathTest extends TestCase
         path2.createPathElement().setPath("88/ee");
         path2.createPathElement().setPath("555");
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", path1));
-        final Module dep = new Module("bar");
+        final Module dep = module("bar");
         dep.setAttributes(TestUtil.<String, Object>map("cp", path2, "1", "2"));
-        module.addDependency(dep);
+        module.setDependencies(new Module[]{dep});
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -455,11 +454,11 @@ public class GetModuleClasspathTest extends TestCase
         path2.createPathElement().setPath("88/ee");
         path2.createPathElement().setPath("555");
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", path1));
-        final Module dep = new Module("bar");
+        final Module dep = module("bar");
         dep.setAttributes(TestUtil.<String, Object>map("cp", path2, "1", "2"));
-        module.addDependency(dep);
+        module.setDependencies(new Module[]{dep});
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -489,11 +488,11 @@ public class GetModuleClasspathTest extends TestCase
         path2.createPathElement().setPath("88/ee");
         path2.createPathElement().setPath("555");
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", path1));
-        final Module dep = new Module("bar");
+        final Module dep = module("bar");
         dep.setAttributes(TestUtil.<String, Object>map("cp", path2, "1", "2"));
-        module.addDependency(dep);
+        module.setDependencies(new Module[]{dep});
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -521,12 +520,12 @@ public class GetModuleClasspathTest extends TestCase
         final Path path2 = new Path(project);
         path2.createPathElement().setPath("88/ee");
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", path1));
-        final Module dep = new Module("bar");
+        final Module dep = module("bar");
         dep.setAttributes(TestUtil.<String, Object>map("cp", path2, "1", "2"));
-        module.addDependency(dep);
-        dep.addDependency(module);
+        module.setDependencies(new Module[]{dep});
+        dep.setDependencies(new Module[]{module});
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -562,19 +561,18 @@ public class GetModuleClasspathTest extends TestCase
         path4.createPathElement().setPath("bbb");
         path4.createPathElement().setPath("555");
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1));
-        final Module dep1 = new Module("bar");
+        final Module dep1 = module("bar");
         dep1.setAttributes(TestUtil.<String, Object>map("cp", path2, "1", "2"));
-        final Module dep2 = new Module("bar");
+        final Module dep2 = module("bar");
         dep2.setAttributes(TestUtil.<String, Object>map("cp", path3));
-        final Module dep3 = new Module("bar");
+        final Module dep3 = module("bar");
         dep3.setAttributes(TestUtil.<String, Object>map("cp", path4));
         
-        module.addDependency(dep1);
-        module.addDependency(dep2);
-        dep1.addDependency(dep3);
-        dep2.addDependency(dep3);
+        module.setDependencies(new Module[]{dep1, dep2});
+        dep1.setDependencies(new Module[]{dep3});
+        dep2.setDependencies(new Module[]{dep3});
         PropertyHelper.setProperty(project, "in", module);
         
         task.setModuleProperty("in");
@@ -606,7 +604,7 @@ public class GetModuleClasspathTest extends TestCase
         final Path path2 = new Path(project);
         path2.createPathElement().setPath("88/ee");
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
         PropertyHelper.setProperty(project, "in", module);
@@ -637,7 +635,7 @@ public class GetModuleClasspathTest extends TestCase
         final Path path2 = new Path(project);
         path2.createPathElement().setPath("88/ee");
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
         PropertyHelper.setProperty(project, "in", module);
@@ -674,7 +672,7 @@ public class GetModuleClasspathTest extends TestCase
         final Path path2 = new Path(project);
         path2.createPathElement().setPath("88/ee");
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
         PropertyHelper.setProperty(project, "in", module);
@@ -706,7 +704,7 @@ public class GetModuleClasspathTest extends TestCase
         final Path path2 = new Path(project);
         path2.createPathElement().setPath("88/ee");
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
         PropertyHelper.setProperty(project, "in", module);
@@ -734,7 +732,7 @@ public class GetModuleClasspathTest extends TestCase
         final Path path2 = new Path(project);
         path2.createPathElement().setPath("88/ee");
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
         PropertyHelper.setProperty(project, "in", module);
@@ -759,7 +757,7 @@ public class GetModuleClasspathTest extends TestCase
         final Path path1 = new Path(project);
         final Path path2 = new Path(project);
         
-        final Module module = new Module("foo");
+        final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
         PropertyHelper.setProperty(project, "in", module);
@@ -795,14 +793,14 @@ public class GetModuleClasspathTest extends TestCase
         final Path path4 = new Path(project);
         path4.createPathElement().setPath("222");
         
-        final Module module = new Module("foo/");
+        final Module module = module("foo/");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
-        final Module dep1 = new Module("bar/");
+        final Module dep1 = module("bar/");
         dep1.setAttributes(TestUtil.<String, Object>map("cp", path3));
-        final Module dep2 = new Module("baz/");
+        final Module dep2 = module("baz/");
         dep2.setAttributes(TestUtil.<String, Object>map("cp3", path4));
-        module.addDependency(dep1);
-        dep1.addDependency(dep2);
+        module.setDependencies(new Module[]{dep1});
+        dep1.setDependencies(new Module[]{dep2});
         
         PropertyHelper.setProperty(project, "in", module);
         
@@ -839,14 +837,14 @@ public class GetModuleClasspathTest extends TestCase
         final Path path4 = new Path(project);
         path4.createPathElement().setPath("222");
         
-        final Module module = new Module("foo/");
+        final Module module = module("foo/");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
-        final Module dep1 = new Module("bar/");
+        final Module dep1 = module("bar/");
         dep1.setAttributes(TestUtil.<String, Object>map("cp", path3));
-        final Module dep2 = new Module("baz/");
+        final Module dep2 = module("baz/");
         dep2.setAttributes(TestUtil.<String, Object>map("cp3", path4));
-        module.addDependency(dep1);
-        dep1.addDependency(dep2);
+        module.setDependencies(new Module[]{dep1});
+        dep1.setDependencies(new Module[]{dep2});
         
         PropertyHelper.setProperty(project, "in", module);
         
@@ -883,14 +881,14 @@ public class GetModuleClasspathTest extends TestCase
         final Path path4 = new Path(project);
         path4.createPathElement().setPath("222");
         
-        final Module module = new Module("foo/");
+        final Module module = module("foo/");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
-        final Module dep1 = new Module("bar/");
+        final Module dep1 = module("bar/");
         dep1.setAttributes(TestUtil.<String, Object>map("cp", path3));
-        final Module dep2 = new Module("baz/");
+        final Module dep2 = module("baz/");
         dep2.setAttributes(TestUtil.<String, Object>map("cp3", path4));
-        module.addDependency(dep1);
-        dep1.addDependency(dep2);
+        module.setDependencies(new Module[]{dep1});
+        dep1.setDependencies(new Module[]{dep2});
         
         PropertyHelper.setProperty(project, "in", module);
         
@@ -964,5 +962,12 @@ public class GetModuleClasspathTest extends TestCase
         for (final File e : otherElements) {
             assertTrue(actualOtherElements.contains(e.getAbsolutePath()));
         }
+    }
+    
+    private Module module(final String path)
+    {
+        final Module result = new Module(path);
+        result.setDependencies(new Module[0]);
+        return result;
     }
 }

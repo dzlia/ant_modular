@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -189,8 +189,9 @@ public class SerialDependencyResolver implements DependencyResolver
         
         if (ctx.path.add(module)) {
             // the dependee modules are added before this module
-            for (int i = 0, n = module.dependencies.size(); i < n; ++i) {
-                final Module dep = module.dependencies.get(i);
+            final Module[] deps = module.dependencies;
+            for (int i = 0, n = deps.length; i < n; ++i) {
+                final Module dep = deps[i];
                 addModuleDeep(dep, ctx);
             }
             ctx.path.remove(module);

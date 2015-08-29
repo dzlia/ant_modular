@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -57,7 +57,7 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     public void testNullModuleInTheRootModuleList() throws Exception
     {
         try {
-            resolver.init(Arrays.asList(new Module("foo"), null, new Module("bar")));
+            resolver.init(Arrays.asList(module("foo"), null, module("bar")));
             fail();
         }
         catch (NullPointerException ex) {
@@ -79,7 +79,7 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     public void testUseNonInitialisedResolver_ModuleProcessed()
     {
         try {
-            resolver.moduleProcessed(new Module("foo"));
+            resolver.moduleProcessed(module("foo"));
             fail();
         }
         catch (IllegalStateException ex) {
@@ -89,7 +89,7 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testRepeatedCallGetFreeModule_ThereAreUnprocessedModules_NonLastModuleIsBeingProcessed() throws Exception
     {
-        resolver.init(Arrays.asList(new Module("foo"), new Module("bar")));
+        resolver.init(Arrays.asList(module("foo"), module("bar")));
         resolver.getFreeModule();
         
         try {
@@ -103,7 +103,7 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testRepeatedCallGetFreeModule_ThereAreUnprocessedModules_LastModuleIsBeingProcessed() throws Exception
     {
-        resolver.init(Arrays.asList(new Module("foo"), new Module("bar")));
+        resolver.init(Arrays.asList(module("foo"), module("bar")));
         resolver.moduleProcessed(resolver.getFreeModule());
         resolver.getFreeModule();
         
@@ -118,7 +118,7 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testRepeatedCallGetFreeModule_ThereAreNoUnprocessedModules() throws Exception
     {
-        resolver.init(Arrays.asList(new Module("foo"), new Module("bar")));
+        resolver.init(Arrays.asList(module("foo"), module("bar")));
         resolver.moduleProcessed(resolver.getFreeModule());
         resolver.moduleProcessed(resolver.getFreeModule());
         
@@ -136,10 +136,10 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_NoModuleIsBeingProcessed_AlienModule_NoModuleWasEverProcessed() throws Exception
     {
-        resolver.init(Arrays.asList(new Module("foo/"), new Module("bar/")));
+        resolver.init(Arrays.asList(module("foo/"), module("bar/")));
         
         try {
-            resolver.moduleProcessed(new Module("baz/"));
+            resolver.moduleProcessed(module("baz/"));
             fail();
         }
         catch (IllegalArgumentException ex) {
@@ -149,11 +149,11 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_NoModuleIsBeingProcessed_AlienModule_SomeModulesWereProcessed() throws Exception
     {
-        resolver.init(Arrays.asList(new Module("foo/"), new Module("bar/")));
+        resolver.init(Arrays.asList(module("foo/"), module("bar/")));
         resolver.moduleProcessed(resolver.getFreeModule());
         
         try {
-            resolver.moduleProcessed(new Module("baz/"));
+            resolver.moduleProcessed(module("baz/"));
             fail();
         }
         catch (IllegalArgumentException ex) {
@@ -163,11 +163,11 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_NoModuleIsBeingProcessed_NativeModule_NoModuleWasEverProcessed() throws Exception
     {
-        final Module module1 = new Module("foo/");
-        final Module module2 = new Module("bar/");
-        final Module module3 = new Module("baz/");
-        module1.addDependency(module2);
-        module2.addDependency(module3);
+        final Module module1 = module("foo/");
+        final Module module2 = module("bar/");
+        final Module module3 = module("baz/");
+        module1.setDependencies(new Module[]{module2});
+        module2.setDependencies(new Module[]{module3});
         
         resolver.init(Arrays.asList(module1, module2, module3));
         
@@ -190,11 +190,11 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_NoModuleIsBeingProcessed_NativeModule_SomeModulesWereProcessed() throws Exception
     {
-        final Module module1 = new Module("foo/");
-        final Module module2 = new Module("bar/");
-        final Module module3 = new Module("baz/");
-        module1.addDependency(module2);
-        module2.addDependency(module3);
+        final Module module1 = module("foo/");
+        final Module module2 = module("bar/");
+        final Module module3 = module("baz/");
+        module1.setDependencies(new Module[]{module2});
+        module2.setDependencies(new Module[]{module3});
         
         resolver.init(Arrays.asList(module1, module2, module3));
         
@@ -216,11 +216,11 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_NoModuleIsBeingProcessed_NullModule_ThereAreModulesInQueue() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module1.addDependency(module2);
-        module2.addDependency(module3);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module1.setDependencies(new Module[]{module2});
+        module2.setDependencies(new Module[]{module3});
         
         resolver.init(Arrays.asList(module1, module2, module3));
         
@@ -239,7 +239,7 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_NoModuleIsBeingProcessed_NullModule_ThereAreNoModulesInQueue() throws Exception
     {
-        final Module module1 = new Module("foo");
+        final Module module1 = module("foo");
         
         resolver.init(Arrays.asList(module1));
         
@@ -258,15 +258,15 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_SomeModuleIsBeingProcessed_AlienModule() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        module1.addDependency(module2);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        module1.setDependencies(new Module[]{module2});
         resolver.init(Arrays.asList(module1, module2));
         
         assertSame(module2, resolver.getFreeModule());
         
         try {
-            resolver.moduleProcessed(new Module("baz"));
+            resolver.moduleProcessed(module("baz"));
             fail();
         }
         catch (IllegalArgumentException ex) {
@@ -276,11 +276,11 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_SomeModuleIsBeingProcessed_WrongNativeModule() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module1.addDependency(module2);
-        module2.addDependency(module3);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module1.setDependencies(new Module[]{module2});
+        module2.setDependencies(new Module[]{module3});
         
         resolver.init(Arrays.asList(module1, module2, module3));
         
@@ -300,11 +300,11 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_SomeModuleIsBeingProcessed_NullModule_ThereAreModulesInQueue() throws Exception
     {
-        final Module module1 = new Module("foo");
-        final Module module2 = new Module("bar");
-        final Module module3 = new Module("baz");
-        module1.addDependency(module2);
-        module2.addDependency(module3);
+        final Module module1 = module("foo");
+        final Module module2 = module("bar");
+        final Module module3 = module("baz");
+        module1.setDependencies(new Module[]{module2});
+        module2.setDependencies(new Module[]{module3});
         
         resolver.init(Arrays.asList(module1, module2, module3));
         
@@ -321,7 +321,7 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
     
     public void testCallModuleProcessed_SomeModuleIsBeingProcessed_NullModule_ThereAreNoModulesInQueue() throws Exception
     {
-        final Module module1 = new Module("foo");
+        final Module module1 = module("foo");
         
         resolver.init(Arrays.asList(module1));
         
@@ -334,5 +334,12 @@ public class SerialDependencyResolver_InvalidUseCasesTest extends TestCase
         catch (NullPointerException ex) {
             assertEquals("module", ex.getMessage());
         }
+    }
+    
+    private Module module(final String path)
+    {
+        final Module result = new Module(path);
+        result.setDependencies(new Module[0]);
+        return result;
     }
 }
