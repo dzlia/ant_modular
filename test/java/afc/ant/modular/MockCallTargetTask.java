@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -85,7 +85,8 @@ public class MockCallTargetTask extends CallTarget
         
         if (inheritAll)
         {
-            for (final Map.Entry prop : (Set<Map.Entry>) getProject().getProperties().entrySet()) {
+            for (final Map.Entry<String, Object> prop :
+                    (Set<Map.Entry<String, Object>>) getProject().getProperties().entrySet()) {
                 final String propertyName = (String) prop.getKey();
                 if (propertyName.equals(MagicNames.PROJECT_BASEDIR)) {
                     continue;
@@ -96,7 +97,8 @@ public class MockCallTargetTask extends CallTarget
         
         // lightwight adding references to the own project.
         if (inheritAll || inheritRefs) {
-            for (final Map.Entry ref : (Set<Map.Entry>) getProject().getReferences().entrySet()) {
+            for (final Map.Entry<String, Object> ref :
+                    (Set<Map.Entry<String, Object>>) getProject().getReferences().entrySet()) {
                 final String refName = (String) ref.getKey();
                 if (refName.equals(MagicNames.REFID_PROPERTY_HELPER) ||
                         refName.equals(ComponentHelper.COMPONENT_HELPER_REFERENCE)) {
