@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -27,13 +27,14 @@ import java.util.List;
 /**
  * <p>Indicates that a loop is detected in dependencies between the {@link Module modules}
  * involved. In other words, there is a module in the given modules that depends upon
- * itself. Circular dependencies do not allow a {@link DependencyResolver} to determine
+ * itself. Circular dependencies do not allow a dependency resolver to determine
  * an order in which modules could be processes so that each module is processed
  * after all its dependee modules are processed.</p>
  * 
  * @author D&#378;mitry La&#365;&#269;uk
  * 
- * @see DependencyResolver
+ * @see SerialDependencyResolver
+ * @see ParallelDependencyResolver
  */
 public class CyclicDependenciesDetectedException extends Exception
 {

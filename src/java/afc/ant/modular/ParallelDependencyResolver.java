@@ -30,17 +30,40 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 /**
- * <p>A {@link DependencyResolver} that supports multi-threaded {@link Module module}
- * processing. That is, at the moment multiple modules could be acquired for processing
+ * <p>Resolves dependencies between {@link Module modules}, that is it defines an order
+ * in which a given set of modules is to be processed so that each module is processed
+ * after all modules it depends upon are processed. The order of processing of independent
+ * modules is undefined.</p>
+ * 
+ * <p>The lifecycle of a {@code ParallelDependencyResolver} instance is the following:</p>
+ * <ol type="1">
+ *  <li>{@link #init(Collection)} is invoked with a collection of root modules
+ *      passed it. All direct and indirect dependee modules of these root modules
+ *      are involved into the dependency resolution process</li>
+ *  <li>the caller invokes {@link #getFreeModule()} to acquire the next module which
+ *      does not have its dependee modules unprocessed</li>
+ *  <li>the caller executes the module processing routine on the module acquired</li>
+ *  <li>when the processing is finished the caller invokes {@link #moduleProcessed(Module)}
+ *      to report to this {@code ParallelDependencyResolver} that this module is processed so that
+ *      the modules that depend upon this module have one less unprocessed dependency</li>
+ *  <li>the steps <tt>2-4</tt> are repeated until there are no modules unprocessed, that is
+ *      until {@link #getFreeModule()} returns {@code null}</li>
+ * </ol>
+ * <p>If there are cyclic dependencies between modules (so that the order of module processing
+ * is undefined) then a {@link CyclicDependenciesDetectedException} is thrown at the
+ * step <tt>1</tt>.</p>
+ * 
+ * <p>This dependency resolver supports multi-threaded {@link Module module} processing.
+ * That is, at the moment multiple modules could be acquired for processing
  * (by different threads). An attempt to acquire a module if there are no modules with
  * no unprocessed dependencies will block the thread until such a module appears (other
  * threads must mark at least a single module as processed for this) or this
- * {@code ParallelDependencyResolver} is {@link #abort() aborted}. Refer to the class
- * description of {@code DependencyResolver} for more details.</p>
+ * {@code ParallelDependencyResolver} is {@link #abort() aborted}.</p>
  * 
  * <p>As against {@link SerialDependencyResolver}, {@code ParallelDependencyResolver} is
  * much less efficient with respect to both processor and memory footprint which is
  * compensated by allowing for parallel processing or independent modules.</p>
+ * 
  * 
  * <p>{@code ParallelDependencyResolver} is thread-safe.</p>
  * 
@@ -49,7 +72,7 @@ import java.util.LinkedHashSet;
  * 
  * @author D&#378;mitry La&#365;&#269;uk
  */
-public class ParallelDependencyResolver implements DependencyResolver
+public class ParallelDependencyResolver
 {
     private ArrayList<Node> shortlist;
     private IdentityHashMap<Module, Node> modulesAcquired;

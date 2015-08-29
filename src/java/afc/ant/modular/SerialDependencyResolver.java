@@ -30,11 +30,33 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 /**
- * <p>A {@link DependencyResolver} that supports only single-threaded {@link Module module}
- * processing. That is, at the moment at most a single module could be acquired for processing.
+ * <p>Resolves dependencies between {@link Module modules}, that is it defines an order
+ * in which a given set of modules is to be processed so that each module is processed
+ * after all modules it depends upon are processed. The order of processing of independent
+ * modules is undefined.</p>
+ * 
+ * <p>The lifecycle of a {@code SerialDependencyResolver} instance is the following:</p>
+ * <ol type="1">
+ *  <li>{@link #init(Collection)} is invoked with a collection of root modules
+ *      passed it. All direct and indirect dependee modules of these root modules
+ *      are involved into the dependency resolution process</li>
+ *  <li>the caller invokes {@link #getFreeModule()} to acquire the next module which
+ *      does not have its dependee modules unprocessed</li>
+ *  <li>the caller executes the module processing routine on the module acquired</li>
+ *  <li>when the processing is finished the caller invokes {@link #moduleProcessed(Module)}
+ *      to report to this {@code SerialDependencyResolver} that this module is processed so that
+ *      the modules that depend upon this module have one less unprocessed dependency</li>
+ *  <li>the steps <tt>2-4</tt> are repeated until there are no modules unprocessed, that is
+ *      until {@link #getFreeModule()} returns {@code null}</li>
+ * </ol>
+ * <p>If there are cyclic dependencies between modules (so that the order of module processing
+ * is undefined) then a {@link CyclicDependenciesDetectedException} is thrown at the
+ * step <tt>1</tt>.</p>
+ * 
+ * <p>This dependency resolver supports only single-threaded {@link Module module} processing.
+ * That is, at the moment at most a single module could be acquired for processing.
  * An attempt to acquire more than a single module leads to an {@link IllegalStateException}
- * thrown by {@link #getFreeModule()}. Refer to the class description of {@code DependencyResolver}
- * for more details.</p>
+ * thrown by {@link #getFreeModule()}.</p>
  * 
  * <p>As against {@link ParallelDependencyResolver}, {@code SerialDependencyResolver} is
  * much more efficient with respect to both processor and memory footprint.</p>
@@ -47,7 +69,7 @@ import java.util.LinkedHashSet;
  * 
  * @author D&#378;mitry La&#365;&#269;uk
  */
-public class SerialDependencyResolver implements DependencyResolver
+public class SerialDependencyResolver
 {
     private ArrayList<Module> moduleOrder;
     private Module moduleAcquired;
