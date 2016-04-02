@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -75,7 +75,7 @@ public class TestUtil
     }
     
     public static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
-            final String target, final boolean inheritAll, final boolean inheritRefs, final String moduleProperty,
+            final String target, final boolean inheritAll, final boolean inheritRefs, final String moduleRefId,
             final ModuleInfo proto, final Map<String, Object> properties, final Map<String, Object> references)
     {
         Assert.assertEquals(executed, task.executed);
@@ -83,7 +83,7 @@ public class TestUtil
         Assert.assertEquals(inheritAll, task.inheritAll);
         Assert.assertEquals(inheritRefs, task.inheritRefs);
         
-        final Object moduleObj = task.ownProject.getProperties().get(moduleProperty);
+        final Object moduleObj = task.ownProject.getReference(moduleRefId);
         Assert.assertTrue(moduleObj instanceof Module);
         final Module module = (Module) moduleObj;
         Assert.assertEquals(proto.getPath(), module.getPath());
@@ -94,14 +94,15 @@ public class TestUtil
         }
         Assert.assertEquals(proto.getDependencies(), depPaths);
         
-        // merging module property into the properties passed. The module object is not freely available
-        final HashMap<String, Object> propsWithModule = new HashMap<String, Object>(properties);
-        propsWithModule.put(moduleProperty, module);
         final Map<?, ?> actualProperties = task.ownProject.getProperties();
         actualProperties.remove(MagicNames.PROJECT_BASEDIR);
-        Assert.assertEquals(propsWithModule, actualProperties);
+        Assert.assertEquals(properties, actualProperties);
         
-        assertReferences(task.ownProject, references);
+        // merging module property into the properties passed. The module object is not freely available
+        final HashMap<String, Object> actualRefs = new HashMap<String, Object>(references);
+        actualRefs.put(moduleRefId, module);
+        
+        assertReferences(task.ownProject, actualRefs);
     }
     
     public static void assertCallTargetState(final MockCallTargetTask task, final boolean executed,
@@ -139,10 +140,11 @@ public class TestUtil
         Assert.assertEquals(expectedReferences, actualReferences);
     }
     
-    public static String getModulePath(final Project project, final String moduleProperty)
+    public static String getModulePath(final Project project, final String moduleRefId)
     {
         Assert.assertNotNull(project);
-        final Object module = project.getProperties().get(moduleProperty);
+        final Object module = project.getReference(moduleRefId);
+        Assert.assertNotNull(module);
         Assert.assertTrue(module instanceof Module);
         return ((Module) module).getPath();
     }

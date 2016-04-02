@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     public void testMissingTarget()
     {
         task.init();
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -70,7 +70,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     {
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         
         try {
@@ -86,7 +86,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     {
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -103,7 +103,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     {
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule();
         task.addConfigured(moduleLoader);
         
@@ -120,7 +120,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     {
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.createModule().setPath("bar");
         task.createModule();
@@ -139,7 +139,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
     {
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.addConfigured(moduleLoader);
         
         try {
@@ -162,7 +162,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.createModule().setPath("bar");
         task.addConfigured(moduleLoader);
@@ -188,7 +188,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -217,7 +217,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -246,7 +246,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -278,7 +278,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -301,7 +301,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -322,7 +322,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -350,7 +350,7 @@ public class CallTargetForModules_InvalidUseCasesTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         
         try {

@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -26,18 +26,17 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
+import junit.framework.Assert;
+
 import org.apache.tools.ant.ComponentHelper;
 import org.apache.tools.ant.MagicNames;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
-import org.apache.tools.ant.taskdefs.CallTarget;
+import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.taskdefs.Property;
-import org.apache.tools.ant.taskdefs.Ant.Reference;
 import org.apache.tools.ant.types.PropertySet;
 
-import junit.framework.Assert;
-
-public class MockCallTargetTask extends CallTarget
+public class MockCallTargetTask extends Ant
 {
     // Allows tests verify isolation between module targets.
     public Map<String, Object> propertiesToSet;
@@ -61,6 +60,12 @@ public class MockCallTargetTask extends CallTarget
         ownProject = new MockProject();
         // The target project inherits basedir from the invoker's project.
         ownProject.setBaseDir(project.getBaseDir());
+    }
+    
+    @Override
+    public void init()
+    {
+        // Initialisation is mocked and performed in the constructor.
     }
     
     @Override
@@ -104,12 +109,17 @@ public class MockCallTargetTask extends CallTarget
                         refName.equals(ComponentHelper.COMPONENT_HELPER_REFERENCE)) {
                     continue;
                 }
-                ownProject.addReference(refName, ref.getValue());
+                if (!ownProject.getReferences().containsKey(refName)) {
+                    ownProject.addReference(refName, ref.getValue());
+                }
             }
         }
         for (final Reference ref : references) {
             Assert.assertNotNull(ref.getProject());
-            ownProject.addReference(ref.getRefId(), ref.getReferencedObject(null));
+            final String refId = ref.getRefId();
+            if (!ownProject.getReferences().containsKey(refId)) {
+                ownProject.addReference(refId, ref.getReferencedObject(null));
+            }
         }
         
         if (propertiesToSet != null)
@@ -156,9 +166,9 @@ public class MockCallTargetTask extends CallTarget
     }
     
     @Override
-    public Property createParam()
+    public Property createProperty()
     {
-        final Property param = super.createParam();
+        final Property param = super.createProperty();
         param.setProject(ownProject);
         params.add(param);
         return param;
@@ -169,5 +179,11 @@ public class MockCallTargetTask extends CallTarget
     {
         propertySets.add(propertySet);
         super.addPropertyset(propertySet);
+    }
+    
+    @Override
+    protected Project getNewProject()
+    {
+        return ownProject;
     }
 }

@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -93,7 +93,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         task.createModule().setPath("baz");
         task.addConfigured(moduleLoader);
@@ -210,7 +210,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         task.createModule().setPath("baz");
         task.addConfigured(moduleLoader);
@@ -350,7 +350,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setThreadCount(2);
@@ -372,9 +372,9 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
             assertTrue(Arrays.equals(exception.getStackTrace(), ex.getStackTrace()));
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleProp", dep1,
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleRef", dep1,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task3.executed);
     }
@@ -413,7 +413,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setThreadCount(2);
@@ -435,9 +435,9 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
             assertTrue(Arrays.equals(exception.getStackTrace(), ex.getStackTrace()));
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleProp", dep1,
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleRef", dep1,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task3.executed);
     }
@@ -471,7 +471,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setThreadCount(2);
@@ -491,9 +491,9 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
             assertNotNull(ex.getLocation());
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleProp", dep1,
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleRef", dep1,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task3.executed);
     }
@@ -530,7 +530,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         final ModuleElement moduleElem = task.createModule();
         moduleElem.setPath("baz");
@@ -648,7 +648,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         final ModuleElement moduleElem = task.createModule();
         moduleElem.setPath("baz");
@@ -710,7 +710,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         final ModuleElement moduleElem = task.createModule();
         moduleElem.setPath("baz");
@@ -775,7 +775,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         final ModuleElement moduleElem = task.createModule();
         moduleElem.setPath("baz");
@@ -864,7 +864,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         task.createModule().setPath("bar");
         task.createModule().setPath("baz");
@@ -978,7 +978,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         task.createModule().setPath("bar");
         task.createModule().setPath("baz");
@@ -1060,7 +1060,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setThreadCount(2);
@@ -1081,7 +1081,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
             assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task3.executed);
     }
@@ -1113,7 +1113,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setThreadCount(2);
@@ -1134,7 +1134,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
             assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task3.executed);
     }
@@ -1168,7 +1168,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setThreadCount(2);
@@ -1189,7 +1189,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
             assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task2.executed);
         assertFalse(task3.executed);
@@ -1224,7 +1224,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setThreadCount(2);
@@ -1245,7 +1245,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
             assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task2.executed);
         assertFalse(task3.executed);

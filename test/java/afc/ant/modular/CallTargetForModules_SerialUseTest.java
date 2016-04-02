@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Location;
 import org.apache.tools.ant.taskdefs.Ant.Reference;
@@ -37,8 +39,6 @@ import org.apache.tools.ant.types.PropertySet;
 
 import afc.ant.modular.CallTargetForModules.ModuleElement;
 import afc.ant.modular.CallTargetForModules.ParamElement;
-
-import junit.framework.TestCase;
 
 public class CallTargetForModules_SerialUseTest extends TestCase
 {
@@ -63,7 +63,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         project = null;
     }
     
-    public void testSerialRun_SingleModule_ModulePropertyDefined()
+    public void testSerialRun_SingleModule_ModuleRefIdDefined()
     {
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
@@ -74,17 +74,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map());
     }
     
-    public void testSerialRun_SingleModule_ModulePropertyUndefined()
+    public void testSerialRun_SingleModule_ModuleRefIdUndefined()
     {
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
@@ -114,7 +114,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -146,7 +146,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, true, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, true, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"),
                 TestUtil.<String, Object>map("ref1", val1, "ref2", val2, "ref3", val3));
     }
@@ -162,7 +162,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -194,7 +194,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"),
                 TestUtil.<String, Object>map("ref1", val1, "ref2", val2, "ref3", val3));
     }
@@ -210,7 +210,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -242,7 +242,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", false, true, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, true, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"),
                 TestUtil.<String, Object>map("ref1", val1, "ref2", val2, "ref3", val3));
     }
@@ -258,7 +258,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -290,7 +290,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"),
                 TestUtil.<String, Object>map("ref1", val1, "ref2", val2));
     }
@@ -306,7 +306,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -329,7 +329,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"),
                 Collections.<String, Object>emptyMap());
     }
@@ -345,7 +345,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -358,7 +358,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"));
     }
     
@@ -373,7 +373,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -389,7 +389,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456"));
     }
     
@@ -404,7 +404,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setInheritAll(true);
@@ -421,7 +421,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456"));
     }
     
@@ -436,7 +436,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setInheritAll(false);
@@ -453,7 +453,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith"));
     }
     
@@ -468,7 +468,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setInheritAll(false);
@@ -485,7 +485,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", new File("a/b/c").getAbsolutePath()));
     }
     
@@ -500,7 +500,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -512,7 +512,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -527,7 +527,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setInheritAll(false);
@@ -540,7 +540,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("John", "Smith", "qwerty", "board", "hello", "world"));
     }
     
@@ -555,7 +555,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -568,7 +568,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("afc.hello", "world", "afc.John", "Smith", "123", "456",
                         "afc.qwerty", "board", "hello", "universe"));
     }
@@ -584,7 +584,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -596,7 +596,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -612,7 +612,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setInheritAll(false);
@@ -625,7 +625,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("John", "Smith", "qwerty", "board", "hello", "world"));
     }
     
@@ -641,7 +641,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -654,7 +654,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("afc.hello", "world", "afc.John", "Smith", "123", "456",
                         "afc.qwerty", "board", "hello", "universe"));
     }
@@ -670,7 +670,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -685,7 +685,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -700,7 +700,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setInheritAll(false);
@@ -716,7 +716,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("John", "Smith", "qwerty", "board", "hello", "world"));
     }
     
@@ -731,7 +731,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -747,7 +747,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("afc.hello", "world", "afc.John", "Smith", "123", "456",
                         "afc.qwerty", "board", "hello", "universe"));
     }
@@ -763,7 +763,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -780,7 +780,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -795,7 +795,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -812,7 +812,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -827,7 +827,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -843,7 +843,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
@@ -858,7 +858,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -875,7 +875,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("afc.hello", "world", "afc.John", "Smith", "123", "456",
                         "afc.qwerty", "board", "hello", "universe"));
     }
@@ -891,7 +891,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -911,7 +911,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"),
                 Collections.<String, Object>singletonMap("cpRef", cpRefPath));
     }
@@ -927,7 +927,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -950,7 +950,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"),
                 Collections.<String, Object>singletonMap("cpRef", cpRefPath));
     }
@@ -966,7 +966,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -989,7 +989,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"),
                 Collections.<String, Object>singletonMap("cpRef", cpRefPath));
     }
@@ -1005,7 +1005,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -1027,7 +1027,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("123", "456", "12345", "45678", "hello", "universe", "qwerty", "board"));
     }
     
@@ -1042,7 +1042,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setInheritAll(true);
@@ -1065,7 +1065,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("123", "456", "12345", "45678", "hello", "universe", "qwerty", "board"));
     }
     
@@ -1080,7 +1080,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         task.setInheritAll(false);
@@ -1103,7 +1103,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", false, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("123", "456", "hello", "universe", "qwerty", "board"));
     }
     
@@ -1118,7 +1118,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -1139,12 +1139,12 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "someRef", "ref_value", "123", "456"),
                 Collections.<String, Object>singletonMap("cpRef", "ref_value"));
     }
     
-    public void testSerialRun_SingleModule_WithUserParams_IncludingParamReference_ModulePropertyUndefined()
+    public void testSerialRun_SingleModule_WithUserParams_IncludingParamReference_ModuleRefIdUndefined()
     {
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
@@ -1191,7 +1191,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -1213,11 +1213,11 @@ public class CallTargetForModules_SerialUseTest extends TestCase
             properties.put("env." + e.getKey(), e.getValue());
         }
         properties.putAll(TestUtil.<String, Object>map("hello", "world", "123", "456"));
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo, properties,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo, properties,
                 Collections.<String, Object>singletonMap("cpRef", "ref_value"));
     }
     
-    public void testSerialRun_ModuleWithDeps_ModulePropertyDefined()
+    public void testSerialRun_ModuleWithDeps_ModuleRefIdDefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
@@ -1249,7 +1249,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -1261,17 +1261,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep3,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep3,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        TestUtil.assertCallTargetState(task3, true, "someTarget", true, false, "moduleProp", dep1,
+        TestUtil.assertCallTargetState(task3, true, "someTarget", true, false, "moduleRef", dep1,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        TestUtil.assertCallTargetState(task4, true, "someTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task4, true, "someTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
     }
     
-    public void testSerialRun_ModuleWithDeps_ModulePropertyUndefined()
+    public void testSerialRun_ModuleWithDeps_ModuleRefIdUndefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
@@ -1324,7 +1324,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
     }
     
-    public void testSerialRun_MultipleModulesWithDeps_RelatedHierarchies_ModulePropertyDefined()
+    public void testSerialRun_MultipleModulesWithDeps_RelatedHierarchies_ModuleRefIdDefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
@@ -1356,7 +1356,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         task.createModule().setPath("baz");
         task.addConfigured(moduleLoader);
@@ -1379,7 +1379,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
     }
     
-    public void testSerialRun_MultipleModulesWithDeps_RelatedHierarchies_ModulePropertyUndefined()
+    public void testSerialRun_MultipleModulesWithDeps_RelatedHierarchies_ModuleRefIdUndefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
@@ -1433,7 +1433,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
     }
     
-    public void testSerialRun_MultipleModulesWithDeps_UnrelatedHierarchies_ModulePropertyDefined()
+    public void testSerialRun_MultipleModulesWithDeps_UnrelatedHierarchies_ModuleRefIdDefined()
     {
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
@@ -1471,7 +1471,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         task.createModule().setPath("baz");
         task.addConfigured(moduleLoader);
@@ -1516,7 +1516,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o", "task4", "prop4"));
     }
     
-    public void testSerialRun_MultipleModulesWithDeps_UnrelatedHierarchies_ModulePropertyUndefined()
+    public void testSerialRun_MultipleModulesWithDeps_UnrelatedHierarchies_ModuleRefIdUndefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
@@ -1611,7 +1611,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         task.createModule().setPath("baz");
         task.addConfigured(moduleLoader);
@@ -1665,7 +1665,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -1686,9 +1686,9 @@ public class CallTargetForModules_SerialUseTest extends TestCase
             assertTrue(Arrays.equals(exception.getStackTrace(), ex.getStackTrace()));
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleProp", dep1,
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleRef", dep1,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task3.executed);
     }
@@ -1722,7 +1722,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -1741,14 +1741,14 @@ public class CallTargetForModules_SerialUseTest extends TestCase
             assertNotNull(ex.getLocation());
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
-        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleProp", dep1,
+        TestUtil.assertCallTargetState(task2, true, "someTarget", true, false, "moduleRef", dep1,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task3.executed);
     }
     
-    public void testSerialRun_MultipleModulesWithDeps_CustomTarget_ModulePropertyDefined()
+    public void testSerialRun_MultipleModulesWithDeps_CustomTarget_ModuleRefIdDefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
@@ -1780,7 +1780,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         final ModuleElement moduleElem = task.createModule();
         moduleElem.setPath("baz");
@@ -1808,7 +1808,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
     }
     
-    public void testSerialRun_MultipleModulesWithDeps_CustomTarget_ModulePropertyUndefined()
+    public void testSerialRun_MultipleModulesWithDeps_CustomTarget_ModuleRefIdUndefined()
     {
         // Unambiguous order of module processing is selected for the sake of simplicity.
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
@@ -1896,7 +1896,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         final ModuleElement moduleElem = task.createModule();
         moduleElem.setPath("baz");
@@ -1957,7 +1957,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         final ModuleElement moduleElem = task.createModule();
         moduleElem.setPath("baz");
@@ -2021,7 +2021,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("mProp");
+        task.setModuleRefId("mProp");
         task.createModule().setPath("foo");
         final ModuleElement moduleElem = task.createModule();
         moduleElem.setPath("baz");
@@ -2078,7 +2078,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -2098,7 +2098,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
             assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task3.executed);
     }
@@ -2130,7 +2130,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -2150,7 +2150,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
             assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task3.executed);
     }
@@ -2184,7 +2184,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -2204,7 +2204,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
             assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task2.executed);
         assertFalse(task3.executed);
@@ -2239,7 +2239,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("someTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -2259,7 +2259,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
             assertSame(Location.UNKNOWN_LOCATION, ex.getLocation());
         }
         
-        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleProp", dep2,
+        TestUtil.assertCallTargetState(task1, true, "someTarget", true, false, "moduleRef", dep2,
                 TestUtil.<String, Object>map("qwerty", "board", "p", "o"));
         assertFalse(task2.executed);
         assertFalse(task3.executed);
@@ -2283,7 +2283,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
@@ -2297,17 +2297,21 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
                 TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
     }
     
     /**
-     * <p>Tests that {@code moduleProperty} overrides {@code <param>} elements if both define
-     * property with the same name.</p>
+     * <p>Tests that {@code ModuleRefId} overrides {@code <reference>} elements if both define
+     * reference with the same name.</p>
      */
-    public void testThatModulePropertyOverridesParamElements()
+    public void testThatModuleRefIdOverridesRefElements()
     {
         project.setBaseDir(new File("test/data/"));
+        project.addReference("moduleRef", new Object());
+        
+        final Object ref2Object = new Object();
+        project.addReference("anotherRef", ref2Object);
         
         final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
         moduleInfo.addAttribute("1", "2");
@@ -2318,13 +2322,14 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("moduleProp");
+        task.setModuleRefId("moduleRef");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         
-        final ParamElement p = task.createParam();
-        p.setName("moduleProp");
-        p.setValue("val");
+        final Reference ref = new Reference();
+        ref.setProject(project);
+        ref.setRefId("moduleRef");
+        task.addReference(ref);
         
         final ParamElement param1 = task.createParam();
         param1.setResource("/params_for_test.properties");
@@ -2336,53 +2341,17 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.perform();
         
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleProp", moduleInfo,
-                TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"));
-    }
-    
-    /**
-     * <p>Tests that {@code moduleProperty} overrides {@code <param>} elements' properties
-     * read from a file if both define property with the same name.</p>
-     */
-    public void testThatModulePropertyOverridesParamElementsReadFromFile()
-    {
-        project.setBaseDir(new File("test/data/"));
-        
-        final ModuleInfo moduleInfo = new ModuleInfo("foo/", moduleLoader);
-        moduleInfo.addAttribute("1", "2");
-        moduleLoader.modules.put("foo/", moduleInfo);
-        
-        final MockCallTargetTask task1 = new MockCallTargetTask(project);
-        project.tasks.add(task1);
-        
-        task.init();
-        task.setTarget("testTarget");
-        task.setModuleProperty("qwerty");
-        task.createModule().setPath("foo");
-        task.addConfigured(moduleLoader);
-        
-        task.createParam().setFile(new File("test/data/CallTargetForModules/params_for_test.properties"));
-        
-        final ParamElement param1 = task.createParam();
-        param1.setResource("/params_for_test.properties");
-        final Path path1 = param1.createClasspath();
-        path1.setPath("CallTargetForModules/");
-        
-        project.setProperty("123", "456");
-        project.setProperty("hello", "universe"); // must be overridden by the param property with the same name
-        
-        task.perform();
-        
-        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "qwerty", moduleInfo,
-                TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456"));
+        TestUtil.assertCallTargetState(task1, true, "testTarget", true, false, "moduleRef", moduleInfo,
+                TestUtil.<String, Object>map("hello", "world", "John", "Smith", "123", "456", "qwerty", "board"),
+                TestUtil.<String, Object>map("anotherRef", ref2Object));
     }
     
     /**
      * <p>Tests that an empty string passed to
-     * {@link CallTargetForModules#setModuleProperty(String)} is considered
+     * {@link CallTargetForModules#setModuleRefId(String)} is considered
      * a defined property.</p>
      */
-    public void testThatEmptyModulePropertyIsConsideredADefinedProperty()
+    public void testThatEmptyModuleRefIdIsConsideredADefinedReference()
     {
         project.setBaseDir(new File("test/data/"));
         
@@ -2395,7 +2364,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
         
         task.init();
         task.setTarget("testTarget");
-        task.setModuleProperty("");
+        task.setModuleRefId("");
         task.createModule().setPath("foo");
         task.addConfigured(moduleLoader);
         

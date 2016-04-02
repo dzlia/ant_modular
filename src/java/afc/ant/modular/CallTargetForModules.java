@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -23,6 +23,7 @@
 package afc.ant.modular;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -35,9 +36,8 @@ import org.apache.tools.ant.Location;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.taskdefs.CallTarget;
-import org.apache.tools.ant.taskdefs.Property;
 import org.apache.tools.ant.taskdefs.Ant;
+import org.apache.tools.ant.taskdefs.Property;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PropertySet;
 
@@ -53,9 +53,9 @@ import org.apache.tools.ant.types.PropertySet;
  * {@link #setInheritRefs(boolean) inheritRefs}, and the nested elements {@link #createParam()
  * &lt;createParam&gt;}, {@link #addPropertyset(PropertySet) &lt;propertyset&gt;},
  * {@link #addReference(org.apache.tools.ant.taskdefs.Ant.Reference) &lt;reference&gt;} can be used
- * for this. If the attribute {@link #setModuleProperty(String) moduleProperty} is defined
+ * for this. If the attribute {@link #setModuleRefId(String) moduleRefId} is defined
  * then a {@link Module} instance that contains module metadata is passed to the module-specific
- * project with the given property. In addition, all user-defined properties (i.e. the properties
+ * project via the given reference. In addition, all user-defined properties (i.e. the properties
  * defined by the command line) are passed to each module-specific project. Note that there is no
  * explicit way to pass data between module-specific Ant projects.</p>
  * 
@@ -63,7 +63,7 @@ import org.apache.tools.ant.types.PropertySet;
  * whose type is a descendant of {@code ModuleLoader}. One and only one such element must
  * be specified.</p>
  * 
- * <p>For the sake of performance, modules could be processed in parallel. That is, independent
+ * <p>For the sake of performance, modules can be processed in parallel. That is, independent
  * modules could be processed simultaneously, each within its own thread. There is no way to
  * perform parallel processing of modules that are dependent, directly or indirectly, one upon
  * another. The number of threads to be used is defined by the attribute
@@ -86,11 +86,11 @@ import org.apache.tools.ant.types.PropertySet;
  *          the current Ant project. If at least one module uses this target and the target itself
  *          is undefined in the current Ant project then the build fails.</td>
  *      <td>N/A</td></tr>
- *  <tr><td>{@link #setModuleProperty(String) moduleProperty}</td>
+ *  <tr><td>{@link #setModuleRefId(String) moduleRefId}</td>
  *      <td>no</td>
- *      <td>The name of the property that holds the {@link Module} object within
- *          the module-specific project. No {@code Module} is passed if <em>moduleProperty</em>
- *          is undefined.</td>
+ *      <td>The ID of the reference that holds the {@link Module} object within
+ *          the module-specific project. No {@code Module} is passed if <em>moduleRefId</em>
+ *          is not defined.</td>
  *      <td>N/A</td></tr>
  *  <tr><td>{@link #setThreadCount(int) threadCount}</td>
  *      <td>no</td>
@@ -133,9 +133,7 @@ import org.apache.tools.ant.types.PropertySet;
  * project created in that project regardless of what is set to {@link #setInheritAll(boolean)
  * inheritAll}. This property set overrides the properties with the same name defined in
  * the project it is passed to. However, it does not override the user-defined properties with
- * the same name. Nor it overrides the property defined by the attribute
- * {@link #setModuleProperty(String) moduleProperty}. It is an optional element. Multiple nested
- * elements are allowed.</p>
+ * the same name. It is an optional element. Multiple nested elements are allowed.</p>
  * <p>Refer to {@link ParamElement} for the attribute/element description.</p>
  * 
  * <h5>{@link #addPropertyset(PropertySet) propertyset}</h5>
@@ -157,7 +155,7 @@ import org.apache.tools.ant.types.PropertySet;
  * 
  * <h3>Usage example</h3>
  * <pre>{@literal
- * <am:callTargetForModules target="moduleTarget" moduleProperty="module" inheritAll="false" inheritRefs="false">
+ * <am:callTargetForModules target="moduleTarget" moduleRefId="module" inheritAll="false" inheritRefs="false">
  *     <module path="foo/bar"/>
  *     <module path="baz" target="otherTarget"/>
  *     <am:manifestModuleLoader>
@@ -173,8 +171,8 @@ import org.apache.tools.ant.types.PropertySet;
  * is invoked to process each module but the module <em>baz</em>. For the latter the target
  * <em>otherTarget</em> is invoked. Each target is executed within its own Ant project. This
  * project inherits neither properties nor references from the project it is exected from. However,
- * it is parameterised with the property <em>querty</em> set to <em>bar</em>, the property
- * <em>module</em> set assigned with the {@code Module} for which it is invoked, and
+ * it is parameterised with the property <em>qwerty</em> set to <em>bar</em>, the reference
+ * <em>module</em> assigned with the {@code Module} for which it is invoked, and
  * the reference <em>xxx</em>, if the latter is defined. If the module <em>foo/bar</em> depends
  * upon the module <em>buzz</em> then it is guaranteed that <em>buzz</em> is processed before
  * <em>foo/bar</em>. All modules involved are processed sequentally.</p>
@@ -185,10 +183,10 @@ public class CallTargetForModules extends Task
 {
     private ArrayList<ModuleElement> moduleElements = new ArrayList<ModuleElement>();
     private ModuleLoader moduleLoader;
-    /* If defined then the correspondent Module object is set to this property for each module
-     * being processed.
+    /* If defined then the correspondent Module object is passed via this reference
+     * for each module being processed.
      */
-    private String moduleProperty;
+    private String moduleRefId;
     
     private String target;
     private final ArrayList<ParamElement> params = new ArrayList<ParamElement>();
@@ -260,11 +258,11 @@ public class CallTargetForModules extends Task
                 }
             }
             
-            /* Params that define the property with the name equal to the moduleProperty value
-             * (if the latter is set) must be removed so that moduleProperty overrides them
+            /* Params that define the reference with the name equal to the moduleRefId value
+             * (if the latter is set) must be removed so that moduleRefId overrides them
              * in module-specific projects.
              */
-            deleteModulePropertyParams();
+            deleteModuleRefs();
             
             if (threadCount == 1) {
                 processModulesSerial(modules, overriddenTargets);
@@ -282,33 +280,35 @@ public class CallTargetForModules extends Task
     
     private void callTarget(final Module module, final String target)
     {
-        final CallTarget antcall = (CallTarget) getProject().createTask("antcall");
-        antcall.init();
-        
-        /* moduleProperty is expected to override properties with the same name
-         * defined in params. That's why it goes first.
-         */
-        if (moduleProperty != null) {
-            final Property moduleParam = antcall.createParam();
-            moduleParam.setName(moduleProperty);
-            moduleParam.setValue(module);
-        }
-        for (int i = 0, n = params.size(); i < n; ++i) {
-            final ParamElement param = params.get(i);
-            param.populate(antcall.createParam());
-        }
-        for (int i = 0, n = references.size(); i < n; ++i) {
-            antcall.addReference(references.get(i));
-        }
-        antcall.addPropertyset(propertySet);
-        antcall.setInheritAll(inheritAll);
-        antcall.setInheritRefs(inheritRefs);
-        antcall.setTarget(target);
-        
         try {
+            final Project project = getProject();
+            final Ant antcall = (Ant) project.createTask("ant");
+            antcall.init();
+            antcall.setAntfile(project.getProperty("ant.file"));
+            
+            for (int i = 0, n = params.size(); i < n; ++i) {
+                final ParamElement param = params.get(i);
+                param.populate(antcall.createProperty());
+            }
+            
+            if (moduleRefId != null) {
+                final Method m = Ant.class.getDeclaredMethod("getNewProject");
+                m.setAccessible(true);
+                
+                final Project newProject = (Project) m.invoke(antcall);
+                newProject.addReference(moduleRefId, module);
+            }
+            for (int i = 0, n = references.size(); i < n; ++i) {
+                antcall.addReference(references.get(i));
+            }
+            antcall.addPropertyset(propertySet);
+            antcall.setInheritAll(inheritAll);
+            antcall.setInheritRefs(inheritRefs);
+            antcall.setTarget(target);
+            
             antcall.perform();
         }
-        catch (RuntimeException ex) {
+        catch (Exception ex) {
             throw buildExceptionForModule(ex, module);
         }
     }
@@ -330,16 +330,15 @@ public class CallTargetForModules extends Task
         return ex;
     }
     
-    // Removes all params which define a property with the name equal to what is set to moduleProperty.
-    private void deleteModulePropertyParams()
+    private void deleteModuleRefs()
     {
-        if (moduleProperty == null) {
+        if (moduleRefId == null) {
             return;
         }
-        for (int i = params.size() - 1; i >= 0; --i) {
-            final String paramName = params.get(i).name;
-            if (paramName != null && moduleProperty.equals(paramName)) {
-                params.remove(i);
+        for (int i = references.size() - 1; i >= 0; --i) {
+            final String refId = references.get(i).getRefId();
+            if (refId != null && references.equals(refId)) {
+                references.remove(i);
             }
         }
     }
@@ -549,30 +548,27 @@ public class CallTargetForModules extends Task
     }
     
     /**
-     * <p>Sets the name of the Ant property in a module-specific project that is assigned
+     * <p>Sets the ID of the Ant reference in a module-specific project that is assigned
      * with the {@link Module} instance that is associated with this module. If it is not
-     * set then the {@code Module} is not passed to that project. This property value overrides
-     * the property with the same name passed with {@link #createParam() &lt;param&gt;} elements.
-     * If the property with the same name is defined in the caller project or in the module
-     * project then it is overridden regardless of what is set to the
-     * {@link #setInheritAll(boolean) inheritAll} attribute. However, the user-defined property
-     * with the same name is not overridden.</p>
+     * set then the {@code Module} is not passed to that project. If the reference with
+     * the same ID is defined in the module project then it is overridden regardless of what
+     * is set to the {@link #setInheritRefs(boolean) inheritRefs} attribute.</p>
      * 
      * <p>It is used to extract module metadata in module-specific Ant projects. In addition,
      * it could be used to pass information between module-specific projects via module
      * attributes (which is possible if two modules are linked one to the other).</p>
      * 
-     * @param propertyName the name of the property to set {@code Module} instances to.
-     *      An empty string is considered a defined property.
+     * @param refId the ID of the reference to set {@code Module} instances to.
+     *      An empty string is considered a defined reference.
      * 
      * @see Module
      * @see GetModuleAttribute
      * @see GetModulePath
      * @see GetModuleClasspath
      */
-    public void setModuleProperty(final String propertyName)
+    public void setModuleRefId(final String refId)
     {
-        moduleProperty = propertyName;
+        moduleRefId = refId;
     }
     
     /**
@@ -641,8 +637,7 @@ public class CallTargetForModules extends Task
      * created for each module or any project created in that project regardless of what
      * is set to {@link #setInheritAll(boolean) inheritAll}. This property set overrides the
      * properties with the same name defined in the project it is passed to. However, it does
-     * not override the user-defined properties with the same name. Nor it overrides the
-     * property defined by the attribute {@link #setModuleProperty(String) moduleProperty}.</p>
+     * not override the user-defined properties with the same name.</p>
      * 
      * <p>This allows you to parameterise targets that are invoked for modules.</p>
      * 
@@ -670,7 +665,8 @@ public class CallTargetForModules extends Task
      * <p>Use the task attribute {@link #setInheritRefs(boolean) inheritRefs} set to {@code true}
      * to pass all references defined within the Ant project of this {@code <callTargetForModules>}
      * to the module-specific projects. Note that no references are overridden in this case except
-     * those that are specified by the {@code <reference>} elements.</p>
+     * those that are specified by the {@code <reference>} elements and
+     * the {@link #setModuleRefId(String) moduleRefId} attribute.</p>
      * 
      * @param reference the {@code <reference>} element to be added. It must be not {@code null}.
      */
