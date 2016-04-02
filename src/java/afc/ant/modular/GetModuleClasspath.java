@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -29,14 +29,14 @@ import java.util.Map;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.types.Reference;
 
 /**
  * <p>An Ant task that generates a classpath for a given {@link Module module} and sets it as
  * an {@link Path org.apache.tools.ant.types.Path} instance as an Ant {@link Project project}
- * property. If the property is already created then it is <em>not</em> updated.</p>
+ * reference. If the reference already exists then it is updated with the new value.</p>
  * 
  * <p>The resulting classpath is built from the module attributes that are specified by
  * the {@link #setClasspathAttribute(String) attribute}/{@link #createClasspathAttribute() elements}
@@ -54,7 +54,7 @@ import org.apache.tools.ant.types.Path;
  * <p>The resulting classpath is built as follows:</p>
  * <ol type="1">
  *  <li>An empty resulting {@code Path} is created relative to the Ant project of this task.</li>
- *  <li>The attributes of the {@link #setModuleProperty(String) primary module} are iterated
+ *  <li>The attributes of the {@link #setModuleRefId(Reference) primary module} are iterated
  *      through in the order they are declared and the {@code Path} objects stored are appended
  *      to the resulting {@code Path}. The attribute {@code classpathAttribute}, if defined,
  *      always precedes the elements {@code classpathAttribute}, if any.</li>
@@ -63,7 +63,7 @@ import org.apache.tools.ant.types.Path;
  *      are processed is undefined.</li>
  * </ol>
  * 
- * <p>This task works with {@code Module} objects that are loaded by any class loader.
+ * <p>This task accepts {@code Module} objects that are loaded by any class loader.
  * It is only required that the class name of the object is exactly {@code afc.ant.modular.Module}
  * and it has the public member function {@link Module#getAttributes()} that returns a {@link Map}.
  * Incompatible module objects passed cause an exception raised by this task.</p>
@@ -77,12 +77,12 @@ import org.apache.tools.ant.types.Path;
  *      <th>Description</th></tr>
  * </thead>
  * <tbody>
- *  <tr><td>moduleProperty</td>
+ *  <tr><td>moduleRefId</td>
  *      <td>yes</td>
- *      <td>The name of the property which holds the module object.</td></tr>
+ *      <td>The ID of the reference which holds the module object.</td></tr>
  *  <tr><td>outputProperty (an attribute)</td>
  *      <td>yes</td>
- *      <td>The name of the property where the module's path is to be set.</td></tr>
+ *      <td>The ID of the reference where the resulting classpath is to be set.</td></tr>
  *  <tr><td>classpathAttribute</td>
  *      <td>no (at least one {@code classpathAttribute} attribute/element must be defined)</td>
  *      <td>The name of a module attribute that is to be used (probably, with other classpath
@@ -114,25 +114,23 @@ import org.apache.tools.ant.types.Path;
  * </table>
  * 
  * <h3>Usage example</h3>
- * <pre> {@literal <getModuleClasspath moduleProperty="project.module" outputProperty="project.module.classpath" classpathAttribute="testClasspath">
+ * <pre> {@literal <getModuleClasspath moduleRefId="project.module" outputRefId="project.module.classpath" classpathAttribute="testClasspath">
  *      <classpathAttribute name="runtimeClasspath"/>
  *      <classpathAttribute name="compileClasspath"/>
  * </getModuleClasspath>}</pre>
  * 
- * <p>Here, the module is expected to be set to the property named <em>project.module</em>.
+ * <p>Here, the module is expected to be set to the reference <em>project.module</em>.
  * The resulting classpath is built up from the classpath attributes {@code testClasspath},
  * {@code runtimeClasspath}, {@code compileClasspath}, exactly in this order. After the task
- * executes the resulting classpath is assigned to the property named
- * <em>project.module.classpath</em>. Note that the latter property must be undefined. Otherwise
- * the task does not assign the new value to this property.</p>
+ * executes the resulting classpath is assigned to the reference <em>project.module.classpath</em>.</p>
  * 
  * @author D&#378;mitry La&#365;&#269;uk
  */
 public class GetModuleClasspath extends Task
 {
-    private String moduleProperty;
+    private Reference moduleRef;
     private final ArrayList<ClasspathAttribute> classpathAttributes = new ArrayList<ClasspathAttribute>();
-    private String outputProperty;
+    private String outputRefId;
     private boolean includeDependencies = false;
     
     /**
@@ -143,7 +141,7 @@ public class GetModuleClasspath extends Task
      * @throws BuildException in any of these cases:
      *      <ul>
      *          <li>this task is configured incorrectly</li>
-     *          <li>the {@link #setModuleProperty(String) module object} specified is not a
+     *          <li>the {@link #setModuleRefId(Reference) module object} specified is not a
      *              well-formed {@link Module} instance</li>
      *          <li>{@link #setIncludeDependencies(boolean) includeDependencies} is set to
      *              {@code true} and any of the dependee modules is not a well-formed
@@ -155,11 +153,11 @@ public class GetModuleClasspath extends Task
     @Override
     public void execute()
     {
-        if (moduleProperty == null) {
-            throw new BuildException("The attribute 'moduleProperty' is undefined.");
+        if (moduleRef == null) {
+            throw new BuildException("The attribute 'moduleRefId' is undefined.");
         }
-        if (outputProperty == null) {
-            throw new BuildException("The attribute 'outputProperty' is undefined.");
+        if (outputRefId == null) {
+            throw new BuildException("The attribute 'outputRefId' is undefined.");
         }
         if (classpathAttributes.isEmpty()) {
             throw new BuildException("No classpath attributes are defined.");
@@ -169,12 +167,10 @@ public class GetModuleClasspath extends Task
                 throw new BuildException("A classpath attribute with the undefined name is specified.");
             }
         }
-        final Project project = getProject();
-        final PropertyHelper propHelper = PropertyHelper.getPropertyHelper(project);
-        final Object moduleObject = propHelper.getProperty(moduleProperty);
+        final Object moduleObject = moduleRef.getReferencedObject();
         if (moduleObject == null) {
             throw new BuildException(MessageFormat.format(
-                    "No module is found under the property ''{0}''.", moduleProperty));
+                    "No module is found via the reference ''{0}''.", moduleRef.getRefId()));
         }
         
         /* This task is invoked from within a target that is called by CallTargetForModules.
@@ -186,14 +182,14 @@ public class GetModuleClasspath extends Task
          */
         if (!ModuleUtil.isModule(moduleObject)) {
             throw new BuildException(MessageFormat.format(
-                    "Invalid module type is found under the property ''{0}''. Expected: ''{1}'', found: ''{2}''.",
-                    moduleProperty, Module.class.getName(), moduleObject.getClass().getName()));
+                    "Invalid module type is found via the reference ''{0}''. Expected: ''{1}'', found: ''{2}''.",
+                    moduleRef.getRefId(), Module.class.getName(), moduleObject.getClass().getName()));
         }
         
-        final Path classpath = new Path(project);
+        final Path classpath = new Path(getProject());
         appendClasspathElements(moduleObject, classpath, new LinkedHashSet<Object>());
         
-        propHelper.setNewProperty((String) null, outputProperty, classpath);
+        getProject().addReference(outputRefId, classpath);
     }
     
     private void appendClasspathElements(final Object /*Module*/ module, final Path classpath,
@@ -233,16 +229,15 @@ public class GetModuleClasspath extends Task
     }
     
     /**
-     * <p>Sets the name of the property which holds the module whose classpath is to be
-     * calculated.</p>
+     * <p>Sets the reference which holds the module whose classpath is to be calculated.</p>
      * 
-     * @param moduleProperty the name of the property. It must be not {@code null}.
+     * @param ref the reference to the module. It must be not {@code null}.
      *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
      *      thrown by {@link #execute()}.
      */
-    public void setModuleProperty(final String moduleProperty)
+    public void setModuleRefId(final Reference ref)
     {
-        this.moduleProperty = moduleProperty;
+        moduleRef = ref;
     }
     
     /**
@@ -360,22 +355,21 @@ public class GetModuleClasspath extends Task
     }
     
     /**
-     * <p>Sets the name of the property to which the classpath calculated (an instance of
-     * {@link Path  org.apache.tools.ant.types.Path}) is to be set. This property should be
-     * undefined. Otherwise this task will not assign the new value to it.</p>
+     * <p>Sets the ID of the reference to which the classpath calculated (an instance of
+     * {@link Path  org.apache.tools.ant.types.Path}) is to be set.</p>
      * 
-     * @param propertyName the name of the output property. It must be not {@code null}.
+     * @param refId the ID of the reference. It must be not {@code null}.
      *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} will be
      *      thrown by {@link #execute()}.
      */
-    public void setOutputProperty(final String propertyName)
+    public void setOutputRefId(final String refId)
     {
-        outputProperty = propertyName;
+        outputRefId = refId;
     }
     
     /**
      * <p>Sets the flag whether or not the classpath elements of the dependee modules
-     * (direct and indirect) of the {@link #setModuleProperty(String) primary module} are to
+     * (direct and indirect) of the {@link #setModuleRefId(Reference) primary module} are to
      * be included into the resulting classpath. If {@code true} is set then the dependee
      * modules are taken into account; if {@code false} is set then they are ignored. The
      * latter case is default. The classpath attributes that are used for the dependee modules

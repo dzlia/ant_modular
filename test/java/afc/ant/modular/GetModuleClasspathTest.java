@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -30,12 +30,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.types.Path;
-
-import junit.framework.TestCase;
+import org.apache.tools.ant.types.Reference;
 
 public class GetModuleClasspathTest extends TestCase
 {
@@ -57,9 +57,9 @@ public class GetModuleClasspathTest extends TestCase
         task = null;
     }
     
-    public void testNoModuleProperty()
+    public void testNoModuleRefId()
     {
-        task.setOutputProperty("out");
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         
         try {
@@ -68,18 +68,18 @@ public class GetModuleClasspathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("The attribute 'moduleProperty' is undefined.", ex.getMessage());
+            assertEquals("The attribute 'moduleRefId' is undefined.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
+        assertEquals(null, project.getReference("out"));
     }
     
-    public void testNoOutputProperty()
+    public void testNoOutputRefId()
     {
         final Module module = module("foo");
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
+        task.setModuleRefId(new Reference(project, "in"));
         task.setClasspathAttribute("cp");
         
         try {
@@ -88,20 +88,20 @@ public class GetModuleClasspathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("The attribute 'outputProperty' is undefined.", ex.getMessage());
+            assertEquals("The attribute 'outputRefId' is undefined.", ex.getMessage());
         }
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
     }
     
     public void testNoClasspathAttributes()
     {
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         
         try {
             task.execute();
@@ -112,8 +112,8 @@ public class GetModuleClasspathTest extends TestCase
             assertEquals("No classpath attributes are defined.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
@@ -121,11 +121,11 @@ public class GetModuleClasspathTest extends TestCase
     {
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         task.setClasspathAttribute(null);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         
         try {
             task.execute();
@@ -136,8 +136,8 @@ public class GetModuleClasspathTest extends TestCase
             assertEquals("A classpath attribute with the undefined name is specified.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
@@ -145,12 +145,12 @@ public class GetModuleClasspathTest extends TestCase
     {
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         task.createClasspathAttribute().setName("foo");
         task.createClasspathAttribute().setName(null);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         
         try {
             task.execute();
@@ -161,15 +161,15 @@ public class GetModuleClasspathTest extends TestCase
             assertEquals("A classpath attribute with the undefined name is specified.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
-    public void testNoModuleUnderThePropery()
+    public void testNoModuleRef()
     {
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         
         try {
@@ -178,20 +178,46 @@ public class GetModuleClasspathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("No module is found under the property 'in'.", ex.getMessage());
+            assertEquals("Reference in not found.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(null, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(null, project.getReference("in"));
+    }
+    
+    public void testNoModuleViaTheRef()
+    {
+        task.setModuleRefId(new Reference(project, "in")
+        {
+            @Override
+            public Object getReferencedObject()
+            {
+                return null;
+            }
+        });
+        task.setOutputRefId("out");
+        task.setClasspathAttribute("cp");
+        
+        try {
+            task.execute();
+            fail();
+        }
+        catch (BuildException ex)
+        {
+            assertEquals("No module is found via the reference 'in'.", ex.getMessage());
+        }
+        
+        assertEquals(null, project.getReference("out"));
+        assertSame(null, project.getReference("in"));
     }
     
     public void testInvalidModuleType()
     {
         final Object invalidModule = Long.valueOf(0);
-        PropertyHelper.setProperty(project, "in", invalidModule);
+        project.addReference("in", invalidModule);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         
         try {
@@ -200,22 +226,22 @@ public class GetModuleClasspathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("Invalid module type is found under the property 'in'. " +
+            assertEquals("Invalid module type is found via the reference 'in'. " +
                     "Expected: 'afc.ant.modular.Module', found: 'java.lang.Long'.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(invalidModule, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(invalidModule, project.getReference("in"));
     }
     
     public void testSingleClasspathAttribute_ClasspathPropertyWithWrongType()
     {
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", "12345"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         
         try {
@@ -226,8 +252,8 @@ public class GetModuleClasspathTest extends TestCase
             assertEquals("The attribute 'cp' of the module 'foo' is not an Ant path.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", "12345"), module.getAttributes());
     }
     
@@ -238,10 +264,10 @@ public class GetModuleClasspathTest extends TestCase
         final Module dep = module("bar");
         dep.setAttributes(TestUtil.<String, Object>map("cp", Integer.valueOf(2)));
         module.setDependencies(new Module[]{dep});
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         task.setIncludeDependencies(true);
         
@@ -253,8 +279,8 @@ public class GetModuleClasspathTest extends TestCase
             assertEquals("The attribute 'cp' of the module 'bar' is not an Ant path.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
         assertEquals(TestUtil.<String, Object>map("cp", Integer.valueOf(2)), dep.getAttributes());
     }
@@ -266,20 +292,20 @@ public class GetModuleClasspathTest extends TestCase
         final Module dep = module("bar");
         dep.setAttributes(TestUtil.<String, Object>map("cp", Integer.valueOf(2)));
         module.setDependencies(new Module[]{dep});
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         final Path classpath = (Path) outObject;
         assertEquals(0, classpath.size());
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
         assertEquals(TestUtil.<String, Object>map("cp", Integer.valueOf(2)), dep.getAttributes());
     }
@@ -288,40 +314,44 @@ public class GetModuleClasspathTest extends TestCase
     {
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         final Path classpath = (Path) outObject;
         assertEquals(0, classpath.size());
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
     public void testSingleClasspathAttribute_NoClasspathProperty_NoDependencies_OutputPropertyAlreadyDefined()
     {
         final Object value = new Object();
-        PropertyHelper.setProperty(project, "out", value);
+        project.addReference("out", value);
         
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         
         task.execute();
         
-        assertSame(value, PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        final Object outObject = project.getReference("out");
+        assertTrue(outObject instanceof Path);
+        final Path classpath = (Path) outObject;
+        assertEquals(0, classpath.size());
+        
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
@@ -334,20 +364,20 @@ public class GetModuleClasspathTest extends TestCase
         final Module dep2 = module("bar");
         dep2.setAttributes(TestUtil.<String, Object>map("b", "c"));
         module.setDependencies(new Module[]{dep1, dep2});
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         final Path classpath = (Path) outObject;
         assertEquals(0, classpath.size());
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
         assertEquals(TestUtil.<String, Object>map("x", "y"), dep1.getAttributes());
         assertEquals(TestUtil.<String, Object>map("b", "c"), dep2.getAttributes());
@@ -364,20 +394,20 @@ public class GetModuleClasspathTest extends TestCase
         module.setDependencies(new Module[]{dep1});
         dep1.setDependencies(new Module[]{dep2});
         dep2.setDependencies(new Module[]{module});
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         final Path classpath = (Path) outObject;
         assertEquals(0, classpath.size());
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
         assertEquals(TestUtil.<String, Object>map("x", "y"), dep1.getAttributes());
         assertEquals(TestUtil.<String, Object>map("b", "c"), dep2.getAttributes());
@@ -392,19 +422,19 @@ public class GetModuleClasspathTest extends TestCase
         
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", path));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, new File("a"), new File("b"), new File("c/d/e")); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", path), module.getAttributes());
     }
     
@@ -424,21 +454,21 @@ public class GetModuleClasspathTest extends TestCase
         final Module dep = module("bar");
         dep.setAttributes(TestUtil.<String, Object>map("cp", path2, "1", "2"));
         module.setDependencies(new Module[]{dep});
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         task.setIncludeDependencies(true);
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, new File("b"), new File("a"), new File("c/d/e"),
                 new File("88/ee"), new File("555")); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", path1), module.getAttributes());
         assertEquals(TestUtil.<String, Object>map("cp", path2, "1", "2"), dep.getAttributes());
     }
@@ -459,20 +489,20 @@ public class GetModuleClasspathTest extends TestCase
         final Module dep = module("bar");
         dep.setAttributes(TestUtil.<String, Object>map("cp", path2, "1", "2"));
         module.setDependencies(new Module[]{dep});
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         task.setIncludeDependencies(false);
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, new File("b"), new File("a"), new File("c/d/e")); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", path1), module.getAttributes());
         assertEquals(TestUtil.<String, Object>map("cp", path2, "1", "2"), dep.getAttributes());
     }
@@ -493,19 +523,19 @@ public class GetModuleClasspathTest extends TestCase
         final Module dep = module("bar");
         dep.setAttributes(TestUtil.<String, Object>map("cp", path2, "1", "2"));
         module.setDependencies(new Module[]{dep});
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, new File("b"), new File("a"), new File("c/d/e")); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", path1), module.getAttributes());
         assertEquals(TestUtil.<String, Object>map("cp", path2, "1", "2"), dep.getAttributes());
     }
@@ -526,20 +556,20 @@ public class GetModuleClasspathTest extends TestCase
         dep.setAttributes(TestUtil.<String, Object>map("cp", path2, "1", "2"));
         module.setDependencies(new Module[]{dep});
         dep.setDependencies(new Module[]{module});
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         task.setIncludeDependencies(true);
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, new File("b"), new File("a"), new File("c/d/e"), new File("88/ee")); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3", "cp", path1), module.getAttributes());
         assertEquals(TestUtil.<String, Object>map("cp", path2, "1", "2"), dep.getAttributes());
     }
@@ -573,21 +603,21 @@ public class GetModuleClasspathTest extends TestCase
         module.setDependencies(new Module[]{dep1, dep2});
         dep1.setDependencies(new Module[]{dep3});
         dep2.setDependencies(new Module[]{dep3});
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         task.setIncludeDependencies(true);
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, new File[]{new File("b"), new File("a"), new File("c/d/e")},
                 TestUtil.set(new File("88/ee"), new File("555"), new File("aaa"), new File("bbb"))); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1), module.getAttributes());
         assertEquals(TestUtil.<String, Object>map("cp", path2, "1", "2"), dep1.getAttributes());
         assertEquals(TestUtil.<String, Object>map("cp", path3), dep2.getAttributes());
@@ -607,21 +637,21 @@ public class GetModuleClasspathTest extends TestCase
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         task.createClasspathAttribute().setName("cp3");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet()); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
     }
     
@@ -638,22 +668,22 @@ public class GetModuleClasspathTest extends TestCase
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setClasspathAttribute("cp");
         task.createClasspathAttribute().setName("cp3");
         task.createClasspathAttribute().setName("cp"); // repeated
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet()); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
     }
     
@@ -675,22 +705,22 @@ public class GetModuleClasspathTest extends TestCase
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         // createClasspathAttribute() must go before setClasspathAttribute() to test the reverse order.
         task.createClasspathAttribute().setName("cp3");
         task.setClasspathAttribute("cp");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet()); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
     }
     
@@ -707,21 +737,21 @@ public class GetModuleClasspathTest extends TestCase
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.createClasspathAttribute().setName("cp");
         task.createClasspathAttribute().setName("cp3");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet()); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
     }
     
@@ -735,20 +765,20 @@ public class GetModuleClasspathTest extends TestCase
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.createClasspathAttribute().setName("cp");
         task.createClasspathAttribute().setName("cp3");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, Collections.singletonList(new File("88/ee")), Collections.<File>emptySet()); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
     }
     
@@ -760,20 +790,20 @@ public class GetModuleClasspathTest extends TestCase
         final Module module = module("foo");
         module.setAttributes(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2));
         
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.createClasspathAttribute().setName("cp");
         task.createClasspathAttribute().setName("cp3");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, Collections.<File>emptyList(), Collections.<File>emptySet()); 
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
     }
     
@@ -802,22 +832,22 @@ public class GetModuleClasspathTest extends TestCase
         module.setDependencies(new Module[]{dep1});
         dep1.setDependencies(new Module[]{dep2});
         
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.createClasspathAttribute().setName("cp");
         task.createClasspathAttribute().setName("cp3");
         task.setIncludeDependencies(true);
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), TestUtil.set(new File("111"), new File("222")));
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
     }
     
@@ -846,22 +876,22 @@ public class GetModuleClasspathTest extends TestCase
         module.setDependencies(new Module[]{dep1});
         dep1.setDependencies(new Module[]{dep2});
         
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.createClasspathAttribute().setName("cp");
         task.createClasspathAttribute().setName("cp3");
         task.setIncludeDependencies(false);
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet());
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
     }
     
@@ -890,21 +920,21 @@ public class GetModuleClasspathTest extends TestCase
         module.setDependencies(new Module[]{dep1});
         dep1.setDependencies(new Module[]{dep2});
         
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.createClasspathAttribute().setName("cp");
         task.createClasspathAttribute().setName("cp3");
         
         task.execute();
         
-        final Object outObject = PropertyHelper.getProperty(project, "out");
+        final Object outObject = project.getReference("out");
         assertTrue(outObject instanceof Path);
         assertClasspath((Path) outObject, Arrays.asList(new File("b"), new File("a"),
                 new File("c/d/e"), new File("88/ee")), Collections.<File>emptySet());
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("cp", path1, "cp2", "123", "cp3", path2), module.getAttributes());
     }
     
