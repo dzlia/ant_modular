@@ -28,7 +28,6 @@ import junit.framework.TestCase;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.types.Reference;
 
 public class GetModuleAttributeTest extends TestCase
