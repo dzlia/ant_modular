@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -28,13 +28,14 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.Reference;
 
 /**
  * <p>An Ant task that sets the {@link Module#getPath() path} of a {@link Module} object
- * as an Ant {@link Project project} property. If the property is already created then
- * it is <em>not</em> updated.</p>
+ * as an Ant {@link Project project} reference. If the reference already exists then
+ * it is updated with the new value.</p>
  * 
- * <p>This task works with {@code Module} objects that are loaded by any class loader.
+ * <p>This task accepts {@code Module} objects that are loaded by any class loader.
  * It is only required that the class name of the object is exactly {@code afc.ant.modular.Module}
  * and it has the public member function {@link Module#getPath()}. Incompatible module objects
  * passed cause an exception raised by this task.</p>
@@ -48,22 +49,20 @@ import org.apache.tools.ant.Task;
  *      <th>Description</th></tr>
  * </thead>
  * <tbody>
- *  <tr><td>moduleProperty</td>
+ *  <tr><td>moduleRefId</td>
  *      <td>yes</td>
- *      <td>The name of the property which holds the module object.</td></tr>
- *  <tr><td>outputProperty</td>
+ *      <td>The ID of the reference which holds the module object.</td></tr>
+ *  <tr><td>outputRefId</td>
  *      <td>yes</td>
- *      <td>The name of the property where the module's path is to be set.</td></tr>
+ *      <td>The ID of the reference where the module path is to be set.</td></tr>
  * </tbody>
  * </table>
  * 
  * <h3>Usage example</h3>
- * <pre>{@literal <getModulePath moduleProperty="project.module" outputProperty="project.module.path"/>}</pre>
+ * <pre>{@literal <getModulePath moduleRefId="project.module" outputRefId="project.module.path"/>}</pre>
  * 
- * <p>Here, the module is expected to be set to the property named <em>project.module</em>. After
- * the task executes the module path is assigned to the property named <em>project.module.path</em>.
- * Note that the latter property must be undefined. Otherwise the task does not assign the new
- * value to this property.</p>
+ * <p>Here, the module is expected to be set to the reference <em>project.module</em>. After
+ * the task executes the module path is assigned to the reference named <em>project.module.path</em>.</p>
  * 
  * @see Module#getPath()
  * 
@@ -71,8 +70,8 @@ import org.apache.tools.ant.Task;
  */
 public class GetModulePath extends Task
 {
-    private String moduleProperty;
-    private String outputProperty;
+    private Reference moduleRef;
+    private String outputRefId;
     
     /**
      * <p>Executes this task. See the {@link GetModulePath class description} for the details.</p>
@@ -83,18 +82,16 @@ public class GetModulePath extends Task
     @Override
     public void execute()
     {
-        if (moduleProperty == null) {
-            throw new BuildException("The attribute 'moduleProperty' is undefined.");
+        if (moduleRef == null) {
+            throw new BuildException("The attribute 'moduleRefId' is undefined.");
         }
-        if (outputProperty == null) {
-            throw new BuildException("The attribute 'outputProperty' is undefined.");
+        if (outputRefId == null) {
+            throw new BuildException("The attribute 'outputRefId' is undefined.");
         }
-        final Project project = getProject();
-        final PropertyHelper propHelper = PropertyHelper.getPropertyHelper(project);
-        final Object moduleObject = propHelper.getProperty(moduleProperty);
+        final Object moduleObject = moduleRef.getReferencedObject();
         if (moduleObject == null) {
             throw new BuildException(MessageFormat.format(
-                    "No module is found under the property ''{0}''.", moduleProperty));
+                    "No module is found via the reference ''{0}''.", moduleRef.getRefId()));
         }
         
         /* This task is invoked from within a target that is called by CallTargetForModules.
@@ -107,38 +104,39 @@ public class GetModulePath extends Task
         if (!ModuleUtil.isModule(moduleObject)) {
             throw new BuildException(MessageFormat.format(
                     "Invalid module type is found under the property ''{0}''. Expected: ''{1}'', found: ''{2}''.",
-                    moduleProperty, Module.class.getName(), moduleObject.getClass().getName()));
+                    moduleRef.getRefId(), Module.class.getName(), moduleObject.getClass().getName()));
         }
         
         final String path = ModuleUtil.getPath(moduleObject);
         if (path == null) { // null path indicates that this module is invalid.
             throw new BuildException("The module path is undefined.");
         }
-        propHelper.setNewProperty((String) null, outputProperty, path);
+        
+        getProject().addReference(outputRefId, path);
     }
     
     /**
-     * <p>Sets the name of the property which holds the module whose path is to be obtained.</p>
+     * <p>Sets the ID of the reference which holds the module whose path is to be obtained.</p>
      * 
-     * @param moduleProperty the name of the property. It must be not {@code null}.
+     * @param ref the reference to the module. It must be not {@code null}.
      *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is
      *      thrown by {@link #execute()}.
      */
-    public void setModuleProperty(final String moduleProperty)
+    public void setModuleRefId(final Reference ref)
     {
-        this.moduleProperty = moduleProperty;
+        moduleRef = ref;
     }
     
     /**
-     * <p>Sets the name of the property to which the module path is to be set. This property
-     * should be undefined. Otherwise this task will not assign the new value to it.</p>
+     * <p>Sets the ID of the reference to which the module path is to be set. If the reference
+     * is already defined then it is overwritten with the new value.</p>
      * 
-     * @param propertyName the name of the output property. It must be not {@code null}.
+     * @param refId the ID of the output reference. It must be not {@code null}.
      *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is
      *      thrown by {@link #execute()}.
      */
-    public void setOutputProperty(final String propertyName)
+    public void setOutputRefId(final String refId)
     {
-        outputProperty = propertyName;
+        outputRefId = refId;
     }
 }

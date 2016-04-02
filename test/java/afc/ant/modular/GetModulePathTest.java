@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -22,11 +22,12 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package afc.ant.modular;
 
+import junit.framework.TestCase;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.PropertyHelper;
-
-import junit.framework.TestCase;
+import org.apache.tools.ant.UnknownElement;
+import org.apache.tools.ant.types.Reference;
 
 public class GetModulePathTest extends TestCase
 {
@@ -48,9 +49,9 @@ public class GetModulePathTest extends TestCase
         task = null;
     }
     
-    public void testNoModuleProperty()
+    public void testNoModuleRefId()
     {
-        task.setOutputProperty("out");
+        task.setOutputRefId("out");
         
         try {
             task.execute();
@@ -58,18 +59,18 @@ public class GetModulePathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("The attribute 'moduleProperty' is undefined.", ex.getMessage());
+            assertEquals("The attribute 'moduleRefId' is undefined.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
+        assertEquals(null, project.getReference("out"));
     }
     
-    public void testNoOutputProperty()
+    public void testNoOutputRefId()
     {
         final Module module = new Module("foo");
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
+        task.setModuleRefId(new Reference(project, "in"));
         
         try {
             task.execute();
@@ -77,16 +78,16 @@ public class GetModulePathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("The attribute 'outputProperty' is undefined.", ex.getMessage());
+            assertEquals("The attribute 'outputRefId' is undefined.", ex.getMessage());
         }
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
     }
     
-    public void testNoModuleUnderThePropery()
+    public void testNoModuleRef()
     {
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         
         try {
             task.execute();
@@ -94,20 +95,45 @@ public class GetModulePathTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("No module is found under the property 'in'.", ex.getMessage());
+            assertEquals("Reference in not found.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(null, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(null, project.getReference("in"));
+    }
+    
+    public void testNoModuleUnderTheRef()
+    {
+        task.setModuleRefId(new Reference(project, "in")
+        {
+            @Override
+            public Object getReferencedObject()
+            {
+                return null;
+            }
+        });
+        task.setOutputRefId("out");
+        
+        try {
+            task.execute();
+            fail();
+        }
+        catch (BuildException ex)
+        {
+            assertEquals("No module is found via the reference 'in'.", ex.getMessage());
+        }
+        
+        assertEquals(null, project.getReference("out"));
+        assertSame(null, project.getReference("in"));
     }
     
     public void testInvalidModuleType()
     {
         final Object invalidModule = Integer.valueOf(0);
-        PropertyHelper.setProperty(project, "in", invalidModule);
+        project.addReference("in", invalidModule);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         
         try {
             task.execute();
@@ -119,38 +145,38 @@ public class GetModulePathTest extends TestCase
                     "Expected: 'afc.ant.modular.Module', found: 'java.lang.Integer'.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(invalidModule, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(invalidModule, project.getReference("in"));
     }
     
     public void testSuccessfulExecution()
     {
         final Module module = new Module("foo");
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         
         task.execute();
         
-        assertEquals("foo", PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals("foo", project.getReference("out"));
+        assertSame(module, project.getReference("in"));
     }
     
-    public void testOutputPropertyAlreadyDefined()
+    public void testOutputRefAlreadyDefined()
     {
         project.setProperty("out", "bar");
         
         final Module module = new Module("foo");
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         
         task.execute();
         
-        assertSame("bar", PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame("foo", project.getReference("out"));
+        assertSame(module, project.getReference("in"));
     }
     
     public void testNullModulePath() throws Exception
@@ -160,10 +186,10 @@ public class GetModulePathTest extends TestCase
         final Class<?> moduleClass = cl.loadClass(Module.class.getName());
         
         final Object module = moduleClass.newInstance();
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         
         try {
             task.execute();
@@ -173,24 +199,24 @@ public class GetModulePathTest extends TestCase
             assertEquals("The module path is undefined.", ex.getMessage());
         }
         
-        assertNull(PropertyHelper.getProperty(project, "out"));
-        assertFalse(project.getProperties().contains("out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertNull(project.getReference("out"));
+        assertFalse(project.getReferences().containsKey("out"));
+        assertSame(module, project.getReference("in"));
     }
     
-    public void testNullModulePath_OutputPropertyAlreadyDefined() throws Exception
+    public void testNullModulePath_OutputRefAlreadyDefined() throws Exception
     {
-        project.setProperty("out", "bar");
+        project.addReference("out", "bar");
         
         // This class loader loads the class afc.ant.modular.Module that returns null path.
         final ModuleClassLoader cl = new ModuleClassLoader("test/data/GetModulePath/Module_null.class");
         final Class<?> moduleClass = cl.loadClass(Module.class.getName());
         
         final Object module = moduleClass.newInstance();
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         
         try {
             task.execute();
@@ -200,7 +226,7 @@ public class GetModulePathTest extends TestCase
             assertEquals("The module path is undefined.", ex.getMessage());
         }
         
-        assertSame("bar", PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame("bar", project.getReference("out"));
+        assertSame(module, project.getReference("in"));
     }
 }
