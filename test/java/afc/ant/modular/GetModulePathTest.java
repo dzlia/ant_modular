@@ -26,7 +26,6 @@ import junit.framework.TestCase;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.UnknownElement;
 import org.apache.tools.ant.types.Reference;
 
 public class GetModulePathTest extends TestCase
