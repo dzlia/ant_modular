@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -24,11 +24,12 @@ package afc.ant.modular;
 
 import java.util.Collections;
 
+import junit.framework.TestCase;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.PropertyHelper;
-
-import junit.framework.TestCase;
+import org.apache.tools.ant.types.Reference;
 
 public class GetModuleAttributeTest extends TestCase
 {
@@ -50,9 +51,9 @@ public class GetModuleAttributeTest extends TestCase
         task = null;
     }
     
-    public void testNoModuleProperty()
+    public void testNoModuleRefId()
     {
-        task.setOutputProperty("out");
+        task.setOutputRefId("out");
         task.setName("attrib");
         
         try {
@@ -61,19 +62,19 @@ public class GetModuleAttributeTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("The attribute 'moduleProperty' is undefined.", ex.getMessage());
+            assertEquals("The attribute 'moduleRefId' is undefined.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
+        assertEquals(null, project.getReference("out"));
     }
     
-    public void testNoOutputProperty()
+    public void testNoOutputRefId()
     {
         final Module module = new Module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
+        task.setModuleRefId(new Reference(project, "in"));
         task.setName("attrib");
         
         try {
@@ -82,21 +83,21 @@ public class GetModuleAttributeTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("The attribute 'outputProperty' is undefined.", ex.getMessage());
+            assertEquals("The attribute 'outputRefId' is undefined.", ex.getMessage());
         }
         
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
-    public void testNoNameProperty()
+    public void testNoNameAttibute()
     {
         final Module module = new Module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         
         try {
             task.execute();
@@ -107,15 +108,15 @@ public class GetModuleAttributeTest extends TestCase
             assertEquals("The attribute 'name' is undefined.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
-    public void testNoModuleUnderThePropery()
+    public void testNoModuleRef()
     {
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setName("attrib");
         
         try {
@@ -124,20 +125,46 @@ public class GetModuleAttributeTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("No module is found under the property 'in'.", ex.getMessage());
+            assertEquals("Reference in not found.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(null, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(null, project.getReference("in"));
+    }
+    
+    public void testNoModuleViaTheRef()
+    {
+        task.setModuleRefId(new Reference(project, "in")
+        {
+            @Override
+            public Object getReferencedObject()
+            {
+                return null;
+            }
+        });
+        task.setOutputRefId("out");
+        task.setName("attrib");
+        
+        try {
+            task.execute();
+            fail();
+        }
+        catch (BuildException ex)
+        {
+            assertEquals("No module is found via the reference 'in'.", ex.getMessage());
+        }
+        
+        assertEquals(null, project.getReference("out"));
+        assertSame(null, project.getReference("in"));
     }
     
     public void testInvalidModuleType()
     {
         final Object invalidModule = Integer.valueOf(0);
-        PropertyHelper.setProperty(project, "in", invalidModule);
+        project.addReference("in", invalidModule);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setName("attrib");
         
         try {
@@ -146,12 +173,12 @@ public class GetModuleAttributeTest extends TestCase
         }
         catch (BuildException ex)
         {
-            assertEquals("Invalid module type is found under the property 'in'. " +
+            assertEquals("Invalid module type is found via the reference 'in'. " +
                     "Expected: 'afc.ant.modular.Module', found: 'java.lang.Integer'.", ex.getMessage());
         }
         
-        assertEquals(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(invalidModule, PropertyHelper.getProperty(project, "in"));
+        assertEquals(null, project.getReference("out"));
+        assertSame(invalidModule, project.getReference("in"));
     }
     
     public void testSuccessfulExecution_AttributeExists()
@@ -159,16 +186,16 @@ public class GetModuleAttributeTest extends TestCase
         final Object attributeValue = new Object();
         final Module module = new Module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", attributeValue, "attrib2", "3"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setName("attrib");
         
         task.execute();
         
-        assertSame(attributeValue, PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(attributeValue, project.getReference("out"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", attributeValue, "attrib2", "3"), module.getAttributes());
     }
     
@@ -176,71 +203,71 @@ public class GetModuleAttributeTest extends TestCase
     {
         final Module module = new Module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib1", "1", "attrib2", "3"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setName("attrib");
         
         task.execute();
         
-        assertSame(null, PropertyHelper.getProperty(project, "out"));
-        assertFalse(project.getProperties().contains("out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(null, project.getReference("out"));
+        assertFalse(project.getReferences().containsKey("out"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib1", "1", "attrib2", "3"), module.getAttributes());
     }
     
     public void testSuccessfulExecution_NoAttributes()
     {
         final Module module = new Module("foo");
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setName("attrib");
         
         task.execute();
         
-        assertSame(null, PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertSame(null, project.getReference("out"));
+        assertSame(module, project.getReference("in"));
         assertEquals(Collections.emptyMap(), module.getAttributes());
     }
     
-    public void testOutputPropertyAlreadyDefined()
+    public void testOutputRefAlreadyDefined()
     {
-        project.setProperty("out", "bar");
+        project.addReference("out", "bar");
         
         final Module module = new Module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setName("attrib");
         
         task.execute();
         
-        assertEquals("bar", PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertEquals("1", project.getReference("out"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib", "1", "attrib2", "3"), module.getAttributes());
     }
     
-    public void testOutputPropertyAlreadyDefined_AttributeDoesNotExist()
+    public void testOutputRefAlreadyDefined_AttributeDoesNotExist()
     {
-        project.setProperty("out", "bar");
+        project.addReference("out", "bar");
         
         final Module module = new Module("foo");
         module.setAttributes(TestUtil.<String, Object>map("attrib1", "1", "attrib2", "3"));
-        PropertyHelper.setProperty(project, "in", module);
+        project.addReference("in", module);
         
-        task.setModuleProperty("in");
-        task.setOutputProperty("out");
+        task.setModuleRefId(new Reference(project, "in"));
+        task.setOutputRefId("out");
         task.setName("attrib");
         
         task.execute();
         
-        assertSame("bar", PropertyHelper.getProperty(project, "out"));
-        assertSame(module, PropertyHelper.getProperty(project, "in"));
+        assertNull(project.getReference("out"));
+        assertSame(module, project.getReference("in"));
         assertEquals(TestUtil.<String, Object>map("attrib1", "1", "attrib2", "3"), module.getAttributes());
     }
 }

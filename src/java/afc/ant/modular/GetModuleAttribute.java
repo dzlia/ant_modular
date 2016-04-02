@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014, Dźmitry Laŭčuk
+/* Copyright (c) 2013-2016, Dźmitry Laŭčuk
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -26,16 +26,16 @@ import java.text.MessageFormat;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.Reference;
 
 /**
  * <p>An Ant task that sets an {@link Module#getAttributes() attribute} of a {@link Module} object
- * as an Ant {@link Project project} property. The attribute is resolved by its name. If the attribute
- * with the given name is undefined for this {@code Module} or set to {@code null} then the property
- * is not set. If the property is already created then it is <em>not</em> updated.</p>
+ * as an Ant {@link Project project} reference. The attribute is resolved by its name. If the attribute
+ * with the given name is undefined for this {@code Module} or set to {@code null} then the reference
+ * is made undefined. If the reference already exists then it is updated with the new value.</p>
  * 
- * <p>This task works with {@code Module} objects that are loaded by any class loader. It is only
+ * <p>This task accepts {@code Module} objects that are loaded by any class loader. It is only
  * required that the class name of the object is exactly {@code afc.ant.modular.Module} and it has
  * the public member function {@link Module#getAttributes()} that returns {@link java.util.Map}.
  * Incompatible module objects passed cause an exception raised by this task.</p>
@@ -49,12 +49,12 @@ import org.apache.tools.ant.Task;
  *      <th>Description</th></tr>
  * </thead>
  * <tbody>
- *  <tr><td>moduleProperty</td>
+ *  <tr><td>moduleRefId</td>
  *      <td>yes</td>
- *      <td>The name of the property which holds the module object.</td></tr>
+ *      <td>The ID of the reference which holds the module object.</td></tr>
  *  <tr><td>outputProperty</td>
  *      <td>yes</td>
- *      <td>The name of the property where the module's attribute value is to be set.</td></tr>
+ *      <td>The ID of the reference where the module attribute value is to be set.</td></tr>
  *  <tr><td>name</td>
  *      <td>yes</td>
  *      <td>The name of the attribute.</td></tr>
@@ -62,13 +62,12 @@ import org.apache.tools.ant.Task;
  * </table>
  * 
  * <h3>Usage example</h3>
- * <pre>{@literal <getModuleAttribute name="Module-Version" moduleProperty="project.module" outputProperty="project.module.path"/>}</pre>
+ * <pre>{@literal <getModuleAttribute name="Module-Version" moduleRefId="project.module" outputRefId="project.module.path"/>}</pre>
  * 
- * <p>Here, the module is expected to be set to the property named <em>project.module</em>. After
- * the task executes the module's attribute <em>Module-Version</em> is assigned to the property
- * named <em>project.module.path</em>. Note that the latter property must be undefined and the
- * attribute must be defined and not set to {@code null}. Otherwise {@code <getModuleAttribute>}
- * does not assign the new value to this property.</p>
+ * <p>Here, the module is expected to be set to the reference named <em>project.module</em>. After
+ * the task executes the module attribute <em>Module-Version</em> is assigned to the reference
+ * <em>project.module.path</em>. If the reference <em>project.module.path</em> is already defined
+ * then it is updated with the new value.</p>
  * 
  * @see Module#getAttributes()
  * 
@@ -76,8 +75,8 @@ import org.apache.tools.ant.Task;
  */
 public class GetModuleAttribute extends Task
 {
-    private String moduleProperty;
-    private String outputProperty;
+    private Reference moduleRef;
+    private String outputRefId;
     private String name;
     
     /**
@@ -90,21 +89,19 @@ public class GetModuleAttribute extends Task
     @Override
     public void execute()
     {
-        if (moduleProperty == null) {
-            throw new BuildException("The attribute 'moduleProperty' is undefined.");
+        if (moduleRef == null) {
+            throw new BuildException("The attribute 'moduleRefId' is undefined.");
         }
-        if (outputProperty == null) {
-            throw new BuildException("The attribute 'outputProperty' is undefined.");
+        if (outputRefId == null) {
+            throw new BuildException("The attribute 'outputRefId' is undefined.");
         }
         if (name == null) {
             throw new BuildException("The attribute 'name' is undefined.");
         }
-        final Project project = getProject();
-        final PropertyHelper propHelper = PropertyHelper.getPropertyHelper(project);
-        final Object moduleObject = propHelper.getProperty(moduleProperty);
+        final Object moduleObject = moduleRef.getReferencedObject();
         if (moduleObject == null) {
             throw new BuildException(MessageFormat.format(
-                    "No module is found under the property ''{0}''.", moduleProperty));
+                    "No module is found via the reference ''{0}''.", moduleRef.getRefId()));
         }
         
         /* This task is invoked from within a target that is called by CallTargetForModules.
@@ -116,45 +113,45 @@ public class GetModuleAttribute extends Task
          */
         if (!ModuleUtil.isModule(moduleObject)) {
             throw new BuildException(MessageFormat.format(
-                    "Invalid module type is found under the property ''{0}''. Expected: ''{1}'', found: ''{2}''.",
-                    moduleProperty, Module.class.getName(), moduleObject.getClass().getName()));
+                    "Invalid module type is found via the reference ''{0}''. Expected: ''{1}'', found: ''{2}''.",
+                    moduleRef.getRefId(), Module.class.getName(), moduleObject.getClass().getName()));
         }
         
         final Object value = ModuleUtil.getAttributes(moduleObject).get(name);
-        if (value != null) { // null value must not be passed to #setNewProperty.
-            propHelper.setNewProperty((String) null, outputProperty, value);
+        if (value != null) {
+            getProject().addReference(outputRefId, value);
+        } else {
+            getProject().getReferences().remove(outputRefId);
         }
     }
     
     /**
-     * <p>Sets the name of the property which holds the module whose attribute is to be obtained.</p>
+     * <p>Sets the reference which holds the module whose attribute is to be obtained.</p>
      * 
-     * @param moduleProperty the name of the property. It must be not {@code null}.
+     * @param ref the reference to the module. It must be not {@code null}.
      *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is
      *      thrown by {@link #execute()}.
      */
-    public void setModuleProperty(final String moduleProperty)
+    public void setModuleRefId(final Reference ref)
     {
-        this.moduleProperty = moduleProperty;
+        moduleRef = ref;
     }
     
     /**
-     * <p>Sets the name of the property to which the module's attribute is to be set. This property
-     * should be undefined. Otherwise this task will not assign the new value to it.</p>
+     * <p>Sets the ID of the reference to which the module attribute is to be set.</p>
      * 
-     * @param propertyName the name of the output property. It must be not {@code null}.
+     * @param refId the ID of the output reference. It must be not {@code null}.
      *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is
      *      thrown by {@link #execute()}.
      */
-    public void setOutputProperty(final String propertyName)
+    public void setOutputRefId(final String refId)
     {
-        outputProperty = propertyName;
+        outputRefId = refId;
     }
     
     /**
-     * <p>Sets the name of the module's attribute which is to be set as an Ant
-     * {@link Project project} property. The attribute with the given name must be defined and
-     * not set to {@code null} for this task to have effect.</p>
+     * <p>Sets the name of the module attribute which is to be set as an Ant
+     * {@link Project project} reference.</p>
      * 
      * @param name the name of the attribute. It must be not {@code null}.
      *      Otherwise an {@link BuildException org.apache.tools.ant.BuildException} is
