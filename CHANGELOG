@@ -12,6 +12,7 @@ API changes:
 - An empty string is considered a defined callTargetForModules/moduleProperty value.
 - ManifestModuleLoader: the attribute manifestEntry is added which defines the name of the manifest entry to load module metadata from. By default the main entry is used (was: the entry "Build").
 - GetModuleClasspath: 'sourceAttribute' is renamed to 'classpathAttribute'.
+- CallTragetForModules, GetModulePath, GetModuleClasspath, GetModuleAttribute: data is passed to the Ant project via a reference (was via a property) to allow for passing non-string data to sub-projects without conversion to a string.
 
 Other:
 - API documentation is expanded.
