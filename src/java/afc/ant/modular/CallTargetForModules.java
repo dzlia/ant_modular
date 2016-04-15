@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Location;
+import org.apache.tools.ant.MagicNames;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.Task;
@@ -258,12 +259,6 @@ public class CallTargetForModules extends Task
                 }
             }
             
-            /* Params that define the reference with the name equal to the moduleRefId value
-             * (if the latter is set) must be removed so that moduleRefId overrides them
-             * in module-specific projects.
-             */
-            deleteModuleRefs();
-            
             if (threadCount == 1) {
                 processModulesSerial(modules, overriddenTargets);
             } else {
@@ -284,7 +279,7 @@ public class CallTargetForModules extends Task
             final Project project = getProject();
             final Ant antcall = (Ant) project.createTask("ant");
             antcall.init();
-            antcall.setAntfile(project.getProperty("ant.file"));
+            antcall.setAntfile(project.getProperty(MagicNames.ANT_FILE));
             
             for (int i = 0, n = params.size(); i < n; ++i) {
                 final ParamElement param = params.get(i);
@@ -328,19 +323,6 @@ public class CallTargetForModules extends Task
         }
         
         return ex;
-    }
-    
-    private void deleteModuleRefs()
-    {
-        if (moduleRefId == null) {
-            return;
-        }
-        for (int i = references.size() - 1; i >= 0; --i) {
-            final String refId = references.get(i).getRefId();
-            if (refId != null && references.equals(refId)) {
-                references.remove(i);
-            }
-        }
     }
     
     private void processModulesSerial(final ArrayList<Module> modules,
