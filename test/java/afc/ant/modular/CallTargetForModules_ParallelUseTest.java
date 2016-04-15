@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Location;
+import org.apache.tools.ant.MagicNames;
 
 import afc.ant.modular.CallTargetForModules.ModuleElement;
 import afc.ant.modular.CallTargetForModules.ParamElement;
@@ -48,6 +49,7 @@ public class CallTargetForModules_ParallelUseTest extends TestCase
     protected void setUp()
     {
         project = new MockProject();
+        project.setProperty(MagicNames.ANT_FILE, "test_ant_file");
         task = new CallTargetForModules();
         task.setProject(project);
         moduleLoader = new MockModuleLoader();

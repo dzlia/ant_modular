@@ -54,23 +54,39 @@ public class MockCallTargetTask extends Ant
     private final ArrayList<Property> params = new ArrayList<Property>();
     private final ArrayList<PropertySet> propertySets = new ArrayList<PropertySet>();
     
+    private boolean initialised = false;
+    private String antFile;
+    private String expectedAntFile;
+    
     public MockCallTargetTask(final Project project)
     {
         setProject(project);
         ownProject = new MockProject();
         // The target project inherits basedir from the invoker's project.
         ownProject.setBaseDir(project.getBaseDir());
+        expectedAntFile = project.getProperty("ant.file");
     }
     
     @Override
     public void init()
     {
         // Initialisation is mocked and performed in the constructor.
+        initialised = true;
+    }
+    
+    @Override
+    public void setAntfile(String antFile)
+    {
+        this.antFile = antFile;
+        super.setAntfile(antFile);
     }
     
     @Override
     public void execute()
     {
+        Assert.assertTrue(initialised);
+        Assert.assertNotNull(antFile);
+        Assert.assertEquals(expectedAntFile, antFile);
         Assert.assertFalse(executed);
         executed = true;
         

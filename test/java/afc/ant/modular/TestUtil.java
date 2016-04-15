@@ -96,6 +96,7 @@ public class TestUtil
         
         final Map<?, ?> actualProperties = task.ownProject.getProperties();
         actualProperties.remove(MagicNames.PROJECT_BASEDIR);
+        actualProperties.remove(MagicNames.ANT_FILE);
         Assert.assertEquals(properties, actualProperties);
         
         // merging module property into the properties passed. The module object is not freely available
@@ -124,6 +125,7 @@ public class TestUtil
         
         final Map<?, ?> actualProperties = task.ownProject.getProperties();
         actualProperties.remove(MagicNames.PROJECT_BASEDIR);
+        actualProperties.remove(MagicNames.ANT_FILE);
         Assert.assertEquals(properties, actualProperties);
         
         assertReferences(task.ownProject, references);

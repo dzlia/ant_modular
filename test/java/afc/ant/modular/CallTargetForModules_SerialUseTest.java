@@ -33,6 +33,7 @@ import junit.framework.TestCase;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Location;
+import org.apache.tools.ant.MagicNames;
 import org.apache.tools.ant.taskdefs.Ant.Reference;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PropertySet;
@@ -50,6 +51,7 @@ public class CallTargetForModules_SerialUseTest extends TestCase
     protected void setUp()
     {
         project = new MockProject();
+        project.setProperty(MagicNames.ANT_FILE, "ant_file");
         task = new CallTargetForModules();
         task.setProject(project);
         moduleLoader = new MockModuleLoader();
