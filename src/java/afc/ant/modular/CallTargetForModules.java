@@ -404,22 +404,35 @@ public class CallTargetForModules extends Task
         // The current thread will be the last thread to process modules.
         final int threadsToCreate = threadCount-1;
         final Thread[] threads = new Thread[threadsToCreate];
-        for (int i = 0; i < threadsToCreate; ++i) {
-            final Thread t = new Thread(parallelBuildWorker);
-            threads[i] = t;
-            t.start();
-        }
+        
+        /* Tracks the actual number of threads created to be joined. If another thread
+         * is not created or started then this build is considered failed.
+         */
+        int startedThreadCount = 0;
         
         try {
+            for (; startedThreadCount < threadsToCreate; ++startedThreadCount) {
+                final Thread t = new Thread(parallelBuildWorker);
+                threads[startedThreadCount] = t;
+                t.start();
+            }
+            
             // The current thread is one of the threads that process the modules.
             parallelBuildWorker.run();
         }
         finally {
+            if (startedThreadCount != threadCount) {
+                /* At least one thread was not started. Ensuring here that other threads will
+                 * stop module processing right after their current module is processed.
+                 */
+                dependencyResolver.abort();
+            }
+            
             /* Waiting for all worker threads to finish even if the build fails on
              * a module that was being processed by this thread. This will allow the
              * 'build failed' message to be the last one.
              */
-            joinThreads(threads);
+            joinThreads(threads, startedThreadCount);
         }
         
         if (buildFailed.get()) {
@@ -434,7 +447,7 @@ public class CallTargetForModules extends Task
         }
     }
     
-    private static void joinThreads(final Thread[] threads)
+    private static void joinThreads(final Thread[] threads, final int n)
     {
         /* parallelBuildWorker preserves the interrupted status of the current thread
          * so an InterruptedException is thrown if this thread starts waiting
@@ -442,16 +455,16 @@ public class CallTargetForModules extends Task
          * so that the build finished rapidly and gracefully.
          */
         try {
-            for (final Thread t : threads) {
-                t.join();
+            for (int i = 0; i < n; ++i) {
+                threads[i].join();
             }
         }
         catch (InterruptedException ex) {
             /* Interrupting all the activities so that the build finishes as quick as possible.
              * This is fine if an already finished thread is interrupted.
              */
-            for (final Thread t : threads) {
-                t.interrupt();
+            for (int i = 0; i < n; ++i) {
+                threads[i].interrupt();
             }
             
             Thread.currentThread().interrupt();
