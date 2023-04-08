@@ -102,7 +102,7 @@ Example
 		<typedef resource="antmodular/ant_modular.properties" classpath="ant_modular.jar" uri="antmodular"/>
 		
 		<target name="run">
-			<am:callTargetForModules target="moduleTarget" moduleProperty="module">
+			<am:callTargetForModules target="moduleTarget" moduleRefId="module">
 				<module path="foo"/>
 				<am:manifestModuleLoader>
 					<classpathAttribute name="Class-Path"/>
@@ -111,12 +111,12 @@ Example
 		</target>
 		
 		<target name="moduleTarget">
-			<am:getModulePath moduleProperty="module" outputProperty="module.path"/>
-			<echo message="Module dir: ${basedir}/${module.path}"/>
+			<am:getModulePath moduleRefId="module" outputRefId="module.path"/>
+			<echo message="Module dir: ${basedir}/${ant.refid:module.path}"/>
 		</target>
 	</project>
 
-Given that the module `foo` depends on the module `bar`, when the `run` target is called then the output looks as follows:
+Given that the module `foo` depends on the modules `bar` and `baz` and `baz` depends on the module `bar`, when the `run` target is called then the output looks as follows:
 
 	$ ant run
 	Buildfile: /somedir/buildtest/build.xml
@@ -124,10 +124,13 @@ Given that the module `foo` depends on the module `bar`, when the `run` target i
 	run:
 	
 	moduleTarget:
-	     [echo] Module dir: /somedir/buildtest/bar/
-	
+	     [echo] Module dir: /somedir/buildtest/bar
+
 	moduleTarget:
-	     [echo] Module dir: /somedir/buildtest/foo/
+	     [echo] Module dir: /somedir/buildtest/baz
+
+	moduleTarget:
+	     [echo] Module dir: /somedir/buildtest/foo
 	
 	BUILD SUCCESSFUL
 
