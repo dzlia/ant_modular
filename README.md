@@ -134,6 +134,8 @@ Given that the module `foo` depends on the modules `bar` and `baz` and `baz` dep
 	
 	BUILD SUCCESSFUL
 
+There is a slightly more developed runnable example in the directory `example` which demostrates basics of how module metadata can be extracted and how Ant targets are called in a multi-module project. Before running, `ant_modular.jar` must be placed into the `example ` directory. Once it is in place, go to the directory `example` and run the demo with the `ant run` command.
+
 System requirements
 -------------------
 

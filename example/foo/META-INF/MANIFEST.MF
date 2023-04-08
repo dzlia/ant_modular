@@ -1,0 +1,2 @@
+Depends: bar baz 
+Class-Path: jar1.jar classes 

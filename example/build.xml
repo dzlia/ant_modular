@@ -1,0 +1,28 @@
+<project xmlns:am="antmodular" name="Ant Modular" default="make" basedir=".">
+	<typedef resource="antmodular/ant_modular.properties" classpath="ant_modular.jar" uri="antmodular"/>
+	
+	<target name="run">
+		<am:callTargetForModules target="moduleTarget" moduleRefId="module">
+			<module path="foo"/>
+			<am:manifestModuleLoader>
+				<classpathAttribute name="Class-Path"/>
+			</am:manifestModuleLoader>
+		</am:callTargetForModules>
+	</target>
+	
+	<target name="moduleTarget">
+		<am:getModulePath moduleRefId="module" outputRefId="module.path"/>
+		<echo message="Module dir: ${basedir}/${ant.refid:module.path}"/>
+
+		<am:getModuleClasspath moduleRefId="module" outputRefId="module.classpath" includeDependencies="true">
+			<classpathAttribute name="Class-Path"/>
+		</am:getModuleClasspath>
+		<echo message="Module classpath: ${ant.refid:module.classpath}"/>
+
+		<am:getModuleAttribute moduleRefId="module" name="CustomAttr" outputRefId="module.attr"/>
+		<condition property="customAttrWithDefault" value="${ant.refid:module.attr}" else="UNSET">
+			<isreference refid="module.attr"/>
+		</condition>
+		<echo message="The value of the &quot;CustomAttr&quot; custom attribute (or &quot;UNSET&quot; if undefined): ${customAttrWithDefault}"/>
+	</target>
+</project>
