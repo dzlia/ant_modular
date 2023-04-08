@@ -70,7 +70,7 @@ Module-specific information such as module directory or module attributes is obt
 descriptor.
 
 The `<callTargetForModules>` task is configured with a `ModuleLoader` component. Any Ant type
-that implements the interface `afc.ant.modular.ModuleLoader` could be plugged in. This allows the
+that implements the interface `antmodular.ModuleLoader` could be plugged in. This allows the
 build engineer to choose a meta information format that fits the requirements best. It could be
 a Jar Manifest file or some form of XML or a properties file.
 
@@ -98,8 +98,8 @@ Other attributes are of free choice.
 
 Example
 -------
-	<project xmlns:am="afc.ant.modular" name="Ant Modular" default="make" basedir=".">
-		<typedef resource="afc/ant/modular/ant_modular.properties" classpath="ant_modular.jar" uri="afc.ant.modular"/>
+	<project xmlns:am="antmodular" name="Ant Modular" default="make" basedir=".">
+		<typedef resource="antmodular/ant_modular.properties" classpath="ant_modular.jar" uri="antmodular"/>
 		
 		<target name="run">
 			<am:callTargetForModules target="moduleTarget" moduleProperty="module">

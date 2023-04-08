@@ -55,7 +55,7 @@
 	<target name="jar" depends="compile">
 		<jar destfile="${jar.file}">
 			<zipfileset dir="${classes.dir}" includes="**"/>
-			<zipfileset dir="${src.resources.dir}" includes="afc/ant/modular/ant_modular.properties"/>
+			<zipfileset dir="${src.resources.dir}" includes="antmodular/ant_modular.properties"/>
 			<zipfileset file="${copyright.file}" prefix="META-INF"/>
 			<manifest>
 				<attribute name="Implementation-Title" value="Ant Modular"/>
@@ -111,7 +111,7 @@
 		<mkdir dir="${test.coverage.report.dir}"/>
 		<taskdef uri="org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpath="${lib.dir}/jacocoant.jar"/>
 		<jacoco:coverage destfile="${test.coverage.data.file}"
-				includes="afc.ant.modular.*" excludes="*Test:*Test.*:*Test$$*:*.Test*:*.Mock*">
+				includes="antmodular.*" excludes="*Test:*Test.*:*Test$$*:*.Test*:*.Mock*">
 			<junit fork="true" forkmode="once" dir="${basedir}" failureProperty="test.failed" printsummary="true">
 				<classpath>
 					<pathelement location="${classes.dir}"/>
